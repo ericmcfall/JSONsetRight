@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Signed release builds (scripts/build-signed.ps1)
+release

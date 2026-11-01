@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "tsc -p tsconfig.test.json && vitest run",
     "test:watch": "vitest",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "build:signed": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-signed.ps1"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

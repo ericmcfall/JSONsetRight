@@ -89,6 +89,15 @@ npm test             # unit tests (engine, tree, store)
 npm run tauri build -- --no-bundle   # portable exe -> src-tauri/target/release/safejson.exe
 ```
 
+### Signed release builds
+`npm run build:signed` builds `release\SafeJSON.exe` and signs it with Azure Artifact Signing, so
+Windows (including Smart App Control) trusts it. A Microsoft sign-in page opens in your browser
+during signing. Requirements: the Windows SDK `signtool` (included with the Visual Studio Build
+Tools) and Microsoft's Artifact Signing plug-in
+(`winget install -e --id Microsoft.Azure.ArtifactSigningClientTools`). The signing account
+details are in `src-tauri/signing/` (`metadata.json`, `tenant-id.txt`); none of them are secrets.
+The signing account needs the role "Artifact Signing Certificate Profile Signer".
+
 `npm run dev` alone opens the interface in a normal browser with a sample file. Opening and saving
 files only works in the desktop app.
 
