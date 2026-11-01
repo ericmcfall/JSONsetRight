@@ -1,6 +1,6 @@
 [package]
 name = "safejson"
-version = "0.1.0"
+version = "1.0.0"
 description = "SafeJSON - a GUI editor for JSON config files"
 authors = ["SafeJSON contributors"]
 edition = "2024"
