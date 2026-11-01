@@ -1,48 +1,35 @@
 // Unlimited undo/redo. Files are small (< 1 MB), so each step simply keeps a whole snapshot.
+// A history is never modified in place: every function returns a new one, which suits React.
 
-export class History<T> {
-  private past: T[] = [];
-  private future: T[] = [];
-  private current: T;
+export interface History<T> {
+  readonly past: readonly T[];
+  readonly present: T;
+  readonly future: readonly T[];
+}
 
-  constructor(initial: T) {
-    this.current = initial;
-  }
+export function startHistory<T>(initial: T): History<T> {
+  return { past: [], present: initial, future: [] };
+}
 
-  get present(): T {
-    return this.current;
-  }
+/** Records a new state. Anything that was undone can no longer be redone. */
+export function pushHistory<T>(history: History<T>, next: T): History<T> {
+  return { past: [...history.past, history.present], present: next, future: [] };
+}
 
-  get canUndo(): boolean {
-    return this.past.length > 0;
-  }
+export function undoHistory<T>(history: History<T>): History<T> {
+  if (history.past.length === 0) return history;
+  return {
+    past: history.past.slice(0, -1),
+    present: history.past[history.past.length - 1],
+    future: [history.present, ...history.future],
+  };
+}
 
-  get canRedo(): boolean {
-    return this.future.length > 0;
-  }
-
-  /** Records a new state. Anything that was undone can no longer be redone. */
-  push(next: T): void {
-    this.past.push(this.current);
-    this.current = next;
-    this.future = [];
-  }
-
-  undo(): T {
-    const previous = this.past.pop();
-    if (previous !== undefined) {
-      this.future.push(this.current);
-      this.current = previous;
-    }
-    return this.current;
-  }
-
-  redo(): T {
-    const next = this.future.pop();
-    if (next !== undefined) {
-      this.past.push(this.current);
-      this.current = next;
-    }
-    return this.current;
-  }
+export function redoHistory<T>(history: History<T>): History<T> {
+  if (history.future.length === 0) return history;
+  return {
+    past: [...history.past, history.present],
+    present: history.future[0],
+    future: history.future.slice(1),
+  };
 }

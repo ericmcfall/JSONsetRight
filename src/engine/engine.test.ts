@@ -9,18 +9,21 @@ import {
   findProblems,
   formatDocument,
   formatPath,
-  History,
   insertItem,
   JsonSyntaxError,
   moveChild,
   parseDocument,
+  pushHistory,
+  redoHistory,
   removeTrailingCommas,
   removeValue,
   renameKey,
   setNumberText,
   setValue,
   sourceOf,
+  startHistory,
   toFileText,
+  undoHistory,
   valueOf,
   type JsonDocument,
 } from "./index";
@@ -232,15 +235,17 @@ describe("formatting", () => {
 
 describe("History", () => {
   it("undoes and redoes, and a new edit clears redo", () => {
-    const h = new History("a");
-    h.push("b");
-    h.push("c");
-    expect(h.undo()).toBe("b");
-    expect(h.undo()).toBe("a");
-    expect(h.canUndo).toBe(false);
-    expect(h.redo()).toBe("b");
-    h.push("x");
-    expect(h.canRedo).toBe(false);
+    let h = pushHistory(pushHistory(startHistory("a"), "b"), "c");
+    h = undoHistory(h);
+    expect(h.present).toBe("b");
+    h = undoHistory(h);
+    expect(h.present).toBe("a");
+    expect(h.past.length).toBe(0);
+    expect(undoHistory(h)).toBe(h); // nothing left to undo
+    h = redoHistory(h);
+    expect(h.present).toBe("b");
+    h = pushHistory(h, "x");
+    expect(h.future.length).toBe(0);
     expect(h.present).toBe("x");
   });
 });
