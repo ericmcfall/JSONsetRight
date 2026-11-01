@@ -116,6 +116,12 @@ describe("objects", () => {
     expect(doc.text).not.toMatch(/^ +"/m);
   });
 
+  it("leaves a one-line list alone when adding the next property", () => {
+    const text = lf(["{", '  "hosts": ["a", "b"]', "}"]);
+    const doc = addProperty(parseDocument(text), [], "mode", true);
+    expect(doc.text).toBe(lf(["{", '  "hosts": ["a", "b"],', '  "mode": true', "}"]));
+  });
+
   it("blocks duplicate and empty keys", () => {
     const doc = parseDocument(CONFIG);
     expect(() => addProperty(doc, [], "port", 1)).toThrow(/already has a key/);

@@ -1,12 +1,140 @@
-// Text edits that work on any of SafeJSON's file types (JSON, JSONC, JSON5) using the syntax
-// tree's exact offsets: inserting and removing object/array entries while keeping the
-// surrounding layout, commas and comments intact.
-import type { Node } from "jsonc-parser";
+// Every structural edit SafeJSON makes (set, insert, remove) for all file types (JSON, JSONC,
+// JSON5), using the syntax tree's exact offsets. Edits touch only the text they must: layout,
+// comments, commas and quote styles elsewhere in the file are left exactly as they were.
+// (jsonc-parser's modify() re-formats the lines it touches and can't read JSON5.)
+import { findNodeAtLocation, type Node } from "jsonc-parser";
+import { isIdentifier } from "./json5/parse";
 
 export interface TextLayout {
   /** One level of indentation, e.g. "  " or "	". */
   indent: string;
   eol: string;
+}
+
+type Path = (string | number)[];
+type Value = unknown;
+
+export interface ModifyOptions {
+  /** Insert into an array at the path's index instead of replacing that item. */
+  isArrayInsertion?: boolean;
+  /** For new object keys: position among the existing keys. */
+  getInsertionIndex?: (keys: string[]) => number;
+}
+
+/**
+ * Applies a set/insert/remove at `path` (value undefined = remove) and returns the new text.
+ * New content follows `style`; pass "detect" (for JSON5) to match the file's own quoting.
+ */
+export function modifyAtPath(
+  text: string,
+  root: Node,
+  path: Path,
+  value: Value,
+  layout: TextLayout,
+  options: ModifyOptions = {},
+  style: TextStyle | "detect" = JSON_STYLE,
+): string {
+  const parentPath = path.slice(0, -1);
+  const last = path[path.length - 1];
+  const container = parentPath.length === 0 ? root : findNodeAtLocation(root, parentPath);
+  if (!container || (container.type !== "object" && container.type !== "array")) throw new Error("No container at path");
+  const items = container.children ?? [];
+  const fileStyle = style === "detect" ? detectStyle(text, root) : style;
+  const serialize = (v: Value, baseIndent: string) => writeValue(v, layout, baseIndent, fileStyle);
+
+  if (container.type === "object") {
+    const index = items.findIndex((p) => p.children![0].value === last);
+    if (value === undefined) return index === -1 ? text : removeChildText(text, container, index);
+    if (index !== -1) return replace(text, items[index].children![1], serialize(value, lineIndent(text, items[index].offset)));
+    const keys = items.map((p) => p.children![0].value as string);
+    const at = Math.max(0, Math.min(options.getInsertionIndex?.(keys) ?? keys.length, keys.length));
+    return insertChildText(text, container, at, (indent) => `${keyText(text, container, String(last), fileStyle)}: ${serialize(value, indent)}`, layout);
+  }
+
+  const index = last as number;
+  if (value === undefined) return index < items.length ? removeChildText(text, container, index) : text;
+  if (!options.isArrayInsertion && index < items.length) {
+    return replace(text, items[index], serialize(value, lineIndent(text, items[index].offset)));
+  }
+  return insertChildText(text, container, Math.min(index, items.length), (indent) => serialize(value, indent), layout);
+}
+
+function replace(text: string, node: Node, content: string): string {
+  return text.slice(0, node.offset) + content + text.slice(node.offset + node.length);
+}
+
+/**
+ * Writes a new key in the style the file already uses (unquoted, 'single' or "double"),
+ * taken from this object or, if it's empty, the nearest enclosing object with keys.
+ */
+function keyText(text: string, object: Node, key: string, fileStyle: TextStyle): string {
+  if (!fileStyle.json5) return JSON.stringify(key);
+  let holder: Node | undefined = object;
+  while (holder && !(holder.type === "object" && holder.children?.length)) holder = holder.parent;
+  const sample = holder?.children?.[0]?.children?.[0];
+  const style = sample ? text[sample.offset] : fileStyle.key;
+  if (style === '"' || style === "'") return quote(key, style);
+  // Unquoted style: keys that can't be bare get the quotes the file uses for strings.
+  return isIdentifier(key) ? key : quote(key, fileStyle.string);
+}
+
+/** A string literal using the given quote character. */
+export function quote(value: string, quoteChar: '"' | "'"): string {
+  const json = JSON.stringify(value);
+  if (quoteChar === '"') return json;
+  return `'${json.slice(1, -1).replace(/\\"/g, '"').replace(/'/g, "\\'")}'`;
+}
+
+/** How keys and strings are written, so new content looks like the rest of the file. */
+export interface TextStyle {
+  /** "" = unquoted where possible (JSON5 only). */
+  key: "" | "'" | '"';
+  string: "'" | '"';
+  /** JSON5 can write Infinity and NaN; JSON can't. */
+  json5: boolean;
+}
+
+/** Standard JSON: double-quoted keys and strings. */
+export const JSON_STYLE: TextStyle = { key: '"', string: '"', json5: false };
+
+/** Takes the style from the first key and the first string value in the file. */
+function detectStyle(text: string, root: Node): TextStyle {
+  let key: TextStyle["key"] | undefined;
+  let str: TextStyle["string"] | undefined;
+  const visit = (node: Node) => {
+    if (key !== undefined && str !== undefined) return;
+    if (node.type === "property") {
+      const k = text[node.children![0].offset];
+      key ??= k === "'" || k === '"' ? k : "";
+      visit(node.children![1]);
+    } else if (node.type === "string") {
+      str ??= text[node.offset] === "'" ? "'" : '"';
+    } else {
+      node.children?.forEach(visit);
+    }
+  };
+  visit(root);
+  return { key: key ?? '"', string: str ?? (key === "'" ? "'" : '"'), json5: true };
+}
+
+/** Text for a new value in the given style; nested lines sit under `baseIndent`. */
+function writeValue(value: Value, layout: TextLayout, baseIndent: string, style: TextStyle): string {
+  const pad = (depth: number) => baseIndent + layout.indent.repeat(depth);
+  const keyOut = (k: string) => (style.key === "" ? (isIdentifier(k) ? k : quote(k, style.string)) : quote(k, style.key));
+  const write = (v: Value, depth: number): string => {
+    if (typeof v === "string") return quote(v, style.string);
+    if (typeof v === "number") return Number.isFinite(v) || !style.json5 ? JSON.stringify(v) : String(v); // JSON5: Infinity, NaN
+    if (v === null || typeof v !== "object") return JSON.stringify(v) ?? "null";
+    const nl = layout.eol;
+    if (Array.isArray(v)) {
+      if (v.length === 0) return "[]";
+      return `[${nl}${v.map((x) => pad(depth + 1) + write(x, depth + 1)).join("," + nl)}${nl}${pad(depth)}]`;
+    }
+    const entries = Object.entries(v as Record<string, Value>);
+    if (entries.length === 0) return "{}";
+    return `{${nl}${entries.map(([k, x]) => `${pad(depth + 1)}${keyOut(k)}: ${write(x, depth + 1)}`).join("," + nl)}${nl}${pad(depth)}}`;
+  };
+  return write(value, 0);
 }
 
 /** Whitespace at the start of the line containing `offset`. */

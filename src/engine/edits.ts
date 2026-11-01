@@ -3,10 +3,10 @@
 // Each one takes a document and returns a NEW document (the old one is never modified, which
 // makes undo simple). Each edit changes only the text it has to, then the result is re-parsed:
 // if an edit would ever produce invalid JSON, it throws EditError and nothing changes.
-import { modify, applyEdits, type FormattingOptions, type ModificationOptions, type Node } from "jsonc-parser";
+import { applyEdits, type Node } from "jsonc-parser";
 import { JsonSyntaxError, withText, type Dialect, type JsonDocument } from "./document";
-import { isIdentifier, modifyJson5, quote } from "./json5";
-import { removeChildText } from "./text-edits";
+import { isIdentifier } from "./json5";
+import { JSON_STYLE, modifyAtPath, quote, removeChildText, type ModifyOptions } from "./text-edits";
 import {
   findNode,
   keysOf,
@@ -116,7 +116,7 @@ export function addProperty(
 ): JsonDocument {
   const object = requireContainer(doc, objectPath, "object");
   checkNewKey(object, key);
-  const extra: ModificationOptions = index === undefined ? {} : { getInsertionIndex: () => index };
+  const extra: ModifyOptions = index === undefined ? {} : { getInsertionIndex: () => index };
   return commit(doc, modifyText(doc, [...objectPath, key], value, extra));
 }
 
@@ -303,35 +303,10 @@ function keyLike(doc: JsonDocument, keyNode: Node, key: string): string {
   return JSON.stringify(key);
 }
 
-/**
- * Runs jsonc-parser's modify() and applies the result. Containers written on one line, like
- * [1, 2, 3], are kept on one line; otherwise new content is indented to match the file.
- */
-function modifyText(doc: JsonDocument, path: Path, value: JsonValue | undefined, extra: ModificationOptions = {}): string {
-  if (doc.dialect === "json5") {
-    return modifyJson5(doc.text, doc.root, path, value, { indent: doc.format.indent, eol: doc.format.eol }, extra);
-  }
-  const container = findNode(doc, path.slice(0, -1));
-  const containerText = container ? sourceOf(doc, container) : "";
-  const oneLine = (container?.children?.length ?? 0) > 0 && !containerText.includes("\n");
-  if (!oneLine) {
-    return applyEdits(doc.text, modify(doc.text, path, value, { ...extra, formattingOptions: formatting(doc) }));
-  }
-  // Without formatting, jsonc-parser writes "a,b"; add the space people expect after commas.
-  const edits = modify(doc.text, path, value, extra).map((edit) => ({
-    ...edit,
-    content: edit.content.replace(/^,/, ", ").replace(/,$/, ", "),
-  }));
-  return applyEdits(doc.text, edits);
-}
-
-function formatting(doc: JsonDocument): FormattingOptions {
-  const tabs = doc.format.indent === "\t";
-  return {
-    insertSpaces: !tabs,
-    tabSize: tabs ? 4 : doc.format.indent.length,
-    eol: doc.format.eol,
-  };
+/** Applies a structural edit, keeping the rest of the file exactly as it was. */
+function modifyText(doc: JsonDocument, path: Path, value: JsonValue | undefined, extra: ModifyOptions = {}): string {
+  const layout = { indent: doc.format.indent, eol: doc.format.eol };
+  return modifyAtPath(doc.text, doc.root, path, value, layout, extra, doc.dialect === "json5" ? "detect" : JSON_STYLE);
 }
 
 /** Re-parses edited text. An invalid result means a bug in SafeJSON, never a user mistake. */
