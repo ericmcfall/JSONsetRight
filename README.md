@@ -5,6 +5,11 @@ errors such as missing commas, unclosed quotes or mismatched brackets.
 
 ## Using it
 
+The full **user guide** is in [docs/user-guide](docs/user-guide/README.md), as Markdown chapters and
+as a single page, [SafeJSON-User-Guide.html](docs/user-guide/SafeJSON-User-Guide.html), that opens
+in any browser and prints cleanly. After changing the Markdown, run `npm run docs` to rebuild the page.
+
+
 - **Open** a `.json`, `.jsonc` or `.json5` file (or drag it onto the window). Each file opens in a tab.
 - **Click** a value in the tree to edit it on the right. Each type has its own editor: text box,
   number box, true/false checkbox. Double-click in the tree to edit in place.

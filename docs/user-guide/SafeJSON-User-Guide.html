@@ -1,0 +1,1646 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SafeJSON User Guide</title>
+<meta name="description" content="How to use SafeJSON 3.0.0, a Windows app for editing JSON files safely.">
+<style>
+:root {
+  --bg: #ffffff; --bg-side: #f5f6f8; --text: #1f2328; --muted: #59636e; --border: #d8dee4;
+  --accent: #0a64c2; --code-bg: #f3f4f6; --note-bg: #eef5fd; --row: #f8f9fa;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1e1e1e; --bg-side: #252526; --text: #e6e6e6; --muted: #a0a0a0; --border: #3c3c3c;
+    --accent: #4aa3ff; --code-bg: #2d2d2d; --note-bg: #1c2b3a; --row: #242424;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 16px; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 "Segoe UI", system-ui, sans-serif; }
+a { color: var(--accent); }
+.layout { display: flex; min-height: 100vh; }
+nav.toc {
+  position: sticky; top: 0; align-self: flex-start; width: 290px; height: 100vh; overflow: auto; flex: none;
+  padding: 20px 16px; background: var(--bg-side); border-right: 1px solid var(--border); font-size: 14px;
+}
+nav.toc .brand { font-size: 20px; font-weight: 700; margin: 0 0 2px; }
+nav.toc .version { color: var(--muted); margin: 0 0 16px; font-size: 13px; }
+nav.toc ul { list-style: none; margin: 0; padding: 0; }
+nav.toc > ul > li { margin: 6px 0; }
+nav.toc > ul > li > a { font-weight: 600; color: var(--text); text-decoration: none; }
+nav.toc ul ul { margin: 2px 0 8px 10px; padding-left: 8px; border-left: 1px solid var(--border); }
+nav.toc ul ul a { color: var(--muted); text-decoration: none; }
+nav.toc a:hover { color: var(--accent); }
+main { flex: 1; min-width: 0; padding: 24px 48px 80px; max-width: 920px; }
+.chapter { padding-bottom: 24px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+h1 { font-size: 30px; margin: 8px 0 12px; }
+h2 { font-size: 22px; margin: 28px 0 8px; padding-top: 4px; }
+h3 { font-size: 18px; margin: 22px 0 6px; }
+p, li { max-width: 72ch; }
+code { font-family: "Cascadia Code", Consolas, monospace; font-size: 0.9em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 6px; overflow: auto; line-height: 1.35; }
+pre code { padding: 0; background: none; font-size: 13px; }
+.table-wrap { overflow-x: auto; margin: 12px 0; }
+table { border-collapse: collapse; font-size: 15px; }
+th, td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
+th { background: var(--bg-side); }
+tbody tr:nth-child(even) td { background: var(--row); }
+blockquote { margin: 14px 0; padding: 8px 14px; background: var(--note-bg); border-left: 4px solid var(--accent); border-radius: 0 6px 6px 0; }
+blockquote p { margin: 4px 0; }
+.top-link { font-size: 13px; }
+footer { color: var(--muted); font-size: 13px; }
+@media (max-width: 800px) {
+  .layout { display: block; }
+  nav.toc { position: static; width: auto; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  main { padding: 16px; }
+}
+@media print {
+  nav.toc, .top-link { display: none; }
+  main { max-width: none; padding: 0; }
+  body { font-size: 11pt; background: #fff; color: #000; }
+  .chapter { border: none; break-before: page; }
+  .chapter:first-of-type { break-before: auto; }
+  a { color: inherit; text-decoration: none; }
+  pre, table, blockquote { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<p class="brand">SafeJSON</p>
+<p class="version">User Guide · version 3.0.0</p>
+<ul>
+<li><a href="#introduction">SafeJSON User Guide</a><ul><li><a href="#introduction--contents">Contents</a></li><li><a href="#introduction--how-to-read-this-guide">How to read this guide</a></li></ul></li>
+<li><a href="#01-installing">Installing SafeJSON</a><ul><li><a href="#01-installing--what-you-need">What you need</a></li><li><a href="#01-installing--download">Download</a></li><li><a href="#01-installing--starting-safejson-for-the-first-time">Starting SafeJSON for the first time</a></li><li><a href="#01-installing--opening-files-with-safejson-from-file-explorer">Opening files with SafeJSON from File Explorer</a></li><li><a href="#01-installing--updating">Updating</a></li><li><a href="#01-installing--where-safejson-keeps-its-own-data">Where SafeJSON keeps its own data</a></li><li><a href="#01-installing--removing-safejson">Removing SafeJSON</a></li></ul></li>
+<li><a href="#02-quick-start">Quick start</a><ul><li><a href="#02-quick-start--1-open-a-file">1. Open a file</a></li><li><a href="#02-quick-start--2-look-around-the-tree">2. Look around the tree</a></li><li><a href="#02-quick-start--3-change-a-value">3. Change a value</a></li><li><a href="#02-quick-start--4-add-a-new-setting">4. Add a new setting</a></li><li><a href="#02-quick-start--5-save">5. Save</a></li><li><a href="#02-quick-start--6-undo-a-mistake">6. Undo a mistake</a></li><li><a href="#02-quick-start--what-next">What next?</a></li></ul></li>
+<li><a href="#03-window-tour">A tour of the window</a><ul><li><a href="#03-window-tour--toolbar">Toolbar</a></li><li><a href="#03-window-tour--tabs">Tabs</a></li><li><a href="#03-window-tour--message-bar">Message bar</a></li><li><a href="#03-window-tour--tree">Tree</a></li><li><a href="#03-window-tour--details-panel">Details panel</a></li><li><a href="#03-window-tour--problems-panel">Problems panel</a></li><li><a href="#03-window-tour--status-bar">Status bar</a></li><li><a href="#03-window-tour--welcome-screen">Welcome screen</a></li></ul></li>
+<li><a href="#04-editing">Editing in the tree</a><ul><li><a href="#04-editing--selecting-and-moving-around">Selecting and moving around</a></li><li><a href="#04-editing--changing-a-value">Changing a value</a></li><li><a href="#04-editing--renaming-a-setting">Renaming a setting</a></li><li><a href="#04-editing--adding-settings-and-list-items">Adding settings and list items</a></li><li><a href="#04-editing--deleting">Deleting</a></li><li><a href="#04-editing--duplicating">Duplicating</a></li><li><a href="#04-editing--moving-changing-the-order">Moving (changing the order)</a></li><li><a href="#04-editing--changing-a-values-type">Changing a value&amp;#39;s type</a></li><li><a href="#04-editing--right-click-menu">Right-click menu</a></li><li><a href="#04-editing--searching">Searching</a></li><li><a href="#04-editing--comments">Comments</a></li><li><a href="#04-editing--undo-and-redo">Undo and redo</a></li></ul></li>
+<li><a href="#05-table-view">Table view</a><ul><li><a href="#05-table-view--opening-a-table">Opening a table</a></li><li><a href="#05-table-view--reading-the-table">Reading the table</a></li><li><a href="#05-table-view--editing-cells">Editing cells</a></li><li><a href="#05-table-view--rows">Rows</a></li><li><a href="#05-table-view--columns">Columns</a></li><li><a href="#05-table-view--sorting">Sorting</a></li><li><a href="#05-table-view--undo">Undo</a></li></ul></li>
+<li><a href="#06-text-mode">Text mode</a><ul><li><a href="#06-text-mode--how-it-stays-safe">How it stays safe</a></li><li><a href="#06-text-mode--opening-files-that-arent-valid-json">Opening files that aren&amp;#39;t valid JSON</a></li><li><a href="#06-text-mode--editor-features">Editor features</a></li><li><a href="#06-text-mode--checking-a-selected-setting">Checking a selected setting</a></li></ul></li>
+<li><a href="#07-schemas">Schemas</a><ul><li><a href="#07-schemas--how-safejson-finds-a-files-schema">How SafeJSON finds a file&amp;#39;s schema</a></li><li><a href="#07-schemas--choosing-a-schema-for-a-file">Choosing a schema for a file</a></li><li><a href="#07-schemas--schemas-from-the-web">Schemas from the web</a></li><li><a href="#07-schemas--when-a-schema-problem-is-reported">When a schema problem is reported</a></li><li><a href="#07-schemas--notes">Notes</a></li></ul></li>
+<li><a href="#08-compare">Comparing files</a><ul><li><a href="#08-compare--starting-a-comparison">Starting a comparison</a></li><li><a href="#08-compare--reading-the-comparison">Reading the comparison</a></li><li><a href="#08-compare--copying-differences-across">Copying differences across</a></li></ul></li>
+<li><a href="#09-file-types">File types and formatting</a><ul><li><a href="#09-file-types--the-three-kinds-of-json-file">The three kinds of JSON file</a></li><li><a href="#09-file-types--what-safejson-keeps-exactly-as-it-was">What SafeJSON keeps exactly as it was</a></li><li><a href="#09-file-types--formatting">Formatting</a></li><li><a href="#09-file-types--trailing-commas">Trailing commas</a></li><li><a href="#09-file-types--encoding-and-size-limits">Encoding and size limits</a></li><li><a href="#09-file-types--large-numbers">Large numbers</a></li><li><a href="#09-file-types--duplicate-names">Duplicate names</a></li></ul></li>
+<li><a href="#10-safety">Saving and safety features</a><ul><li><a href="#10-safety--the-file-is-always-valid">The file is always valid</a></li><li><a href="#10-safety--saving">Saving</a></li><li><a href="#10-safety--backups">Backups</a></li><li><a href="#10-safety--crash-recovery">Crash recovery</a></li><li><a href="#10-safety--changes-made-by-other-programs">Changes made by other programs</a></li><li><a href="#10-safety--closing">Closing</a></li><li><a href="#10-safety--undo">Undo</a></li></ul></li>
+<li><a href="#11-settings">Settings</a><ul><li><a href="#11-settings--schema-rules">Schema rules</a></li><li><a href="#11-settings--where-settings-are-stored">Where settings are stored</a></li></ul></li>
+<li><a href="#12-keyboard-shortcuts">Keyboard shortcuts</a><ul><li><a href="#12-keyboard-shortcuts--files-and-tabs">Files and tabs</a></li><li><a href="#12-keyboard-shortcuts--editing">Editing</a></li><li><a href="#12-keyboard-shortcuts--in-the-tree">In the tree</a></li><li><a href="#12-keyboard-shortcuts--while-editing-a-value">While editing a value</a></li><li><a href="#12-keyboard-shortcuts--in-table-view">In table view</a></li><li><a href="#12-keyboard-shortcuts--in-text-mode">In text mode</a></li></ul></li>
+<li><a href="#13-troubleshooting">Troubleshooting and FAQ</a><ul><li><a href="#13-troubleshooting--starting-safejson">Starting SafeJSON</a></li><li><a href="#13-troubleshooting--opening-files">Opening files</a></li><li><a href="#13-troubleshooting--editing">Editing</a></li><li><a href="#13-troubleshooting--schemas">Schemas</a></li><li><a href="#13-troubleshooting--saving">Saving</a></li><li><a href="#13-troubleshooting--faq">FAQ</a></li></ul></li>
+<li><a href="#14-glossary">Glossary</a></li>
+</ul>
+</nav>
+<main>
+<section class="chapter" id="section-introduction">
+<h1 id="introduction">SafeJSON User Guide</h1>
+<p>SafeJSON is a Windows app for creating and editing JSON files, such as the settings files used by
+programs and websites, without having to type JSON yourself. You change values with ordinary
+controls: text boxes, number boxes, checkboxes and lists. SafeJSON writes the JSON for you, so
+you can&#39;t introduce mistakes like a missing comma, an unclosed quote or a mismatched bracket.</p>
+<p>This guide is for people who use SafeJSON. You don&#39;t need to know how to program, and you don&#39;t
+need to know JSON in detail. Where a JSON term matters, the guide explains it.</p>
+<p><strong>Version:</strong> this guide describes SafeJSON 3.0.</p>
+<h2 id="introduction--contents">Contents</h2>
+<ol>
+<li><a href="#01-installing">Installing SafeJSON</a>: download, first run, updating, removing</li>
+<li><a href="#02-quick-start">Quick start</a>: open, change and save a file in five minutes</li>
+<li><a href="#03-window-tour">A tour of the window</a>: what each part of the screen does</li>
+<li><a href="#04-editing">Editing in the tree</a>: changing values, adding, renaming, moving and deleting</li>
+<li><a href="#05-table-view">Table view</a>: working with lists of similar items as a grid</li>
+<li><a href="#06-text-mode">Text mode</a>: editing the JSON text directly, and fixing broken files</li>
+<li><a href="#07-schemas">Schemas</a>: letting SafeJSON check a file against its rules</li>
+<li><a href="#08-compare">Comparing files</a>: seeing and copying differences</li>
+<li><a href="#09-file-types">File types and formatting</a>: JSON, JSONC, JSON5, layout and line endings</li>
+<li><a href="#10-safety">Saving and safety features</a>: undo, backups, crash recovery and more</li>
+<li><a href="#11-settings">Settings</a></li>
+<li><a href="#12-keyboard-shortcuts">Keyboard shortcuts</a></li>
+<li><a href="#13-troubleshooting">Troubleshooting and FAQ</a></li>
+<li><a href="#14-glossary">Glossary</a>: JSON and SafeJSON terms explained</li>
+</ol>
+<h2 id="introduction--how-to-read-this-guide">How to read this guide</h2>
+<ul>
+<li><strong>New to SafeJSON?</strong> Read <a href="#01-installing">Installing</a> and the <a href="#02-quick-start">Quick start</a>.
+That&#39;s enough to get going.</li>
+<li><strong>Looking for something specific?</strong> Use the contents above, or the
+<a href="#12-keyboard-shortcuts">Keyboard shortcuts</a> and <a href="#13-troubleshooting">Troubleshooting</a> pages.</li>
+<li>Names of buttons and menu items are shown in <strong>bold</strong>, for example <strong>Save as…</strong>.</li>
+<li>Keyboard shortcuts are written like <strong>Ctrl+S</strong>: hold Ctrl and press S.</li>
+</ul>
+<p>This guide is also available as a single web page, <code>SafeJSON-User-Guide.html</code>, which you can open
+in any browser or print.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-01-installing">
+<h1 id="01-installing">Installing SafeJSON</h1>
+<h2 id="01-installing--what-you-need">What you need</h2>
+<ul>
+<li><strong>Windows 10 or Windows 11.</strong></li>
+<li><strong>Microsoft Edge WebView2.</strong> This is part of Windows 11 and current Windows 10, so you almost
+certainly have it already.</li>
+<li>About 6 MB of disk space.</li>
+</ul>
+<h2 id="01-installing--download">Download</h2>
+<ol>
+<li>Open the SafeJSON releases page on GitHub (your administrator can give you the link).</li>
+<li>Under the newest release (marked <strong>Latest</strong>), click <strong>SafeJSON.exe</strong> to download it.</li>
+</ol>
+<p>SafeJSON is <strong>portable</strong>: there is no installer. The <code>.exe</code> file <em>is</em> the app.</p>
+<ol start="3">
+<li>Move <code>SafeJSON.exe</code> somewhere convenient, for example a <code>Programs</code> or <code>Tools</code> folder in your
+Documents. Avoid leaving it in Downloads, where it&#39;s easy to delete by accident.</li>
+<li>To make it easy to start, right-click <code>SafeJSON.exe</code> and choose <strong>Pin to Start</strong> or <strong>Send to →
+Desktop (create shortcut)</strong>.</li>
+</ol>
+<h2 id="01-installing--starting-safejson-for-the-first-time">Starting SafeJSON for the first time</h2>
+<p>Double-click <code>SafeJSON.exe</code>.</p>
+<p>SafeJSON 3.0 is <strong>digitally signed</strong> by its publisher, Eric McFall, using a Microsoft-verified
+identity. You can check this yourself: right-click <code>SafeJSON.exe</code> → <strong>Properties</strong> →
+<strong>Digital Signatures</strong>.</p>
+<p>Windows may still show a warning for a new release:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>You see</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>&quot;Windows protected your PC&quot;</strong></td>
+<td>Windows hasn&#39;t seen this release often yet. Click <strong>More info</strong>, check that the publisher is <strong>Eric McFall</strong>, then click <strong>Run anyway</strong>. This stops appearing as the release becomes known.</td>
+</tr>
+<tr>
+<td><strong>&quot;Smart App Control blocked an app&quot;</strong> or <strong>&quot;An Application Control policy has blocked this file&quot;</strong></td>
+<td>You have an older, unsigned version (1.0 or 2.0). Download SafeJSON 3.0 or later.</td>
+</tr>
+</tbody></table></div>
+<h2 id="01-installing--opening-files-with-safejson-from-file-explorer">Opening files with SafeJSON from File Explorer</h2>
+<p>You can open a JSON file straight into SafeJSON:</p>
+<ol>
+<li>In File Explorer, right-click a <code>.json</code> file.</li>
+<li>Choose <strong>Open with → Choose another app</strong>.</li>
+<li>Click <strong>More apps → Look for another app on this PC</strong>, find <code>SafeJSON.exe</code> and select it.</li>
+<li>Tick <strong>Always use this app to open .json files</strong> if you want double-clicking to use SafeJSON.</li>
+</ol>
+<p>You can also <strong>drag files</strong> from File Explorer onto the SafeJSON window.</p>
+<h2 id="01-installing--updating">Updating</h2>
+<p>Download the new <code>SafeJSON.exe</code> and replace the old one. Your settings, recent files and
+backups are kept, because they&#39;re stored separately (see below).</p>
+<h2 id="01-installing--where-safejson-keeps-its-own-data">Where SafeJSON keeps its own data</h2>
+<p>SafeJSON never changes your files except when you save. Its own data lives in
+<code>%LOCALAPPDATA%\SafeJSON</code> (paste that into File Explorer&#39;s address bar to open it):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Folder or file</th>
+<th>What&#39;s in it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>settings.json</code></td>
+<td>Your settings, recent files and schema choices</td>
+</tr>
+<tr>
+<td><code>backups\</code></td>
+<td>Earlier versions of files you&#39;ve saved (see <a href="#10-safety--backups">Backups</a>)</td>
+</tr>
+<tr>
+<td><code>recovery\</code></td>
+<td>Unsaved work, kept in case SafeJSON closes unexpectedly</td>
+</tr>
+<tr>
+<td><code>schema-cache\</code></td>
+<td>Downloaded schemas, so they work offline</td>
+</tr>
+</tbody></table></div>
+<h2 id="01-installing--removing-safejson">Removing SafeJSON</h2>
+<ol>
+<li>Delete <code>SafeJSON.exe</code> (and any shortcuts you made).</li>
+<li>Optionally, delete the <code>%LOCALAPPDATA%\SafeJSON</code> folder to remove settings and backups.</li>
+</ol>
+<p>Your JSON files are not affected.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-02-quick-start">
+<h1 id="02-quick-start">Quick start</h1>
+<p>This walk-through takes about five minutes. You&#39;ll open a file, change some values, add a new
+setting, save, and undo a mistake.</p>
+<h2 id="02-quick-start--1-open-a-file">1. Open a file</h2>
+<ol>
+<li>Start SafeJSON. The welcome screen appears.</li>
+<li>Click <strong>Open a file…</strong> (or press <strong>Ctrl+O</strong>) and choose a <code>.json</code> file.</li>
+</ol>
+<p>The file opens in a <strong>tab</strong>. On the left is the <strong>tree</strong>, which shows everything in the file. On
+the right is the <strong>details panel</strong>, which shows the item you&#39;ve selected.</p>
+<blockquote>
+<p><strong>Tip:</strong> to practise without risk, copy a file first and open the copy. You can always undo,
+but practising on a copy is reassuring.</p>
+</blockquote>
+<h2 id="02-quick-start--2-look-around-the-tree">2. Look around the tree</h2>
+<p>Each line in the tree is one setting. For example:</p>
+<pre><code>▾ { }  appsettings.json  {4}
+    Aa  AllowedHosts: &quot;*&quot;
+  ▾ { }  Logging: {1}
+    ▸ { }  LogLevel: {2}
+</code></pre>
+<ul>
+<li>The <strong>badge</strong> at the start of each line shows what kind of value it is: <code>Aa</code> text, <code>#</code> number,
+<code>✓</code> true/false, <code>{ }</code> a group of settings (an <em>object</em>), <code>[ ]</code> a list (an <em>array</em>), <code>∅</code> empty.</li>
+<li>Click <strong>▸</strong> to open a group, and <strong>▾</strong> to close it.</li>
+<li>The part before the colon is the setting&#39;s <strong>name</strong> (its <em>key</em>), and the part after it is its <strong>value</strong>.</li>
+</ul>
+<h2 id="02-quick-start--3-change-a-value">3. Change a value</h2>
+<ol>
+<li>Click a setting with a <code>#</code> (number) badge.</li>
+<li>In the details panel on the right, change the number in the <strong>Value</strong> box.</li>
+<li>Press <strong>Enter</strong>.</li>
+</ol>
+<p>The change appears in the tree, and a <strong>●</strong> dot on the tab shows you have unsaved changes.</p>
+<p>Now try typing something that isn&#39;t a number, such as <code>12px</code>. The box turns red and explains what
+it expects. SafeJSON won&#39;t save an invalid value, so you can&#39;t break the file.</p>
+<p>For a text value (<code>Aa</code>), type anything you like, including quotes <code>&quot;</code> and backslashes <code>\</code>.
+SafeJSON handles the special characters for you.</p>
+<p>For true/false (<code>✓</code>), just tick or untick the checkbox.</p>
+<h2 id="02-quick-start--4-add-a-new-setting">4. Add a new setting</h2>
+<ol>
+<li>Click the group (<code>{ }</code>) you want to add to. To add at the top level, click the first line of the tree.</li>
+<li>In the details panel under <strong>Add property</strong>, type a name for the new setting.</li>
+<li>Choose its type (for example <strong>Text</strong> or <strong>Number</strong>) and click <strong>Add</strong>.</li>
+<li>The new setting is selected, so type its value straight away.</li>
+</ol>
+<p>If you type a name that already exists in that group, SafeJSON tells you and won&#39;t add it.
+Duplicate names are a common cause of hard-to-find mistakes.</p>
+<h2 id="02-quick-start--5-save">5. Save</h2>
+<p>Click <strong>Save</strong> (or press <strong>Ctrl+S</strong>). The <strong>●</strong> dot disappears.</p>
+<p>SafeJSON keeps a copy of the previous version as a <strong>backup</strong> each time you save, so you can go
+back later with <strong>Backups…</strong>.</p>
+<h2 id="02-quick-start--6-undo-a-mistake">6. Undo a mistake</h2>
+<p>Delete something: select it and press <strong>Delete</strong>. Then click <strong>Undo</strong> (or press <strong>Ctrl+Z</strong>).
+It&#39;s back. <strong>Undo</strong> remembers every change since you opened the file, and <strong>Redo</strong> (<strong>Ctrl+Y</strong>)
+re-applies what you undid.</p>
+<h2 id="02-quick-start--what-next">What next?</h2>
+<ul>
+<li><a href="#03-window-tour">A tour of the window</a> explains every part of the screen.</li>
+<li><a href="#04-editing">Editing in the tree</a> covers renaming, moving, duplicating and more.</li>
+<li>If your file has a <strong>schema</strong> (a description of what it may contain), SafeJSON can check the
+file and suggest settings: see <a href="#07-schemas">Schemas</a>.</li>
+</ul>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-03-window-tour">
+<h1 id="03-window-tour">A tour of the window</h1>
+<pre><code>TOOLBAR      New  Open…  Save  Save as…  Undo  Redo  Format  Tree|Table|Text  Backups…  Compare…  [search]  ⚙
+TABS         settings.json ● ×   build.json5 ×
+MESSAGE BAR  (notices appear here)
+
+┌─ TREE ──────────────────────────────┬─ DETAILS PANEL ─────────────────────────┐
+│ ▾ { } settings.json {5}             │ port                         Copy path  │
+│     # port: 8080             (!)   │ KEY     [ port              ]           │
+│     Aa host: &quot;localhost&quot;            │ TYPE    # [ Number ▾ ]                  │
+│   ▸ { } logging: {2}                │ VALUE   [ 8080              ]           │
+│                                     │ [Move up] [Move down] [Duplicate] …     │
+└─────────────────────────────────────┴─────────────────────────────────────────┘
+PROBLEMS     ⛔ port  Must be &lt;= 65535                                    Schema
+STATUS BAR   C:\config\settings.json   1 problem   Schema: app.schema.json   JSON   Spaces: 2   CRLF   UTF-8
+</code></pre>
+<h2 id="03-window-tour--toolbar">Toolbar</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What it does</th>
+<th>Shortcut</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>New</strong></td>
+<td>Starts a new, empty file in a new tab</td>
+<td>Ctrl+N</td>
+</tr>
+<tr>
+<td><strong>Open…</strong></td>
+<td>Opens one or more files, each in its own tab</td>
+<td>Ctrl+O</td>
+</tr>
+<tr>
+<td><strong>Save</strong></td>
+<td>Saves the current file</td>
+<td>Ctrl+S</td>
+</tr>
+<tr>
+<td><strong>Save as…</strong></td>
+<td>Saves the current file under a new name or location</td>
+<td>Ctrl+Shift+S</td>
+</tr>
+<tr>
+<td><strong>Undo</strong> / <strong>Redo</strong></td>
+<td>Steps backwards or forwards through your changes</td>
+<td>Ctrl+Z / Ctrl+Y</td>
+</tr>
+<tr>
+<td><strong>Format</strong></td>
+<td>Re-indents the whole file neatly (see <a href="#09-file-types--formatting">Formatting</a>)</td>
+<td>Shift+Alt+F</td>
+</tr>
+<tr>
+<td><strong>Tree</strong> / <strong>Table</strong> / <strong>Text</strong></td>
+<td>Switches how you view and edit the file (<a href="#05-table-view">Table view</a>, <a href="#06-text-mode">Text mode</a>)</td>
+<td>Ctrl+Shift+T switches between Tree and Text</td>
+</tr>
+<tr>
+<td><strong>Backups…</strong></td>
+<td>Restores an earlier saved version (<a href="#10-safety--backups">Backups</a>)</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Compare…</strong></td>
+<td>Compares this file with another version (<a href="#08-compare">Comparing files</a>)</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Search box</strong></td>
+<td>Shows only the settings whose name or value matches</td>
+<td>Ctrl+F</td>
+</tr>
+<tr>
+<td><strong>⚙</strong></td>
+<td>Opens <a href="#11-settings">Settings</a></td>
+<td>Ctrl+,</td>
+</tr>
+</tbody></table></div>
+<p>Hover over any button to see a short description.</p>
+<h2 id="03-window-tour--tabs">Tabs</h2>
+<p>Each open file has a tab. A <strong>●</strong> after the name means the file has unsaved changes.</p>
+<ul>
+<li>Click a tab to switch to it, or press <strong>Ctrl+Tab</strong> to go to the next tab.</li>
+<li>Click <strong>×</strong>, middle-click the tab, or press <strong>Ctrl+W</strong> to close it. If it has unsaved changes,
+SafeJSON asks whether to <strong>Save</strong>, <strong>Don&#39;t save</strong>, or <strong>Cancel</strong>.</li>
+<li>Opening a file that&#39;s already open just switches to its tab.</li>
+</ul>
+<h2 id="03-window-tour--message-bar">Message bar</h2>
+<p>Information and warnings appear in a bar below the tabs, for example when a file was changed by
+another program. Click <strong>Dismiss</strong> to hide the message.</p>
+<h2 id="03-window-tour--tree">Tree</h2>
+<p>The tree shows the whole file as an outline. Each line shows:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>▸ / ▾</strong></td>
+<td>Opens or closes a group or list</td>
+</tr>
+<tr>
+<td><strong>Badge</strong></td>
+<td>The kind of value (see below)</td>
+</tr>
+<tr>
+<td><strong>Name</strong></td>
+<td>The setting&#39;s name (its <em>key</em>). In lists, items are numbered <code>[0]</code>, <code>[1]</code>, …</td>
+</tr>
+<tr>
+<td><strong>Value</strong></td>
+<td>The value, or <code>{3}</code> / <code>[5]</code> for a group or list with 3 or 5 entries</td>
+</tr>
+<tr>
+<td><strong>// comment</strong></td>
+<td>A comment written in the file next to this setting (hover to read it all)</td>
+</tr>
+<tr>
+<td><strong>⛔ / ⚠</strong></td>
+<td>A problem with this setting (hover to read it; shown as <code>(!)</code> in the diagram above). A small <strong>●</strong> on a closed group means something inside it has a problem</td>
+</tr>
+</tbody></table></div>
+<h3 id="03-window-tour--value-types-badges">Value types (badges)</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Badge</th>
+<th>Type</th>
+<th>Example</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Aa</code></td>
+<td><strong>Text</strong></td>
+<td><code>&quot;localhost&quot;</code></td>
+<td>Any text, including line breaks</td>
+</tr>
+<tr>
+<td><code>#</code></td>
+<td><strong>Number</strong></td>
+<td><code>8080</code>, <code>0.5</code>, <code>-3</code>, <code>1e6</code></td>
+<td>Whole or decimal numbers</td>
+</tr>
+<tr>
+<td><code>✓</code></td>
+<td><strong>True / false</strong></td>
+<td><code>true</code></td>
+<td>Also called a <em>boolean</em></td>
+</tr>
+<tr>
+<td><code>∅</code></td>
+<td><strong>Null (no value)</strong></td>
+<td><code>null</code></td>
+<td>A deliberately empty value</td>
+</tr>
+<tr>
+<td><code>{ }</code></td>
+<td><strong>Object</strong></td>
+<td><code>{ &quot;a&quot;: 1 }</code></td>
+<td>A group of named settings</td>
+</tr>
+<tr>
+<td><code>[ ]</code></td>
+<td><strong>Array (list)</strong></td>
+<td><code>[1, 2, 3]</code></td>
+<td>An ordered list of values</td>
+</tr>
+</tbody></table></div>
+<p>See <a href="#04-editing">Editing in the tree</a> for everything you can do here.</p>
+<h2 id="03-window-tour--details-panel">Details panel</h2>
+<p>The right-hand panel shows the selected setting:</p>
+<ul>
+<li><strong>Path:</strong> where the setting is in the file, such as <code>Logging.LogLevel.Default</code>. Click
+<strong>Copy path</strong> to copy it.</li>
+<li><strong>Schema help:</strong> if the file has a <a href="#07-schemas">schema</a>, a description of the setting appears here.</li>
+<li><strong>Key:</strong> the setting&#39;s name, which you can rename here. For list items, <strong>Position</strong> shows the item&#39;s number.</li>
+<li><strong>Type:</strong> change the kind of value. If the schema expects certain types, they&#39;re marked <strong>(expected)</strong>.</li>
+<li><strong>Value:</strong> an editor suited to the type: a text box, a number box, a checkbox, or a dropdown when only certain values are allowed.</li>
+<li><strong>Add property / Add item:</strong> shown for groups and lists.</li>
+<li><strong>Comments:</strong> any comments the file has for this setting.</li>
+<li><strong>Move up</strong>, <strong>Move down</strong>, <strong>Duplicate</strong>, <strong>Delete</strong>.</li>
+</ul>
+<h2 id="03-window-tour--problems-panel">Problems panel</h2>
+<p>Appears at the bottom when the file has problems. Each line shows where the problem is, what&#39;s
+wrong, and where the check came from:</p>
+<ul>
+<li><strong>SafeJSON:</strong> built-in checks, such as duplicate names or numbers too large to store exactly.</li>
+<li><strong>Schema:</strong> the file breaks a rule in its <a href="#07-schemas">schema</a>.</li>
+</ul>
+<p>Click a problem to jump to it.</p>
+<h2 id="03-window-tour--status-bar">Status bar</h2>
+<p>The blue bar at the bottom shows, from left to right:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>File location</td>
+<td>Where the file is saved, or &quot;Not saved yet&quot;</td>
+</tr>
+<tr>
+<td><em>N</em> problems</td>
+<td>How many problems the file has</td>
+</tr>
+<tr>
+<td>Schema</td>
+<td>Which schema checks this file, if any. Click it to choose one (<a href="#07-schemas">Schemas</a>)</td>
+</tr>
+<tr>
+<td>JSON / JSON with Comments / JSON5</td>
+<td>The file&#39;s type (<a href="#09-file-types">File types</a>)</td>
+</tr>
+<tr>
+<td>Spaces: 2 / Tabs</td>
+<td>How the file is indented</td>
+</tr>
+<tr>
+<td>CRLF / LF</td>
+<td>The file&#39;s line-ending style</td>
+</tr>
+<tr>
+<td>UTF-8 / UTF-8 with BOM</td>
+<td>The file&#39;s text encoding</td>
+</tr>
+</tbody></table></div>
+<h2 id="03-window-tour--welcome-screen">Welcome screen</h2>
+<p>When no files are open, SafeJSON shows <strong>Open a file…</strong>, <strong>New file</strong>, and your <strong>Recent files</strong>.
+Click a recent file to reopen it.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-04-editing">
+<h1 id="04-editing">Editing in the tree</h1>
+<p>Everything you change goes through SafeJSON&#39;s checks, so the file always stays valid. Every change
+can be undone with <strong>Undo</strong> (<strong>Ctrl+Z</strong>).</p>
+<h2 id="04-editing--selecting-and-moving-around">Selecting and moving around</h2>
+<ul>
+<li><strong>Click</strong> a line to select it. Its details appear on the right.</li>
+<li><strong>▸ / ▾</strong> (or <strong>→ / ←</strong> on the keyboard) open and close groups and lists.</li>
+<li><strong>↑ / ↓</strong> move the selection up and down.</li>
+<li><strong>←</strong> on a closed item jumps to the group it belongs to.</li>
+</ul>
+<h2 id="04-editing--changing-a-value">Changing a value</h2>
+<p>Select the setting, then use the <strong>Value</strong> editor in the details panel. Each type has its own editor:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Editor</th>
+<th>How to finish</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Text</strong></td>
+<td>A text box. It grows for longer text and accepts line breaks</td>
+<td>Click elsewhere, or press <strong>Ctrl+Enter</strong></td>
+</tr>
+<tr>
+<td><strong>Number</strong></td>
+<td>A number box. Invalid input turns red and is never saved</td>
+<td>Press <strong>Enter</strong> or click elsewhere</td>
+</tr>
+<tr>
+<td><strong>True / false</strong></td>
+<td>A checkbox</td>
+<td>Changes immediately</td>
+</tr>
+<tr>
+<td><strong>Null</strong></td>
+<td>Nothing to edit: change the type to give it a value</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Object / list</strong></td>
+<td>Shows how many entries it has; select an entry to edit it</td>
+<td></td>
+</tr>
+</tbody></table></div>
+<p>Press <strong>Escape</strong> in a text or number box to cancel your typing.</p>
+<p><strong>Under the text box</strong>, SafeJSON shows how the text will be saved, for example
+<code>&quot;He said \&quot;hi\&quot;&quot;</code>. Quotes, backslashes and line breaks are converted automatically. You never
+need to type escape codes yourself.</p>
+<p><strong>Numbers</strong> can be written as <code>42</code>, <code>-7</code>, <code>3.14</code>, or <code>1e6</code> (one million). SafeJSON rejects things
+like <code>12px</code>, <code>1,000</code>, <code>.5</code>, or <code>NaN</code>, because standard JSON doesn&#39;t allow them. (JSON5 files are
+more relaxed: there, <code>.5</code>, <code>+1</code>, hex numbers like <code>0xFF</code>, <code>Infinity</code> and <code>NaN</code> are accepted. See
+<a href="#09-file-types">File types</a>.) If a whole number
+is too large for most programs to store exactly (more than about 9 million billion), SafeJSON
+saves it exactly as you typed it and shows a warning.</p>
+<h3 id="04-editing--editing-directly-in-the-tree">Editing directly in the tree</h3>
+<p><strong>Double-click</strong> a value in the tree to edit it in place, then press <strong>Enter</strong> to save or <strong>Escape</strong>
+to cancel. Double-clicking a true/false value flips it. Text that contains line breaks opens in the
+details panel instead, so no line breaks are lost.</p>
+<h2 id="04-editing--renaming-a-setting">Renaming a setting</h2>
+<ul>
+<li>Select it and change the <strong>Key</strong> box in the details panel, then press <strong>Enter</strong>, or</li>
+<li>Double-click the name in the tree, or press <strong>F2</strong>.</li>
+</ul>
+<p>SafeJSON won&#39;t accept an empty name, or a name already used by another setting in the same group.
+List items don&#39;t have names; they&#39;re numbered by position.</p>
+<h2 id="04-editing--adding-settings-and-list-items">Adding settings and list items</h2>
+<p>Select the group (<code>{ }</code>) or list (<code>[ ]</code>) you want to add to. In the details panel:</p>
+<ul>
+<li><strong>For a group (Add property):</strong> type a name, choose a type, and click <strong>Add</strong> (or press <strong>Enter</strong>).</li>
+<li><strong>For a list (Add item):</strong> choose a type and click <strong>Add</strong>. The item is added at the end.</li>
+</ul>
+<p>The new entry starts with a sensible empty value (<code>&quot;&quot;</code>, <code>0</code>, <code>false</code>, <code>null</code>, <code>{}</code> or <code>[]</code>) and is
+selected, ready for you to type its value.</p>
+<p>If the file has a <a href="#07-schemas">schema</a>, the name box suggests the settings the schema knows
+about, new entries start with the schema&#39;s default value, and missing <strong>required</strong> settings are
+listed with one-click <strong>+</strong> buttons.</p>
+<h2 id="04-editing--deleting">Deleting</h2>
+<p>Select the setting or item and press <strong>Delete</strong>, click <strong>Delete</strong> in the details panel, or
+right-click it and choose <strong>Delete</strong>. The selection moves to the next item.</p>
+<h2 id="04-editing--duplicating">Duplicating</h2>
+<p>Press <strong>Ctrl+D</strong>, or use <strong>Duplicate</strong>. The copy appears right after the original.
+Duplicated settings in a group are named <code>name copy</code>, <code>name copy 2</code>, and so on; rename them as needed.</p>
+<h2 id="04-editing--moving-changing-the-order">Moving (changing the order)</h2>
+<ul>
+<li><strong>Drag</strong> a line up or down within the same group or list. A blue line shows where it will land.</li>
+<li>Or press <strong>Alt+↑</strong> / <strong>Alt+↓</strong>, or use <strong>Move up</strong> / <strong>Move down</strong>.</li>
+</ul>
+<p>You can only reorder within the same group or list. To move a setting into a different group,
+duplicate it there (copy its value) and delete the original.</p>
+<blockquote>
+<p>The order of settings in a group usually doesn&#39;t matter to programs, but it can make files easier to read.
+The order of items in a <strong>list</strong> often does matter.</p>
+</blockquote>
+<h2 id="04-editing--changing-a-values-type">Changing a value&#39;s type</h2>
+<p>Use the <strong>Type</strong> dropdown in the details panel, or right-click → <strong>Change type to</strong>.</p>
+<p>SafeJSON converts the value where it can: <code>5</code> becomes <code>&quot;5&quot;</code> as text, and <code>&quot;42&quot;</code> becomes <code>42</code> as a
+number. If something would be lost, it asks first. For example, changing a group that contains
+3 settings into text would delete those settings. You can undo any type change.</p>
+<h2 id="04-editing--right-click-menu">Right-click menu</h2>
+<p>Right-click any line (or press <strong>Shift+F10</strong>):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Rename key</strong> (F2)</td>
+<td>Rename the setting</td>
+</tr>
+<tr>
+<td><strong>Duplicate</strong> (Ctrl+D)</td>
+<td>Copy it, placing the copy right after it</td>
+</tr>
+<tr>
+<td><strong>Move up</strong> / <strong>Move down</strong> (Alt+↑ / Alt+↓)</td>
+<td>Reorder it</td>
+</tr>
+<tr>
+<td><strong>Delete</strong> (Del)</td>
+<td>Remove it</td>
+</tr>
+<tr>
+<td><strong>Change type to</strong></td>
+<td>Convert it to another type</td>
+</tr>
+<tr>
+<td><strong>Copy path</strong></td>
+<td>Copy its location, e.g. <code>servers[0].host</code></td>
+</tr>
+<tr>
+<td><strong>Copy value as JSON</strong></td>
+<td>Copy its value as JSON text, to paste elsewhere</td>
+</tr>
+</tbody></table></div>
+<h2 id="04-editing--searching">Searching</h2>
+<p>Type in the <strong>Search</strong> box (<strong>Ctrl+F</strong>). The tree shows only matching settings, plus the groups
+that contain them, with matches highlighted. The search covers both names and values and ignores
+capital letters. Clear the box to see everything again. Drag-to-reorder is turned off while
+searching.</p>
+<h2 id="04-editing--comments">Comments</h2>
+<p>Files that allow comments (see <a href="#09-file-types">File types</a>) may contain notes like
+<code>// The port to listen on</code>. SafeJSON shows a setting&#39;s comment in green next to it in the tree,
+and in full in the details panel. Comments are always kept exactly as they are when you edit and
+save. SafeJSON doesn&#39;t add, edit or delete comments in the tree; use <a href="#06-text-mode">Text mode</a>
+for that.</p>
+<h2 id="04-editing--undo-and-redo">Undo and redo</h2>
+<ul>
+<li><strong>Undo</strong> (<strong>Ctrl+Z</strong>) steps back one change at a time, as far back as when you opened the file.</li>
+<li><strong>Redo</strong> (<strong>Ctrl+Y</strong> or <strong>Ctrl+Shift+Z</strong>) re-applies what you undid.</li>
+<li>Making a new change after undoing clears the redo history.</li>
+</ul>
+<p>While you&#39;re typing in a box, Ctrl+Z and Ctrl+Y undo and redo your typing in that box instead.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-05-table-view">
+<h1 id="05-table-view">Table view</h1>
+<p>Many files contain <strong>lists of similar items</strong>, such as users, products or servers, where each item
+has the same kinds of settings. Table view shows such a list as a grid, like a spreadsheet: one row
+per item, one column per setting.</p>
+<pre><code> #   sku     name     qty    price   active
+ 1   A-100   Bolt     250    0.12    ☑
+ 2   B-200   Nut      1200   0.05    ░░░░░    ← hatched: this item has no &quot;active&quot; setting
+ 3   C-300   Washer   0      0.02    ☐
+</code></pre>
+<h2 id="05-table-view--opening-a-table">Opening a table</h2>
+<ol>
+<li>In the tree, select a list whose items are groups (<code>[ ]</code> containing <code>{ }</code> items), or anything inside such a list.</li>
+<li>Click <strong>Table</strong> in the toolbar, or <strong>▦ Show this list as a table</strong> in the details panel.</li>
+</ol>
+<p>If <strong>Table</strong> is greyed out, the selection isn&#39;t inside a list of groups. Table view needs a list
+where every item is a group of settings.</p>
+<p>Click <strong>‹ Tree</strong> (top left) to go back to the tree.</p>
+<h2 id="05-table-view--reading-the-table">Reading the table</h2>
+<ul>
+<li><strong>Columns</strong> are every setting name that appears in any row, in the order first seen. The small
+badge shows the column&#39;s usual type. Hover over a column name to see how many rows have it, plus
+the schema&#39;s description of it, if there is one.</li>
+<li><strong>Hatched (striped) cells</strong> mean that row doesn&#39;t have that setting at all, which is different
+from having an empty value.</li>
+<li><strong>True/false</strong> cells show a checkbox you can click directly.</li>
+<li><strong>Groups and lists</strong> inside a cell show as <code>{2} ›</code> or <code>[3] ›</code>. Click to open them in the tree.</li>
+<li><strong>⛔</strong> next to a row number, or a red line under a cell, marks a problem. Hover to read it.</li>
+</ul>
+<h2 id="05-table-view--editing-cells">Editing cells</h2>
+<ul>
+<li><strong>Click</strong> a cell to select it. Use the <strong>arrow keys</strong> or <strong>Tab</strong> to move between cells.</li>
+<li><strong>Double-click</strong>, or press <strong>Enter</strong> or <strong>F2</strong>, to edit the selected cell. Press <strong>Enter</strong> to save
+or <strong>Escape</strong> to cancel.</li>
+<li>Numbers are checked as you type, just like in the details panel.</li>
+<li>If the schema lists allowed values for a column, editing shows a dropdown.</li>
+<li><strong>Space</strong> toggles a true/false cell.</li>
+<li><strong>Delete</strong> removes that setting from the row; the cell becomes hatched.</li>
+</ul>
+<p><strong>Filling in a hatched cell</strong> adds the setting to that row, placed in column order, with the
+column&#39;s usual type.</p>
+<h2 id="05-table-view--rows">Rows</h2>
+<p>Hover over a row number to see its buttons:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>↑</strong> / <strong>↓</strong></td>
+<td>Move the row up or down</td>
+</tr>
+<tr>
+<td><strong>⧉</strong></td>
+<td>Duplicate the row</td>
+</tr>
+<tr>
+<td><strong>×</strong></td>
+<td>Delete the row</td>
+</tr>
+</tbody></table></div>
+<p><strong>+ Add row</strong> (top right) adds a new row at the end, with every column filled in with an empty
+value or the schema&#39;s default.</p>
+<h2 id="05-table-view--columns">Columns</h2>
+<ul>
+<li><strong>+ Add column</strong> adds an empty column. It becomes part of the file as soon as you fill in a cell.</li>
+<li><strong>Rename a column:</strong> double-click its name. Every row that has the setting is renamed. If any
+row already has a setting with the new name, nothing is renamed and SafeJSON explains why.</li>
+<li><strong>Remove a column:</strong> hover over its name and click <strong>×</strong>. SafeJSON asks before removing the
+setting from every row.</li>
+</ul>
+<h2 id="05-table-view--sorting">Sorting</h2>
+<p>Click a column name to sort the rows by it. Click again to reverse the order (▲ / ▼), and a third
+time to stop sorting. Numbers sort by value, text sorts naturally (<code>item2</code> before <code>item10</code>), and
+rows without the setting go last.</p>
+<p><strong>Sorting only changes what you see.</strong> A banner reminds you that the file&#39;s order hasn&#39;t changed.
+Click <strong>Save this order to the file</strong> to make the order permanent (one undo step), or <strong>Unsort</strong> to
+go back to the file&#39;s order. Row moves are turned off while sorted.</p>
+<h2 id="05-table-view--undo">Undo</h2>
+<p>Every change in the table, including renaming or removing a column across all rows, is a single
+undo step. Press <strong>Ctrl+Z</strong> to undo it.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-06-text-mode">
+<h1 id="06-text-mode">Text mode</h1>
+<p>Text mode shows the file as text in a code editor, the same editor used in Visual Studio Code. It&#39;s
+for people who prefer typing JSON, for quick large edits like pasting a block, and for <strong>fixing files
+that aren&#39;t valid JSON</strong>.</p>
+<p>Click <strong>Text</strong> in the toolbar, or press <strong>Ctrl+Shift+T</strong>, to switch. Click <strong>Tree</strong> (or press
+<strong>Ctrl+Shift+T</strong> again) to switch back.</p>
+<h2 id="06-text-mode--how-it-stays-safe">How it stays safe</h2>
+<p>What you type is <strong>applied to the file only once it&#39;s valid</strong>:</p>
+<ul>
+<li>When you pause typing, SafeJSON checks the text. If it&#39;s valid, the change is applied, and each
+pause becomes one undo step.</li>
+<li>If it isn&#39;t valid, a red banner shows exactly where the problem is, for example
+<em>&quot;Line 5, column 3: Expected &#39;,&#39;&quot;</em>. Click <strong>Go to problem</strong> to jump there.</li>
+<li><strong>While there&#39;s a problem, you can&#39;t save or switch to the tree.</strong> Fix the text first.
+The rest of SafeJSON keeps using the last valid version.</li>
+</ul>
+<p>The editor underlines mistakes as you type, and if the file has a <a href="#07-schemas">schema</a>, it
+suggests setting names and values as you type (press <strong>Ctrl+Space</strong> to see suggestions).</p>
+<p><strong>Standard JSON files stay standard.</strong> If the file was plain JSON when you opened it, text mode
+won&#39;t accept comments or trailing commas, because the programs that read it might not understand them.
+See <a href="#09-file-types">File types</a>.</p>
+<h2 id="06-text-mode--opening-files-that-arent-valid-json">Opening files that aren&#39;t valid JSON</h2>
+<p>If you open a file that has a mistake in it, SafeJSON opens it in text mode instead of refusing
+it. A message says what&#39;s wrong and where. Fix the mistake, and once the text is valid the tree
+and saving become available. The file&#39;s original line endings and encoding are kept.</p>
+<p>Common mistakes and their messages:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Message</th>
+<th>Usual cause</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>Expected &#39;,&#39;</em></td>
+<td>A missing comma between two settings or list items</td>
+</tr>
+<tr>
+<td><em>Expected a property name in double quotes</em></td>
+<td>A comma after the last setting (in standard JSON), or a name without quotes</td>
+</tr>
+<tr>
+<td><em>Expected a value</em></td>
+<td>An extra comma, like <code>[1, , 2]</code>, or nothing after a <code>:</code></td>
+</tr>
+<tr>
+<td><em>String is not closed</em></td>
+<td>A missing closing <code>&quot;</code></td>
+</tr>
+<tr>
+<td><em>Expected &#39;}&#39;</em> or <em>Expected &#39;]&#39;</em></td>
+<td>A missing closing bracket</td>
+</tr>
+<tr>
+<td><em>Unexpected content after the end of the JSON</em></td>
+<td>Extra text after the final <code>}</code></td>
+</tr>
+</tbody></table></div>
+<h2 id="06-text-mode--editor-features">Editor features</h2>
+<p>The code editor has its own tools:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Ctrl+F</strong> / <strong>Ctrl+H</strong></td>
+<td>Find / find and replace</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Space</strong></td>
+<td>Show suggestions</td>
+</tr>
+<tr>
+<td><strong>Shift+Alt+F</strong></td>
+<td>Format the text</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Z</strong> / <strong>Ctrl+Y</strong></td>
+<td>Undo / redo typing</td>
+</tr>
+<tr>
+<td><strong>Alt+↑</strong> / <strong>Alt+↓</strong></td>
+<td>Move a line up or down</td>
+</tr>
+<tr>
+<td><strong>Ctrl+/</strong></td>
+<td>Comment or uncomment a line (in files that allow comments)</td>
+</tr>
+</tbody></table></div>
+<p><strong>Undo</strong> on the toolbar undoes whole applied changes, and also throws away any text that wasn&#39;t
+valid yet.</p>
+<h2 id="06-text-mode--checking-a-selected-setting">Checking a selected setting</h2>
+<p>Clicking a problem in the <strong>Problems</strong> panel while in text mode moves the cursor to that setting in
+the text.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-07-schemas">
+<h1 id="07-schemas">Schemas</h1>
+<p>A <strong>JSON Schema</strong> is a separate file that describes what another JSON file may contain: which
+settings exist, what type each one is, which values are allowed, which are required, and what they
+mean. Many programs publish schemas for their settings files, for example on
+<a href="https://www.schemastore.org" target="_blank" rel="noopener">schemastore.org</a>.</p>
+<p>When a file has a schema, SafeJSON becomes much more helpful:</p>
+<ul>
+<li><strong>It checks the file.</strong> Problems are listed in plain language (&quot;Must be one of: development,
+staging, production&quot;), marked in the tree, and shown in the details panel.</li>
+<li><strong>It explains settings.</strong> The schema&#39;s description of the selected setting appears at the top of
+the details panel.</li>
+<li><strong>It offers choices.</strong> When only certain values are allowed, the value editor becomes a dropdown.</li>
+<li><strong>It suggests settings.</strong> The <strong>Add property</strong> name box lists the settings the schema knows
+about, with their descriptions. New settings start with the schema&#39;s default value.</li>
+<li><strong>It lists what&#39;s missing.</strong> Required settings that are missing appear as <strong>+ name</strong> buttons.</li>
+<li><strong>It shows defaults.</strong> Under the value you&#39;ll see <em>Default: …</em> with a <strong>Use default</strong> link.</li>
+<li><strong>It warns on save.</strong> Saving a file that breaks its schema shows the problems and lets you choose
+<strong>Save anyway</strong>, <strong>Show first problem</strong>, or <strong>Cancel</strong>.</li>
+</ul>
+<h2 id="07-schemas--how-safejson-finds-a-files-schema">How SafeJSON finds a file&#39;s schema</h2>
+<p>SafeJSON looks in this order and uses the first one it finds:</p>
+<ol>
+<li><strong>A schema you chose for this file</strong> (see below).</li>
+<li><strong>The file&#39;s own <code>&quot;$schema&quot;</code> setting</strong>, a top-level setting that names its schema, for example:<pre><code class="language-json">{ &quot;$schema&quot;: &quot;https://json.schemastore.org/package.json&quot;, &quot;name&quot;: &quot;my-app&quot; }
+</code></pre>
+It can be a web address, or a path relative to the file such as <code>&quot;./app.schema.json&quot;</code>.</li>
+<li><strong>A filename rule</strong> from <a href="#11-settings--schema-rules">Settings</a>, for example &quot;files named
+<code>appsettings*.json</code> use <code>C:\schemas\appsettings.schema.json</code>&quot;.</li>
+</ol>
+<p>The status bar shows the result: <strong>Schema: name</strong>, <strong>No schema</strong>, <strong>Loading schema…</strong>, or
+<strong>⚠ Schema not loaded</strong> (hover over it to see why).</p>
+<h2 id="07-schemas--choosing-a-schema-for-a-file">Choosing a schema for a file</h2>
+<p>Click the schema item in the status bar. The schema dialog shows which schema is in use and why,
+and lets you:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Choose a schema file…</strong></td>
+<td>Use a schema file from your PC for this file</td>
+</tr>
+<tr>
+<td><em>web address</em> + <strong>Use</strong></td>
+<td>Use a schema from the web, e.g. <code>https://json.schemastore.org/tsconfig.json</code></td>
+</tr>
+<tr>
+<td><strong>Don&#39;t use a schema</strong></td>
+<td>Turn schema checking off for this file</td>
+</tr>
+<tr>
+<td><strong>Back to automatic</strong></td>
+<td>Forget your choice; use <code>$schema</code> or a filename rule again</td>
+</tr>
+<tr>
+<td><strong>Reload schema</strong></td>
+<td>Re-read the schema files and download web schemas again (use this after a schema changes)</td>
+</tr>
+</tbody></table></div>
+<p>Choices are remembered per file. The file has to be saved somewhere before you can choose a schema for it.</p>
+<h2 id="07-schemas--schemas-from-the-web">Schemas from the web</h2>
+<p>Web schemas are downloaded the first time they&#39;re needed and kept on your PC, so they keep working
+without an internet connection. Use <strong>Reload schema</strong> to fetch a newer copy.</p>
+<h2 id="07-schemas--when-a-schema-problem-is-reported">When a schema problem is reported</h2>
+<p>Schema problems aren&#39;t syntax errors: the file is valid JSON, but it doesn&#39;t follow the rules the
+program expects. Programs reading the file may reject it or behave unexpectedly. Typical messages:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Message</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>Missing required property &quot;name&quot;</em></td>
+<td>The setting must exist; use the <strong>+ name</strong> button to add it</td>
+</tr>
+<tr>
+<td><em>&quot;colour&quot; is not a known property here</em></td>
+<td>The schema doesn&#39;t allow this setting; it may be misspelled</td>
+</tr>
+<tr>
+<td><em>Should be a number</em></td>
+<td>The value has the wrong type</td>
+</tr>
+<tr>
+<td><em>Must be one of: …</em></td>
+<td>Only the listed values are allowed</td>
+</tr>
+<tr>
+<td><em>Must be &lt;= 65535</em></td>
+<td>The number is outside the allowed range</td>
+</tr>
+<tr>
+<td><em>Should be a valid hostname / email / uri</em></td>
+<td>The text isn&#39;t in the expected format</td>
+</tr>
+</tbody></table></div>
+<h2 id="07-schemas--notes">Notes</h2>
+<ul>
+<li>SafeJSON supports the common schema versions (draft-04, -06, -07, 2019-09 and 2020-12), including
+schemas that refer to other schema files.</li>
+<li>Deprecated settings (ones the schema says are no longer used) are marked <em>Deprecated</em> in the
+details panel.</li>
+</ul>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-08-compare">
+<h1 id="08-compare">Comparing files</h1>
+<p><strong>Compare…</strong> shows exactly how the current file differs from another version of the same data.
+Common uses:</p>
+<ul>
+<li>&quot;What have I changed since I last saved?&quot;</li>
+<li>&quot;How does the test server&#39;s config differ from the live one?&quot;</li>
+<li>&quot;What did this file look like before last Tuesday&#39;s change?&quot;</li>
+</ul>
+<h2 id="08-compare--starting-a-comparison">Starting a comparison</h2>
+<p>Click <strong>Compare…</strong> in the toolbar and choose what to compare with:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Choice</th>
+<th>Compares with</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Saved version</strong></td>
+<td>The file as it was when you last saved, so you see your unsaved changes. Only available when there are unsaved changes</td>
+</tr>
+<tr>
+<td><em>Another open tab</em></td>
+<td>Another file that&#39;s open in SafeJSON. Changes can be copied in <strong>both</strong> directions</td>
+</tr>
+<tr>
+<td><strong>Backup</strong></td>
+<td>One of the automatic <a href="#10-safety--backups">backups</a> of this file</td>
+</tr>
+<tr>
+<td><strong>Another file…</strong></td>
+<td>Any file you choose</td>
+</tr>
+</tbody></table></div>
+<h2 id="08-compare--reading-the-comparison">Reading the comparison</h2>
+<p>The current file is on the <strong>left</strong> and can be edited. The other version is on the <strong>right</strong>.</p>
+<p>Only the <strong>data</strong> is compared. These differences are ignored:</p>
+<ul>
+<li>spacing, indentation and line breaks</li>
+<li>comments</li>
+<li>the order of settings within a group</li>
+<li>quote style (in JSON5 files)</li>
+<li>number spelling, e.g. <code>1.0</code> and <code>1</code></li>
+</ul>
+<p>Lists are lined up by matching items, so inserting one item shows as a single addition instead of
+making everything after it look changed.</p>
+<p>Each difference is one row:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Changed</strong></td>
+<td>The setting exists in both, with different values (or different types)</td>
+</tr>
+<tr>
+<td><strong>Only in this file</strong></td>
+<td>The setting or item exists only on the left</td>
+</tr>
+<tr>
+<td><strong>Only in the other</strong></td>
+<td>The setting or item exists only on the right</td>
+</tr>
+</tbody></table></div>
+<p>The filter buttons at the top show the count of each kind and let you show just one kind.
+Click a highlighted location (left column) to show it in the tree.</p>
+<p>If there are no differences, SafeJSON says so: both contain the same data.</p>
+<h2 id="08-compare--copying-differences-across">Copying differences across</h2>
+<p>Each row has buttons to make the two sides match at that spot:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Row</th>
+<th>Button</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Changed</td>
+<td><strong>← Use theirs</strong></td>
+<td>Copy the right-hand value into this file</td>
+</tr>
+<tr>
+<td>Only in the other</td>
+<td><strong>← Add here</strong></td>
+<td>Add it to this file</td>
+</tr>
+<tr>
+<td>Only in this file</td>
+<td><strong>Remove here</strong></td>
+<td>Remove it from this file</td>
+</tr>
+</tbody></table></div>
+<p>When the right side is <strong>another open tab</strong>, there are also buttons for the opposite direction:
+<strong>Use mine →</strong>, <strong>Add there →</strong> and <strong>Remove there</strong>.</p>
+<p>The list updates after every change. Each change is one undo step in the file it changed, so
+undo changes to the other file in that file&#39;s own tab.</p>
+<p>Click <strong>‹ Done comparing</strong> to return to the tree.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-09-file-types">
+<h1 id="09-file-types">File types and formatting</h1>
+<h2 id="09-file-types--the-three-kinds-of-json-file">The three kinds of JSON file</h2>
+<p>SafeJSON works with three closely related formats. It detects the format automatically and shows
+it in the status bar.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Status bar</th>
+<th>Format</th>
+<th>Typical files</th>
+<th>What it allows</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>JSON</strong></td>
+<td>Standard JSON</td>
+<td><code>package.json</code>, <code>appsettings.json</code>, API data</td>
+<td>Only the strict rules: double-quoted names and text, no comments, no trailing commas</td>
+</tr>
+<tr>
+<td><strong>JSON with Comments</strong></td>
+<td>JSONC</td>
+<td>VS Code <code>settings.json</code>, <code>tsconfig.json</code></td>
+<td>Standard JSON plus <code>//</code> and <code>/* */</code> comments and trailing commas</td>
+</tr>
+<tr>
+<td><strong>JSON5</strong></td>
+<td>JSON5</td>
+<td><code>.json5</code> config files</td>
+<td>Also unquoted names, &#39;single quotes&#39;, hex numbers (<code>0xFF</code>), <code>Infinity</code>, <code>NaN</code>, <code>.5</code>, <code>+1</code>, and text continued over several lines</td>
+</tr>
+</tbody></table></div>
+<p>A <em>trailing comma</em> is a comma after the last item: <code>[1, 2, 3,]</code>.</p>
+<p><strong>SafeJSON never changes a file&#39;s format by itself.</strong> A standard JSON file stays standard JSON:
+SafeJSON never adds comments to it, and <a href="#06-text-mode">text mode</a> refuses comments and trailing
+commas in it, because programs that expect standard JSON would fail to read them.</p>
+<h3 id="09-file-types--json5-files-keep-their-style">JSON5 files keep their style</h3>
+<p>In JSON5 files, SafeJSON writes new content the way the file already does: if the file uses
+unquoted names and single-quoted text, new settings follow suit. Renamed settings and edited text
+keep their original quoting. (Format is not available for JSON5 files yet.)</p>
+<h2 id="09-file-types--what-safejson-keeps-exactly-as-it-was">What SafeJSON keeps exactly as it was</h2>
+<p>When you change something, SafeJSON rewrites only that part of the file. Everything else stays
+byte-for-byte the same:</p>
+<ul>
+<li>comments, wherever they are</li>
+<li>indentation (spaces or tabs, and how many)</li>
+<li>line endings (Windows <strong>CRLF</strong> or Unix <strong>LF</strong>)</li>
+<li>the order of settings</li>
+<li>blank lines and alignment</li>
+<li>lists written on one line, like <code>[&quot;a&quot;, &quot;b&quot;]</code>, which stay on one line</li>
+<li>numbers exactly as written (<code>1.50</code> stays <code>1.50</code>; very large numbers aren&#39;t rounded)</li>
+<li>a byte-order mark (BOM) at the start of the file, if it had one</li>
+</ul>
+<p>This keeps changes small and easy to review, which matters if your files are tracked in a system such as git.</p>
+<p>New content is indented to match the file.</p>
+<h2 id="09-file-types--formatting">Formatting</h2>
+<p><strong>Format</strong> (<strong>Shift+Alt+F</strong>) re-indents the whole file neatly, one setting per line, keeping
+comments. It&#39;s useful for files that were written on one long line. Format is one undo step.</p>
+<p>By default, Format keeps the file&#39;s current indentation style. You can choose 2 spaces, 4 spaces
+or tabs instead in <a href="#11-settings">Settings</a>.</p>
+<h2 id="09-file-types--trailing-commas">Trailing commas</h2>
+<p>JSONC files may contain trailing commas. In <a href="#11-settings">Settings</a>, choose:</p>
+<ul>
+<li><strong>Keep them</strong> (default), or</li>
+<li><strong>Remove them when saving:</strong> SafeJSON removes them as an undoable step just before saving.</li>
+</ul>
+<p>JSON5 files always keep their trailing commas, since they&#39;re a normal part of JSON5.</p>
+<h2 id="09-file-types--encoding-and-size-limits">Encoding and size limits</h2>
+<ul>
+<li>Files must be <strong>UTF-8</strong> text, the standard for JSON. Other encodings are refused with a message,
+rather than risking damage to the file.</li>
+<li>Files up to <strong>10 MB</strong> can be opened. SafeJSON is designed for configuration files, which are
+usually far smaller.</li>
+</ul>
+<h2 id="09-file-types--large-numbers">Large numbers</h2>
+<p>Most programs can only store whole numbers up to about 9 million billion (9,007,199,254,740,991)
+exactly. SafeJSON keeps larger numbers exactly as written, but shows a warning in the
+<strong>Problems</strong> panel, because the program reading the file may round them.</p>
+<h2 id="09-file-types--duplicate-names">Duplicate names</h2>
+<p>If a file somehow contains the same setting name twice in one group, SafeJSON reports it in the
+<strong>Problems</strong> panel. Most programs silently use only the last one, which is a common source of
+confusing bugs. SafeJSON never lets you create duplicates yourself.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-10-safety">
+<h1 id="10-safety">Saving and safety features</h1>
+<p>SafeJSON is built so that you can&#39;t damage a file by accident, and so that you can get your work
+back if something goes wrong.</p>
+<h2 id="10-safety--the-file-is-always-valid">The file is always valid</h2>
+<p>Every change you make in the tree, the table or the details panel is checked before it&#39;s applied.
+A change that would produce invalid JSON is refused. In <a href="#06-text-mode">text mode</a>, text is only
+applied once it&#39;s valid, and saving is blocked while it isn&#39;t.</p>
+<h2 id="10-safety--saving">Saving</h2>
+<ul>
+<li><strong>Save</strong> (<strong>Ctrl+S</strong>) writes the file. A file that has never been saved asks for a name first.</li>
+<li><strong>Save as…</strong> (<strong>Ctrl+Shift+S</strong>) saves under a new name or location. The tab then refers to the new file.</li>
+</ul>
+<p><strong>Crash-safe saving:</strong> SafeJSON writes to a temporary file next to yours and swaps it in only once
+it&#39;s complete. If the PC loses power mid-save, your original file is still intact.</p>
+<p><strong>Before saving, SafeJSON may ask you about:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Why</th>
+<th>Your choices</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><em>&quot;…doesn&#39;t match its schema&quot;</em></td>
+<td>The file breaks rules in its <a href="#07-schemas">schema</a></td>
+<td><strong>Save anyway</strong>, <strong>Show first problem</strong>, <strong>Cancel</strong></td>
+</tr>
+<tr>
+<td><em>&quot;…was changed by another program&quot;</em></td>
+<td>Someone else saved the file since you opened it</td>
+<td><strong>Save anyway</strong> (their version is kept as a backup), <strong>Cancel</strong></td>
+</tr>
+</tbody></table></div>
+<h2 id="10-safety--backups">Backups</h2>
+<p>Each time you save over a file, SafeJSON first keeps a copy of the previous version. By default
+it keeps the <strong>5 most recent</strong> per file; you can change this, or turn backups off, in
+<a href="#11-settings">Settings</a>.</p>
+<p>To restore one:</p>
+<ol>
+<li>Open the file and click <strong>Backups…</strong>.</li>
+<li>Pick a version by its date and time, and click <strong>Restore</strong>.</li>
+</ol>
+<p>The restored version replaces what&#39;s on screen but <strong>isn&#39;t saved yet</strong>: check it, then <strong>Save</strong>,
+or press <strong>Ctrl+Z</strong> to undo the restore. You can also <a href="#08-compare">compare</a> the current file
+with a backup first.</p>
+<p>Backups are stored in <code>%LOCALAPPDATA%\SafeJSON\backups</code>, not next to your files, so they don&#39;t
+clutter your folders or project repositories.</p>
+<h2 id="10-safety--crash-recovery">Crash recovery</h2>
+<p>Every 30 seconds, SafeJSON keeps a private copy of any unsaved changes. If SafeJSON closes
+unexpectedly (a crash, a power cut, or Windows restarting for updates), the next time you start it
+you&#39;ll see <strong>&quot;Recover unsaved work?&quot;</strong>:</p>
+<ul>
+<li><strong>Recover</strong> reopens your unsaved changes in tabs, ready to review and save.</li>
+<li><strong>Discard</strong> throws them away.</li>
+<li><strong>Cancel</strong> decides later (you&#39;ll be asked again next time).</li>
+</ul>
+<p>Recovery copies are deleted when you save or close normally.</p>
+<h2 id="10-safety--changes-made-by-other-programs">Changes made by other programs</h2>
+<p>SafeJSON checks open files every few seconds, and whenever you switch back to its window:</p>
+<ul>
+<li><strong>If you have no unsaved changes</strong>, it reloads the file automatically and tells you. Press
+<strong>Ctrl+Z</strong> to go back to what you had.</li>
+<li><strong>If you do have unsaved changes</strong>, it asks: <strong>Load their version</strong> (undoable) or <strong>Keep mine</strong>.</li>
+<li>If the file was <strong>deleted or moved</strong>, it tells you; saving creates it again.</li>
+<li>If the other program left the file <strong>invalid</strong> (for example mid-save), SafeJSON keeps your version and tells you.</li>
+</ul>
+<h2 id="10-safety--closing">Closing</h2>
+<ul>
+<li>Closing a tab with unsaved changes asks: <strong>Save</strong>, <strong>Don&#39;t save</strong>, or <strong>Cancel</strong>.</li>
+<li>Closing the SafeJSON window asks about each file with unsaved changes.</li>
+</ul>
+<h2 id="10-safety--undo">Undo</h2>
+<p>Every change, including deleting, moving, changing type, restoring a backup, reloading after another
+program&#39;s change, and formatting, can be undone with <strong>Ctrl+Z</strong>, step by step, back to when you opened
+the file.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-11-settings">
+<h1 id="11-settings">Settings</h1>
+<p>Click <strong>⚙</strong> at the right end of the toolbar, or press <strong>Ctrl+,</strong>. Changes apply and are saved
+immediately. Click <strong>Done</strong> to close.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Choices</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Theme</strong></td>
+<td>Match Windows (default), Light, Dark</td>
+<td>Colours of the app. <em>Match Windows</em> follows the light/dark choice in Windows settings, and switches when Windows does</td>
+</tr>
+<tr>
+<td><strong>Format uses</strong></td>
+<td>The file&#39;s current indentation (default), 2 spaces, 4 spaces, Tabs</td>
+<td>Indentation used by the <strong>Format</strong> button. Normal edits always match the file</td>
+</tr>
+<tr>
+<td><strong>Trailing commas</strong></td>
+<td>Keep them (default), Remove them when saving</td>
+<td>Whether commas before a closing bracket, such as <code>[1, 2,]</code>, are removed when saving. See <a href="#09-file-types--trailing-commas">File types</a></td>
+</tr>
+<tr>
+<td><strong>Backups per file</strong></td>
+<td>0 to 50 (default 5)</td>
+<td>How many earlier versions to keep per file. 0 turns backups off</td>
+</tr>
+<tr>
+<td><strong>Schema rules</strong></td>
+<td>A list of pattern → schema</td>
+<td>See below</td>
+</tr>
+<tr>
+<td><strong>Recent files</strong></td>
+<td><strong>Clear list</strong></td>
+<td>Empties the list on the welcome screen</td>
+</tr>
+</tbody></table></div>
+<h2 id="11-settings--schema-rules">Schema rules</h2>
+<p>Schema rules give files a <a href="#07-schemas">schema</a> automatically based on their name, for files
+that don&#39;t name their own schema.</p>
+<ol>
+<li>Click <strong>+ Add rule</strong>.</li>
+<li>In the first box, type a file-name pattern. <code>*</code> matches anything and <code>?</code> matches one character:<ul>
+<li><code>appsettings*.json</code> matches <code>appsettings.json</code> and <code>appsettings.Development.json</code></li>
+<li><code>*.config.json</code> matches any file ending in <code>.config.json</code></li>
+<li>Include a folder, as in <code>C:\projects\*\settings.json</code>, to match the whole path</li>
+</ul>
+</li>
+<li>In the second box, enter the schema&#39;s file path or web address, or click <strong>…</strong> to choose a file.</li>
+</ol>
+<p>Click <strong>×</strong> to remove a rule. A file&#39;s own <code>&quot;$schema&quot;</code>, or a schema you chose for that file in the
+schema dialog, takes priority over these rules.</p>
+<h2 id="11-settings--where-settings-are-stored">Where settings are stored</h2>
+<p>In <code>%LOCALAPPDATA%\SafeJSON\settings.json</code>. To reset everything to the defaults, close SafeJSON
+and delete that file.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-12-keyboard-shortcuts">
+<h1 id="12-keyboard-shortcuts">Keyboard shortcuts</h1>
+<h2 id="12-keyboard-shortcuts--files-and-tabs">Files and tabs</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Ctrl+N</strong></td>
+<td>New file</td>
+</tr>
+<tr>
+<td><strong>Ctrl+O</strong></td>
+<td>Open file(s)</td>
+</tr>
+<tr>
+<td><strong>Ctrl+S</strong></td>
+<td>Save</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+S</strong></td>
+<td>Save as</td>
+</tr>
+<tr>
+<td><strong>Ctrl+W</strong></td>
+<td>Close tab</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Tab</strong> / <strong>Ctrl+Shift+Tab</strong></td>
+<td>Next / previous tab</td>
+</tr>
+<tr>
+<td><strong>Ctrl+,</strong></td>
+<td>Settings</td>
+</tr>
+</tbody></table></div>
+<h2 id="12-keyboard-shortcuts--editing">Editing</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Ctrl+Z</strong></td>
+<td>Undo</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Y</strong> or <strong>Ctrl+Shift+Z</strong></td>
+<td>Redo</td>
+</tr>
+<tr>
+<td><strong>Ctrl+F</strong></td>
+<td>Search keys and values (in text mode: find in text)</td>
+</tr>
+<tr>
+<td><strong>Shift+Alt+F</strong></td>
+<td>Format the whole file</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Shift+T</strong></td>
+<td>Switch between Tree and Text</td>
+</tr>
+</tbody></table></div>
+<h2 id="12-keyboard-shortcuts--in-the-tree">In the tree</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>↑</strong> / <strong>↓</strong></td>
+<td>Select the previous / next line</td>
+</tr>
+<tr>
+<td><strong>→</strong></td>
+<td>Open a group or list; if it&#39;s open, go to its first entry</td>
+</tr>
+<tr>
+<td><strong>←</strong></td>
+<td>Close a group or list; if it&#39;s closed, go to the group it belongs to</td>
+</tr>
+<tr>
+<td><strong>Enter</strong></td>
+<td>Edit the selected value in place</td>
+</tr>
+<tr>
+<td><strong>F2</strong></td>
+<td>Rename the selected setting</td>
+</tr>
+<tr>
+<td><strong>Delete</strong></td>
+<td>Delete the selected setting or item</td>
+</tr>
+<tr>
+<td><strong>Ctrl+D</strong></td>
+<td>Duplicate</td>
+</tr>
+<tr>
+<td><strong>Alt+↑</strong> / <strong>Alt+↓</strong></td>
+<td>Move up / down</td>
+</tr>
+<tr>
+<td><strong>Shift+F10</strong> or the <strong>Menu</strong> key</td>
+<td>Open the right-click menu</td>
+</tr>
+</tbody></table></div>
+<h2 id="12-keyboard-shortcuts--while-editing-a-value">While editing a value</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Enter</strong></td>
+<td>Save (number boxes, key names, in-tree editing)</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Enter</strong></td>
+<td>Save (multi-line text box)</td>
+</tr>
+<tr>
+<td><strong>Escape</strong></td>
+<td>Cancel</td>
+</tr>
+</tbody></table></div>
+<h2 id="12-keyboard-shortcuts--in-table-view">In table view</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Arrow keys</strong>, <strong>Tab</strong></td>
+<td>Move between cells</td>
+</tr>
+<tr>
+<td><strong>Enter</strong> or <strong>F2</strong></td>
+<td>Edit the selected cell</td>
+</tr>
+<tr>
+<td><strong>Space</strong></td>
+<td>Toggle a true/false cell</td>
+</tr>
+<tr>
+<td><strong>Delete</strong></td>
+<td>Remove the setting from that row</td>
+</tr>
+<tr>
+<td><strong>Escape</strong></td>
+<td>Cancel editing</td>
+</tr>
+</tbody></table></div>
+<h2 id="12-keyboard-shortcuts--in-text-mode">In text mode</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Keys</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Ctrl+F</strong> / <strong>Ctrl+H</strong></td>
+<td>Find / replace</td>
+</tr>
+<tr>
+<td><strong>Ctrl+Space</strong></td>
+<td>Suggestions</td>
+</tr>
+<tr>
+<td><strong>Shift+Alt+F</strong></td>
+<td>Format the text</td>
+</tr>
+<tr>
+<td><strong>Alt+↑</strong> / <strong>Alt+↓</strong></td>
+<td>Move line up / down</td>
+</tr>
+<tr>
+<td><strong>Ctrl+/</strong></td>
+<td>Toggle a comment (files that allow comments)</td>
+</tr>
+</tbody></table></div>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-13-troubleshooting">
+<h1 id="13-troubleshooting">Troubleshooting and FAQ</h1>
+<h2 id="13-troubleshooting--starting-safejson">Starting SafeJSON</h2>
+<p><strong>&quot;Windows protected your PC&quot; appears.</strong>
+Click <strong>More info</strong>, check the publisher is <strong>Eric McFall</strong>, and click <strong>Run anyway</strong>. This warning
+appears for new releases until Windows has seen them often.</p>
+<p><strong>&quot;Smart App Control blocked an app&quot; / &quot;An Application Control policy has blocked this file&quot;.</strong>
+You&#39;re running SafeJSON 1.0 or 2.0, which aren&#39;t signed. Download version 3.0 or later.</p>
+<p><strong>Nothing happens, or an error mentions WebView2.</strong>
+SafeJSON needs Microsoft Edge WebView2, which comes with Windows 11 and current Windows 10. Run Windows
+Update, or install the &quot;Evergreen WebView2 Runtime&quot; from Microsoft&#39;s website.</p>
+<h2 id="13-troubleshooting--opening-files">Opening files</h2>
+<p><strong>&quot;…isn&#39;t valid JSON yet (line 3, column 5: …)&quot;.</strong>
+The file has a mistake. SafeJSON opens it in <a href="#06-text-mode">text mode</a> so you can fix it.
+See the table of common mistakes there.</p>
+<p><strong>&quot;…is not UTF-8 text, so SafeJSON can&#39;t open it safely.&quot;</strong>
+The file uses an older text encoding. Open it in Notepad, choose <strong>File → Save as</strong>, set
+<strong>Encoding</strong> to <strong>UTF-8</strong>, and save. Then open it in SafeJSON.</p>
+<p><strong>&quot;…is larger than SafeJSON supports (10 MB).&quot;</strong>
+SafeJSON is designed for configuration files. Use a text editor for very large data files.</p>
+<p><strong>Table is greyed out.</strong>
+Select a list whose items are all groups of settings (<code>{ }</code>), or something inside one. See
+<a href="#05-table-view">Table view</a>.</p>
+<h2 id="13-troubleshooting--editing">Editing</h2>
+<p><strong>My number turns red.</strong>
+It isn&#39;t a valid JSON number. Use digits with an optional <code>-</code>, one <code>.</code> for decimals, and <code>e</code> for
+powers of ten: <code>1500</code>, <code>-2.5</code>, <code>1e6</code>. Don&#39;t use thousands separators or units (<code>1,500</code>, <code>12px</code>).</p>
+<p><strong>I can&#39;t add a setting: &quot;This object already has a key named …&quot;.</strong>
+Each name can appear only once in a group. Choose another name or edit the existing setting.</p>
+<p><strong>I need to move a setting into another group.</strong>
+Copy its value (right-click → <strong>Copy value as JSON</strong>), add a setting with the same name in the
+other group, paste the value in <a href="#06-text-mode">text mode</a> or re-enter it, then delete the
+original.</p>
+<p><strong>Format says it isn&#39;t available.</strong>
+Format isn&#39;t available for JSON5 files yet. Your edits still keep the file&#39;s layout.</p>
+<p><strong>I want to add or edit comments.</strong>
+Use <a href="#06-text-mode">text mode</a> in a JSON with Comments or JSON5 file. Standard JSON files can&#39;t
+have comments.</p>
+<h2 id="13-troubleshooting--schemas">Schemas</h2>
+<p><strong>The status bar says &quot;⚠ Schema not loaded&quot;.</strong>
+Hover over it to see why. Common causes: the schema file was moved, the web address is wrong, or
+there&#39;s no internet connection and the schema hasn&#39;t been downloaded before. Click the item to
+choose another schema or <strong>Reload schema</strong>.</p>
+<p><strong>The schema is wrong or out of date for my program&#39;s version.</strong>
+Click the schema item in the status bar and choose a different schema, or <strong>Don&#39;t use a schema</strong>.
+Schema problems never stop you saving.</p>
+<p><strong>Every setting is &quot;not a known property here&quot;.</strong>
+The file is probably being checked against the wrong schema. Check which one in the schema dialog.</p>
+<h2 id="13-troubleshooting--saving">Saving</h2>
+<p><strong>&quot;Can&#39;t be saved until it&#39;s valid JSON.&quot;</strong>
+Text mode has a mistake; the red banner shows where. Fix it, then save.</p>
+<p><strong>&quot;Windows denied access to …&quot;</strong>
+The file is read-only, in a protected folder (such as Program Files), or open and locked in
+another program. Close the other program, or use <strong>Save as…</strong> to save elsewhere.</p>
+<p><strong>I saved something by mistake.</strong>
+Click <strong>Backups…</strong> and restore the previous version, then save again. Or press <strong>Ctrl+Z</strong>
+(undo still works after saving) and save again.</p>
+<h2 id="13-troubleshooting--faq">FAQ</h2>
+<p><strong>Does SafeJSON send my files anywhere?</strong>
+No. Files are read and saved only on your PC. The only internet access is downloading schemas from
+web addresses that a file (or you) names.</p>
+<p><strong>Will SafeJSON change parts of my file I didn&#39;t touch?</strong>
+No. Only the part you change is rewritten; comments, spacing, order and line endings are kept. The
+exceptions are things you ask for: <strong>Format</strong>, and removing trailing commas if you turned that on.</p>
+<p><strong>Can several people edit the same file?</strong>
+SafeJSON notices when another program or person saves the file while you have it open, and
+asks before overwriting their changes. It doesn&#39;t merge edits automatically, but
+<a href="#08-compare">Compare</a> helps you combine them.</p>
+<p><strong>Can I use SafeJSON on a Mac or Linux?</strong>
+Not currently. SafeJSON is built for Windows.</p>
+<p><strong>Where are my backups and settings?</strong>
+In <code>%LOCALAPPDATA%\SafeJSON</code>. See <a href="#01-installing--where-safejson-keeps-its-own-data">Installing</a>.</p>
+</section>
+<p class="top-link"><a href="#introduction">↑ Back to top</a></p>
+<section class="chapter" id="section-14-glossary">
+<h1 id="14-glossary">Glossary</h1>
+<p><strong>Array (list)</strong>
+An ordered list of values, written <code>[1, 2, 3]</code>. Items are numbered from 0. Badge: <code>[ ]</code>.</p>
+<p><strong>Backup</strong>
+A copy of a file&#39;s previous version, kept automatically each time you save. See <a href="#10-safety--backups">Backups</a>.</p>
+<p><strong>Boolean (true / false)</strong>
+A value that is either <code>true</code> or <code>false</code>. Badge: <code>✓</code>.</p>
+<p><strong>BOM (byte-order mark)</strong>
+An invisible marker some programs put at the start of a text file. SafeJSON keeps it if it&#39;s there.</p>
+<p><strong>Comment</strong>
+A note in a file that programs ignore: <code>// like this</code> or <code>/* like this */</code>. Allowed in JSON with
+Comments and JSON5, not in standard JSON.</p>
+<p><strong>CRLF / LF</strong>
+The two styles of line ending. Windows traditionally uses CRLF; Linux and macOS use LF. SafeJSON
+keeps whichever the file uses.</p>
+<p><strong>Default</strong>
+The value a <a href="#07-schemas">schema</a> says a setting has when it isn&#39;t specified.</p>
+<p><strong>Deprecated</strong>
+A setting the schema says is no longer used, or will be removed.</p>
+<p><strong>Enum (allowed values)</strong>
+A fixed list of values a schema allows for a setting. SafeJSON shows these as a dropdown.</p>
+<p><strong>Escape characters</strong>
+Codes like <code>\&quot;</code> or <code>\n</code> used inside JSON text to represent quotes and line breaks. SafeJSON adds
+them automatically; you never type them.</p>
+<p><strong>JSON</strong>
+JavaScript Object Notation: a common text format for settings and data, made of objects, arrays,
+text, numbers, true/false and null.</p>
+<p><strong>JSONC (JSON with Comments)</strong>
+JSON that also allows comments and trailing commas. Used by VS Code and others.</p>
+<p><strong>JSON5</strong>
+A friendlier extension of JSON that also allows unquoted names, single quotes, hex numbers and more.</p>
+<p><strong>Key (name)</strong>
+The name of a setting in an object, such as <code>&quot;port&quot;</code> in <code>&quot;port&quot;: 8080</code>.</p>
+<p><strong>Null</strong>
+A deliberately empty value, written <code>null</code>. Badge: <code>∅</code>.</p>
+<p><strong>Number</strong>
+A numeric value such as <code>8080</code>, <code>-1.5</code> or <code>1e6</code>. Badge: <code>#</code>.</p>
+<p><strong>Object (group)</strong>
+A group of named settings, written <code>{ &quot;name&quot;: value, … }</code>. Badge: <code>{ }</code>.</p>
+<p><strong>Path</strong>
+The location of a setting in a file, such as <code>servers[0].host</code>: the <code>host</code> setting of the first item
+in the <code>servers</code> list.</p>
+<p><strong>Property</strong>
+Another word for a named setting in an object (a key and its value).</p>
+<p><strong>Required</strong>
+A setting a schema says must be present.</p>
+<p><strong>Schema (JSON Schema)</strong>
+A file describing what another JSON file may contain. See <a href="#07-schemas">Schemas</a>.</p>
+<p><strong>String (text)</strong>
+A text value, written in quotes: <code>&quot;hello&quot;</code>. Badge: <code>Aa</code>.</p>
+<p><strong>Trailing comma</strong>
+A comma after the last item in a list or object: <code>[1, 2,]</code>. Allowed in JSONC and JSON5 only.</p>
+<p><strong>UTF-8</strong>
+The standard way of storing text in files, and the encoding JSON files use.</p>
+<p><strong>Value</strong>
+The data part of a setting: text, a number, true/false, null, an object or a list.</p>
+</section>
+<footer>SafeJSON 3.0.0 User Guide. Generated from the Markdown files in docs/user-guide.</footer>
+</main>
+</div>
+</body>
+</html>
