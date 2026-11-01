@@ -86,13 +86,14 @@ input:focus, select:focus, textarea:focus, .tree:focus { outline: 2px solid var(
 /* ---- layout */
 .app { display: flex; flex-direction: column; height: 100vh; }
 .toolbar {
-  display: flex; align-items: center; gap: 6px;
+  /* Wraps onto a second row in narrow windows, so no button is ever cut off. */
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
   padding: 6px 8px; background: var(--bg-panel); border-bottom: 1px solid var(--border);
 }
 .toolbar button { white-space: nowrap; }
 .toolbar-gap { width: 10px; }
 .toolbar-spacer { flex: 1; }
-.toolbar input[type="search"] { width: 280px; }
+.toolbar input[type="search"] { flex: 1 1 150px; max-width: 280px; } /* grows to 280px when there is room; wraps only below 150px */
 .workspace { flex: 1; display: flex; min-height: 0; }
 
 .segmented { display: inline-flex; }

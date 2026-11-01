@@ -37,4 +37,5 @@ need to know JSON in detail. Where a JSON term matters, the guide explains it.
 - Keyboard shortcuts are written like **Ctrl+S**: hold Ctrl and press S.
 
 This guide is also available as a single web page, `SafeJSON-User-Guide.html`, which you can open
-in any browser or print.
+in any browser or print. The latest version is online at
+<https://ericmcfall.github.io/SafeJSON/>. Click **Help** in SafeJSON's toolbar (or press **F1**) to open it.

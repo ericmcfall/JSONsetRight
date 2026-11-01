@@ -11,6 +11,7 @@
 | **Ctrl+W** | Close tab |
 | **Ctrl+Tab** / **Ctrl+Shift+Tab** | Next / previous tab |
 | **Ctrl+,** | Settings |
+| **F1** | Open this user guide in your web browser |
 
 ## Editing
 

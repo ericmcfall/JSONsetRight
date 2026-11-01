@@ -10,7 +10,7 @@ import { fileNameOf } from "../platform/files";
 import { isDirty, useEditor, type Tab } from "../store/editor";
 import { useSettings } from "../store/settings";
 import { useDialog } from "./dialog";
-import { closeTabWithPrompt, formatActive } from "./commands";
+import { closeTabWithPrompt, formatActive, openUserGuide } from "./commands";
 
 interface ToolbarProps {
   query: string;
@@ -77,6 +77,7 @@ export function Toolbar({ query, onQuery, onBackups, onSettings, onCompare }: To
         disabled={!has || tab?.view === "text"}
         aria-label="Search"
       />
+      <button type="button" onClick={openUserGuide} title="Open the user guide in your web browser (F1)">Help</button>
       <button type="button" onClick={onSettings} title="Settings (Ctrl+,)" aria-label="Settings">⚙</button>
     </header>
   );

@@ -1,10 +1,26 @@
 // Window-level commands used by the toolbar, tabs and keyboard shortcuts.
+import { isTauri } from "@tauri-apps/api/core";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { formatDocument } from "../engine";
 import { isDirty, useEditor } from "../store/editor";
 import { formatIndentFor } from "../store/settings";
 import { askDialog } from "./dialog";
 
 const store = () => useEditor.getState();
+
+/** The HTML user guide, published from docs/ by GitHub Pages. */
+export const USER_GUIDE_URL = "https://ericmcfall.github.io/SafeJSON/user-guide/SafeJSON-User-Guide.html";
+
+/** Opens the user guide in the default web browser. */
+export function openUserGuide(): void {
+  if (isTauri()) {
+    openUrl(USER_GUIDE_URL).catch((error) =>
+      store().showMessage({ kind: "error", text: `Couldn't open the user guide (${error}). It's at ${USER_GUIDE_URL}` }),
+    );
+  } else {
+    window.open(USER_GUIDE_URL, "_blank", "noopener");
+  }
+}
 
 /** Closes a tab, asking to save first if it has unsaved changes. */
 export async function closeTabWithPrompt(tabId: string): Promise<boolean> {
@@ -68,4 +84,6 @@ export function handleShortcut(e: KeyboardEvent, focusSearch: () => void): void 
     if (!inTextBox && (key === "y" || (key === "z" && e.shiftKey))) return run(s.redo);
   }
   if (e.shiftKey && e.altKey && key === "f" && !inCodeEditor) return run(formatActive);
+  // F1 is the usual Windows help key (in text mode it opens the code editor's command list instead).
+  if (e.key === "F1" && !e.ctrlKey && !e.shiftKey && !e.altKey && !inCodeEditor) return run(openUserGuide);
 }

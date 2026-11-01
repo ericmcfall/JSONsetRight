@@ -1,7 +1,7 @@
 # A tour of the window
 
 ```
-TOOLBAR      New  Open…  Save  Save as…  Undo  Redo  Format  Tree|Table|Text  Backups…  Compare…  [search]  ⚙
+TOOLBAR      New  Open…  Save  Save as…  Undo  Redo  Format  Tree|Table|Text  Backups…  Compare…  [search]  Help  ⚙
 TABS         settings.json ● ×   build.json5 ×
 MESSAGE BAR  (notices appear here)
 
@@ -30,9 +30,11 @@ STATUS BAR   C:\config\settings.json   1 problem   Schema: app.schema.json   JSO
 | **Backups…** | Restores an earlier saved version ([Backups](10-safety.md#backups)) | |
 | **Compare…** | Compares this file with another version ([Comparing files](08-compare.md)) | |
 | **Search box** | Shows only the settings whose name or value matches | Ctrl+F |
+| **Help** | Opens this user guide in your web browser | F1 |
 | **⚙** | Opens [Settings](11-settings.md) | Ctrl+, |
 
-Hover over any button to see a short description.
+Hover over any button to see a short description. In a narrow window, the last buttons move to a
+second row of the toolbar.
 
 ## Tabs
 
