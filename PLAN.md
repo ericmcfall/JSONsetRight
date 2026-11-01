@@ -2,7 +2,7 @@
 
 A standalone Windows app for creating and editing JSON config files through a GUI, built so that **syntax errors are impossible** and schema mistakes are caught before saving.
 
-Status: **v1.0.0 and v2.0.0 released. Phase 3 (JSON5, table view, compare) built.** All planned phases are done.
+Status: **v1.0.0, v2.0.0 and v3.0.0 released.** All planned phases are done. Next: a browser version, see [PLAN-WEB.md](PLAN-WEB.md).
 
 Changes from the original plan, made during Phase 2:
 - Schema discovery order: a schema the user picks for a file now comes *first* (before `$schema`),
