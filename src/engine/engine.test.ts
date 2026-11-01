@@ -141,6 +141,17 @@ describe("arrays", () => {
     expect(value(doc)).toMatchObject({ tags: ["first", "a", "mid", "b", "c", "z"] });
   });
 
+  it("keeps one-line lists on one line", () => {
+    let doc = moveChild(parseDocument(CONFIG), ["tags"], 0, 2);
+    expect(doc.text).toContain('"tags": ["b", "c", "a"],');
+    doc = insertItem(doc, ["tags"], "z", 0);
+    doc = insertItem(doc, ["tags"], "end");
+    expect(doc.text).toContain('"tags": ["z", "b", "c", "a", "end"],');
+    doc = removeValue(doc, ["tags", 2]);
+    expect(doc.text).toContain('"tags": ["z", "b", "a", "end"],');
+    expect(doc.text.split("\n").length).toBe(CONFIG.split("\n").length);
+  });
+
   it("inserts into an empty array", () => {
     const doc = insertItem(parseDocument('{"list": []}'), ["list"], { a: 1 });
     expect(value(doc)).toEqual({ list: [{ a: 1 }] });

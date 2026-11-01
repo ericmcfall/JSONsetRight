@@ -52,7 +52,7 @@ export function setValue(doc: JsonDocument, path: Path, value: JsonValue): JsonD
     const content = JSON.stringify(value, null, doc.format.indent).replace(/\n/g, doc.format.eol);
     return replaceNodeText(doc, node, content);
   }
-  return commit(doc, applyEdits(doc.text, modify(doc.text, path, value, options(doc))));
+  return commit(doc, modifyText(doc, path, value));
 }
 
 /**
@@ -104,9 +104,8 @@ export function addProperty(
 ): JsonDocument {
   const object = requireContainer(doc, objectPath, "object");
   checkNewKey(object, key);
-  const opts = options(doc);
-  if (index !== undefined) opts.getInsertionIndex = () => index;
-  return commit(doc, applyEdits(doc.text, modify(doc.text, [...objectPath, key], value, opts)));
+  const extra: ModificationOptions = index === undefined ? {} : { getInsertionIndex: () => index };
+  return commit(doc, modifyText(doc, [...objectPath, key], value, extra));
 }
 
 /** Renames a key, leaving its value and everything around it untouched. */
@@ -127,9 +126,7 @@ export function insertItem(doc: JsonDocument, arrayPath: Path, value: JsonValue,
   const length = array.children?.length ?? 0;
   const at = index ?? length;
   if (at < 0 || at > length) throw new EditError("index-out-of-range", `Index ${at} is outside the list`);
-  const opts = options(doc);
-  opts.isArrayInsertion = true;
-  return commit(doc, applyEdits(doc.text, modify(doc.text, [...arrayPath, at], value, opts)));
+  return commit(doc, modifyText(doc, [...arrayPath, at], value, { isArrayInsertion: true }));
 }
 
 // ---------------------------------------------------------------- both
@@ -138,7 +135,7 @@ export function insertItem(doc: JsonDocument, arrayPath: Path, value: JsonValue,
 export function removeValue(doc: JsonDocument, path: Path): JsonDocument {
   if (path.length === 0) throw new EditError("cannot-remove-root", "The top-level value cannot be deleted");
   requireNode(doc, path);
-  return commit(doc, applyEdits(doc.text, modify(doc.text, path, undefined, options(doc))));
+  return commit(doc, modifyText(doc, path, undefined));
 }
 
 /**
@@ -276,14 +273,32 @@ function replaceNodeText(doc: JsonDocument, node: Node, content: string): JsonDo
   return commit(doc, applyEdits(doc.text, [{ offset: node.offset, length: node.length, content }]));
 }
 
-function options(doc: JsonDocument): ModificationOptions {
+/**
+ * Runs jsonc-parser's modify() and applies the result. Containers written on one line, like
+ * [1, 2, 3], are kept on one line; otherwise new content is indented to match the file.
+ */
+function modifyText(doc: JsonDocument, path: Path, value: JsonValue | undefined, extra: ModificationOptions = {}): string {
+  const container = findNode(doc, path.slice(0, -1));
+  const containerText = container ? sourceOf(doc, container) : "";
+  const oneLine = (container?.children?.length ?? 0) > 0 && !containerText.includes("\n");
+  if (!oneLine) {
+    return applyEdits(doc.text, modify(doc.text, path, value, { ...extra, formattingOptions: formatting(doc) }));
+  }
+  // Without formatting, jsonc-parser writes "a,b"; add the space people expect after commas.
+  const edits = modify(doc.text, path, value, extra).map((edit) => ({
+    ...edit,
+    content: edit.content.replace(/^,/, ", ").replace(/,$/, ", "),
+  }));
+  return applyEdits(doc.text, edits);
+}
+
+function formatting(doc: JsonDocument): FormattingOptions {
   const tabs = doc.format.indent === "\t";
-  const formattingOptions: FormattingOptions = {
+  return {
     insertSpaces: !tabs,
     tabSize: tabs ? 4 : doc.format.indent.length,
     eol: doc.format.eol,
   };
-  return { formattingOptions };
 }
 
 /** Re-parses edited text. An invalid result means a bug in SafeJSON, never a user mistake. */

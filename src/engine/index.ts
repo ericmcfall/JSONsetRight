@@ -5,3 +5,4 @@ export * from "./edits";
 export * from "./validate";
 export * from "./format";
 export * from "./history";
+export * from "./comments";

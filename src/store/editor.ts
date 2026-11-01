@@ -2,6 +2,7 @@
 // Components read from this store and call its actions; they never edit text themselves.
 import { create } from "zustand";
 import {
+  childrenOf,
   EditError,
   JsonSyntaxError,
   parseDocument,
@@ -15,6 +16,7 @@ import {
   type Path,
 } from "../engine";
 import { fileNameOf, pickFilesToOpen, pickSavePath, readTextFile, saveTextFile } from "../platform/files";
+import { pathKey } from "../ui/tree-model";
 
 export interface Tab {
   id: string;
@@ -27,6 +29,8 @@ export interface Tab {
   /** File's modified time when last loaded or saved, to notice changes made by other programs. */
   diskModifiedMs: number | null;
   selectedPath: Path;
+  /** Tree nodes that are expanded, as pathKey() strings. */
+  expanded: Set<string>;
 }
 
 export interface Message {
@@ -41,12 +45,16 @@ interface EditorState {
   backupCount: number;
 
   newFile(): void;
+  /** Opens text that didn't come from a file on disk (used for the browser-only dev preview). */
+  openText(title: string, text: string): void;
   openFiles(paths?: string[]): Promise<void>;
   save(tabId?: string): Promise<boolean>;
   saveAs(tabId?: string): Promise<boolean>;
   closeTab(tabId: string): void;
   activate(tabId: string): void;
+  /** Selects a value and expands its parents so it is visible. */
   select(path: Path): void;
+  setExpanded(path: Path, open: boolean): void;
   /** Runs an engine edit on the active document. Returns false (and shows why) if it was refused. */
   apply(edit: (doc: JsonDocument) => JsonDocument, selectAfter?: Path): boolean;
   undo(): void;
@@ -56,6 +64,28 @@ interface EditorState {
 
 let nextTabNumber = 1;
 let untitledCount = 0;
+
+/** A new tab shows the top level and the containers directly inside it. */
+function initialExpanded(doc: JsonDocument): Set<string> {
+  const keys = new Set([pathKey([])]);
+  for (const child of childrenOf(doc.root)) {
+    if (child.node.type === "object" || child.node.type === "array") keys.add(pathKey([child.key]));
+  }
+  return keys;
+}
+
+function makeTab(filePath: string | null, title: string, doc: JsonDocument, savedText: string, diskModifiedMs: number | null): Tab {
+  return {
+    id: `tab-${nextTabNumber++}`,
+    filePath,
+    title,
+    history: startHistory(doc),
+    savedText,
+    diskModifiedMs,
+    selectedPath: [],
+    expanded: initialExpanded(doc),
+  };
+}
 
 export const useEditor = create<EditorState>((set, get) => {
   const activeTab = () => get().tabs.find((t) => t.id === get().activeId);
@@ -71,16 +101,12 @@ export const useEditor = create<EditorState>((set, get) => {
 
     newFile() {
       untitledCount++;
-      const doc = parseDocument("{\r\n}\r\n");
-      const tab: Tab = {
-        id: `tab-${nextTabNumber++}`,
-        filePath: null,
-        title: `Untitled-${untitledCount}.json`,
-        history: startHistory(doc),
-        savedText: "",
-        diskModifiedMs: null,
-        selectedPath: [],
-      };
+      const tab = makeTab(null, `Untitled-${untitledCount}.json`, parseDocument("{\r\n}\r\n"), "", null);
+      set((state) => ({ tabs: [...state.tabs, tab], activeId: tab.id }));
+    },
+
+    openText(title, text) {
+      const tab = makeTab(null, title, parseDocument(text), text, null);
       set((state) => ({ tabs: [...state.tabs, tab], activeId: tab.id }));
     },
 
@@ -94,16 +120,7 @@ export const useEditor = create<EditorState>((set, get) => {
         }
         try {
           const file = await readTextFile(path);
-          const doc = parseDocument(file.text);
-          const tab: Tab = {
-            id: `tab-${nextTabNumber++}`,
-            filePath: path,
-            title: fileNameOf(path),
-            history: startHistory(doc),
-            savedText: file.text,
-            diskModifiedMs: file.modifiedMs,
-            selectedPath: [],
-          };
+          const tab = makeTab(path, fileNameOf(path), parseDocument(file.text), file.text, file.modifiedMs);
           set((state) => ({ tabs: [...state.tabs, tab], activeId: tab.id }));
         } catch (error) {
           if (error instanceof JsonSyntaxError) {
@@ -158,7 +175,19 @@ export const useEditor = create<EditorState>((set, get) => {
 
     select(path) {
       const tab = activeTab();
-      if (tab) updateTab(tab.id, { selectedPath: path });
+      if (!tab) return;
+      const expanded = new Set(tab.expanded);
+      for (let i = 0; i < path.length; i++) expanded.add(pathKey(path.slice(0, i)));
+      updateTab(tab.id, { selectedPath: path, expanded });
+    },
+
+    setExpanded(path, open) {
+      const tab = activeTab();
+      if (!tab) return;
+      const expanded = new Set(tab.expanded);
+      if (open) expanded.add(pathKey(path));
+      else expanded.delete(pathKey(path));
+      updateTab(tab.id, { expanded });
     },
 
     apply(edit, selectAfter) {
@@ -167,10 +196,8 @@ export const useEditor = create<EditorState>((set, get) => {
       try {
         const next = edit(tab.history.present);
         if (next === tab.history.present) return true; // no change
-        updateTab(tab.id, {
-          history: pushHistory(tab.history, next),
-          ...(selectAfter ? { selectedPath: selectAfter } : {}),
-        });
+        updateTab(tab.id, { history: pushHistory(tab.history, next) });
+        if (selectAfter) get().select(selectAfter);
         return true;
       } catch (error) {
         fail(error instanceof EditError ? error.message : `Unexpected problem: ${error}`);
