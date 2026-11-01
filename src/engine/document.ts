@@ -171,6 +171,27 @@ function scanText(text: string): { hasComments: boolean; hasTrailingCommas: bool
   return { hasComments, hasTrailingCommas };
 }
 
+/**
+ * For files that were strict JSON when opened: the first comment or trailing comma in `text`,
+ * since adding those would make the file unreadable by programs that expect standard JSON.
+ */
+export function findStrictJsonViolation(text: string): SyntaxProblem | null {
+  const scanner = createScanner(text, false);
+  let lastComma: number | null = null;
+  for (let token = scanner.scan(); token !== Token.EOF; token = scanner.scan()) {
+    const offset = scanner.getTokenOffset();
+    if (token === Token.LineComment || token === Token.BlockComment) {
+      return { message: "Comments aren't allowed in this file, because it is standard JSON", offset, ...lineAndColumn(text, offset) };
+    }
+    if (isTrivia(token)) continue;
+    if ((token === Token.CloseBrace || token === Token.CloseBracket) && lastComma !== null) {
+      return { message: "A comma before a closing bracket isn't allowed in standard JSON", offset: lastComma, ...lineAndColumn(text, lastComma) };
+    }
+    lastComma = token === Token.Comma ? offset : null;
+  }
+  return null;
+}
+
 function detectEol(text: string): "\n" | "\r\n" {
   const lf = text.indexOf("\n");
   if (lf === -1) return "\r\n"; // single-line file: use the Windows default for new lines

@@ -13,6 +13,7 @@ import { DetailsPanel } from "./ui/DetailsPanel";
 import { startSafetyNet } from "./ui/safety";
 import { SchemaDialog } from "./ui/SchemaDialog";
 import { SettingsDialog } from "./ui/SettingsDialog";
+import { TextEditor } from "./ui/TextEditor";
 import { TreeView } from "./ui/TreeView";
 
 // React runs effects twice in development; this keeps one-time startup work from repeating.
@@ -101,8 +102,14 @@ function App() {
       {tab ? (
         <>
           <main className="workspace">
-            <TreeView tab={tab} query={query} />
-            <DetailsPanel tab={tab} />
+            {tab.view === "text" ? (
+              <TextEditor tab={tab} />
+            ) : (
+              <>
+                <TreeView tab={tab} query={query} />
+                <DetailsPanel tab={tab} />
+              </>
+            )}
           </main>
           <ProblemsPanel tab={tab} />
           <StatusBar tab={tab} onSchema={() => setDialog("schema")} />

@@ -2,7 +2,14 @@
 
 A standalone Windows app for creating and editing JSON config files through a GUI, built so that **syntax errors are impossible** and schema mistakes are caught before saving.
 
-Status: **Phase 0 and Phase 1 (v1) built.** Phase 2 (schemas, raw mode) is next.
+Status: **v1.0.0 released. Phase 2 (schemas, text mode) built.** Phase 3 (JSON5, table view, compare) is next.
+
+Changes from the original plan, made during Phase 2:
+- Schema discovery order: a schema the user picks for a file now comes *first* (before `$schema`),
+  so an explicit choice always wins. "Don't use a schema" is also a per-file choice.
+- Raw mode is called "Text" mode in the app. It also opens files that aren't valid JSON, so they
+  can be fixed in SafeJSON (v1 refused them).
+- Files that were strict JSON when opened stay strict in text mode (comments/trailing commas refused).
 
 ---
 

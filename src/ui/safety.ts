@@ -2,7 +2,6 @@
 // program changes an open file, and asking about unsaved work when the window closes.
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { toFileText } from "../engine";
 import {
   deleteRecoveryDraft,
   fileModifiedMs,
@@ -10,7 +9,7 @@ import {
   readTextFile,
   writeRecoveryDraft,
 } from "../platform/files";
-import { isDirty, useEditor } from "../store/editor";
+import { currentFileText, isDirty, useEditor } from "../store/editor";
 import { closeTabWithPrompt } from "./commands";
 import { askDialog } from "./dialog";
 
@@ -69,7 +68,7 @@ async function saveDrafts(): Promise<void> {
       id,
       filePath: tab.filePath,
       title: tab.title,
-      text: toFileText(tab.history.present),
+      text: currentFileText(tab),
       savedAtMs: Date.now(),
     }).catch(() => undefined);
     draftsWritten.add(id);

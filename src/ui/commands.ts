@@ -41,6 +41,8 @@ export function formatActive(): void {
 export function handleShortcut(e: KeyboardEvent, focusSearch: () => void): void {
   const s = store();
   const inTextBox = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
+  // The text-mode editor has its own Find (Ctrl+F) and Format (Shift+Alt+F).
+  const inCodeEditor = e.target instanceof Element && e.target.closest(".monaco-editor") !== null;
   const key = e.key.toLowerCase();
   const run = (action: () => unknown) => {
     e.preventDefault();
@@ -52,7 +54,11 @@ export function handleShortcut(e: KeyboardEvent, focusSearch: () => void): void 
     if (key === "s" && e.shiftKey) return run(() => s.saveAs());
     if (key === "s") return run(() => s.save());
     if (key === "w" && s.activeId) return run(() => closeTabWithPrompt(s.activeId!));
-    if (key === "f") return run(focusSearch);
+    if (key === "f" && !inCodeEditor) return run(focusSearch);
+    if (key === "t" && e.shiftKey) {
+      const tab = s.tabs.find((t) => t.id === s.activeId);
+      if (tab) return run(() => s.setView(tab.view === "tree" ? "text" : "tree"));
+    }
     if (key === "tab" && s.tabs.length > 1) {
       const i = s.tabs.findIndex((t) => t.id === s.activeId);
       const next = (i + (e.shiftKey ? -1 : 1) + s.tabs.length) % s.tabs.length;
@@ -61,5 +67,5 @@ export function handleShortcut(e: KeyboardEvent, focusSearch: () => void): void 
     if (!inTextBox && key === "z" && !e.shiftKey) return run(s.undo);
     if (!inTextBox && (key === "y" || (key === "z" && e.shiftKey))) return run(s.redo);
   }
-  if (e.shiftKey && e.altKey && key === "f") return run(formatActive);
+  if (e.shiftKey && e.altKey && key === "f" && !inCodeEditor) return run(formatActive);
 }

@@ -13,6 +13,23 @@ errors such as missing commas, unclosed quotes or mismatched brackets.
 - Comments (`//`, `/* */`) and the file's formatting are kept exactly as they were. Only what
   you change is rewritten.
 
+### Schemas
+If a file has a JSON Schema, SafeJSON checks the file against it and helps you fill it in:
+descriptions for each setting, dropdowns for allowed values, suggested property names,
+required properties you're missing, and defaults. Saving a file that breaks its schema asks first.
+
+SafeJSON finds the schema, in this order:
+1. One you chose for the file. Click the schema name in the status bar to choose, reload, or switch off.
+2. The file's own `"$schema"` property (a web address or a path relative to the file). Web schemas
+   are downloaded once and cached in `%LOCALAPPDATA%\SafeJSON\schema-cache` for offline use.
+3. A filename rule in Settings, such as `appsettings*.json`.
+
+### Text mode
+Click **Text** (Ctrl+Shift+T) to edit the JSON directly in a code editor with schema-aware
+autocomplete. Changes apply once the text is valid. Until then a banner shows the problem, and
+saving and the tree are blocked. Files that aren't valid JSON open in text mode so you can fix
+them. Files that were standard JSON stay that way: comments and trailing commas are refused there.
+
 ### Guardrails
 - Numbers reject letters; text is escaped automatically; keys can't be duplicated or empty.
 - Changing a value's type asks first if anything would be lost.
@@ -33,7 +50,8 @@ errors such as missing commas, unclosed quotes or mismatched brackets.
 | Ctrl+N / Ctrl+O / Ctrl+S / Ctrl+Shift+S | New / Open / Save / Save as |
 | Ctrl+W, Ctrl+Tab | Close tab, next tab |
 | Ctrl+Z / Ctrl+Y | Undo / Redo |
-| Ctrl+F | Search keys and values |
+| Ctrl+F | Search keys and values (in text mode: find in text) |
+| Ctrl+Shift+T | Switch between Tree and Text |
 | Shift+Alt+F | Format document |
 | Ctrl+, | Settings |
 | ↑ ↓ ← → | Move around the tree, collapse/expand |
@@ -60,6 +78,7 @@ files only works in the desktop app.
 | Folder | What's there |
 |---|---|
 | `src/engine/` | JSON document engine: parsing, format-preserving edits, validation, undo history. No UI. |
+| `src/engine/schema/` | Finding a file's JSON Schema, validating with Ajv, and reading hints for the UI. |
 | `src/store/` | App state (open tabs, settings). |
 | `src/ui/` | React components and editing actions. |
 | `src/platform/` | Calls into the Rust side (files, dialogs). |

@@ -4,6 +4,7 @@ import { create } from "zustand";
 import {
   childrenOf,
   EditError,
+  findStrictJsonViolation,
   formatPath,
   JsonSyntaxError,
   parseDocument,
@@ -13,9 +14,11 @@ import {
   startHistory,
   toFileText,
   undoHistory,
+  withText,
   type History,
   type JsonDocument,
   type Path,
+  type SyntaxProblem,
 } from "../engine";
 import { fileModifiedMs, fileNameOf, pickFilesToOpen, pickSavePath, readTextFile, saveTextFile } from "../platform/files";
 import { askDialog, confirmDialog } from "../ui/dialog";
@@ -36,6 +39,20 @@ export interface Tab {
   selectedPath: Path;
   /** Tree nodes that are expanded, as pathKey() strings. */
   expanded: Set<string>;
+  /** Tree editing, or plain-text editing (Monaco). */
+  view: "tree" | "text";
+  /**
+   * Text typed in text mode that isn't valid yet, so it hasn't been applied to the document.
+   * While set, switching to the tree and saving are blocked.
+   */
+  pendingText: PendingText | null;
+  /** True when the file was invalid on open: the document is a stand-in until the text is fixed. */
+  placeholder: boolean;
+}
+
+export interface PendingText {
+  text: string;
+  problem: SyntaxProblem;
 }
 
 export interface Message {
@@ -72,6 +89,16 @@ interface EditorState {
   undo(): void;
   redo(): void;
   showMessage(message: Message | null): void;
+  /** Switches the active tab between tree and text editing. Returns false if blocked. */
+  setView(view: "tree" | "text"): boolean;
+  /** Applies text typed in text mode (one undo step), or keeps it pending if it isn't valid. */
+  applyText(tabId: string, text: string): void;
+}
+
+/** Text mode registers this so typing that hasn't been applied yet is applied before saving. */
+let flushTextEditor: (() => void) | null = null;
+export function setTextEditorFlush(flush: (() => void) | null): void {
+  flushTextEditor = flush;
 }
 
 let nextTabNumber = 1;
@@ -96,7 +123,27 @@ function makeTab(filePath: string | null, title: string, doc: JsonDocument, save
     diskModifiedMs,
     selectedPath: [],
     expanded: initialExpanded(doc),
+    view: "tree",
+    pendingText: null,
+    placeholder: false,
   };
+}
+
+const BOM = "﻿";
+
+/**
+ * Makes a tab for file text. Text that isn't valid JSON opens in text mode so it can be fixed,
+ * with a stand-in document until then.
+ */
+function makeTabFromText(filePath: string | null, title: string, text: string, savedText: string, diskModifiedMs: number | null): Tab {
+  try {
+    return makeTab(filePath, title, parseDocument(text), savedText, diskModifiedMs);
+  } catch (error) {
+    if (!(error instanceof JsonSyntaxError)) throw error;
+    const bom = text.startsWith(BOM);
+    const tab = makeTab(filePath, title, parseDocument(bom ? `${BOM}null` : "null"), savedText, diskModifiedMs);
+    return { ...tab, view: "text", placeholder: true, pendingText: { text: bom ? text.slice(1) : text, problem: error.problems[0] } };
+  }
 }
 
 export const useEditor = create<EditorState>((set, get) => {
@@ -117,7 +164,7 @@ export const useEditor = create<EditorState>((set, get) => {
     },
 
     openText(title, text) {
-      const tab = makeTab(null, title, parseDocument(text), text, null);
+      const tab = makeTabFromText(null, title, text, text, null);
       set((state) => ({ tabs: [...state.tabs, tab], activeId: tab.id }));
     },
 
@@ -131,39 +178,40 @@ export const useEditor = create<EditorState>((set, get) => {
         }
         try {
           const file = await readTextFile(path);
-          const tab = makeTab(path, fileNameOf(path), parseDocument(file.text), file.text, file.modifiedMs);
+          const tab = makeTabFromText(path, fileNameOf(path), file.text, file.text, file.modifiedMs);
           set((state) => ({ tabs: [...state.tabs, tab], activeId: tab.id }));
           useSettings.getState().addRecent(path);
-        } catch (error) {
-          if (error instanceof JsonSyntaxError) {
-            fail(
-              `${fileNameOf(path)} can't be opened because it isn't valid JSON yet. ${error.message}. ` +
-                "Fix that spot in a text editor such as VS Code, then open it again.",
-            );
-          } else {
-            fail(String(error));
+          if (tab.pendingText) {
+            const { line, column, message } = tab.pendingText.problem;
+            set({
+              message: {
+                kind: "info",
+                text: `${tab.title} isn't valid JSON yet (line ${line}, column ${column}: ${message}). It's open as text so you can fix it; the tree becomes available once it's valid.`,
+              },
+            });
           }
+        } catch (error) {
+          fail(String(error));
         }
       }
     },
 
     openRecovered(filePath, title, text, diskText, diskModifiedMs) {
-      try {
-        const tab = makeTab(filePath, title, parseDocument(text), diskText, diskModifiedMs);
-        set((state) => ({ tabs: [...state.tabs, tab], activeId: tab.id }));
-      } catch {
-        fail(`The recovered copy of ${title} was damaged and could not be restored.`);
-      }
+      const tab = makeTabFromText(filePath, title, text, diskText, diskModifiedMs);
+      set((state) => ({ tabs: [...state.tabs, tab], activeId: tab.id }));
     },
 
     reloadFromDisk(tabId, text, modifiedMs) {
       const tab = get().tabs.find((t) => t.id === tabId);
       if (!tab) return;
       try {
+        const doc = parseDocument(text);
         updateTab(tabId, {
-          history: pushHistory(tab.history, parseDocument(text)),
+          history: tab.placeholder ? startHistory(doc) : pushHistory(tab.history, doc),
           savedText: text,
           diskModifiedMs: modifiedMs,
+          pendingText: null,
+          placeholder: false,
         });
       } catch (error) {
         // The other program left the file invalid (maybe mid-edit). Keep ours and say so.
@@ -187,8 +235,14 @@ export const useEditor = create<EditorState>((set, get) => {
     },
 
     async save(tabId) {
+      flushTextEditor?.();
       let tab = tabId ? get().tabs.find((t) => t.id === tabId) : activeTab();
       if (!tab) return false;
+      if (tab.pendingText) {
+        const { line, column, message } = tab.pendingText.problem;
+        fail(`${tab.title} can't be saved until it's valid JSON. Fix line ${line}, column ${column}: ${message}.`);
+        return false;
+      }
       const filePath = tab.filePath;
       if (!filePath) return get().saveAs(tab.id);
       const settings = useSettings.getState();
@@ -293,22 +347,70 @@ export const useEditor = create<EditorState>((set, get) => {
       }
     },
 
+    // Undo/redo also discard text that wasn't valid yet; the text view shows the restored version.
     undo() {
       const tab = activeTab();
-      if (tab) updateTab(tab.id, { history: undoHistory(tab.history) });
+      if (tab && !tab.placeholder) updateTab(tab.id, { history: undoHistory(tab.history), pendingText: null });
     },
 
     redo() {
       const tab = activeTab();
-      if (tab) updateTab(tab.id, { history: redoHistory(tab.history) });
+      if (tab && !tab.placeholder) updateTab(tab.id, { history: redoHistory(tab.history), pendingText: null });
     },
 
     showMessage(message) {
       set({ message });
     },
+
+    setView(view) {
+      flushTextEditor?.();
+      const tab = activeTab();
+      if (!tab) return false;
+      if (view === "tree" && tab.pendingText) {
+        const { line, column, message } = tab.pendingText.problem;
+        fail(`Fix the text first: line ${line}, column ${column}: ${message}. The tree needs valid JSON.`);
+        return false;
+      }
+      updateTab(tab.id, { view });
+      return true;
+    },
+
+    applyText(tabId, text) {
+      const tab = get().tabs.find((t) => t.id === tabId);
+      if (!tab) return;
+      const doc = tab.history.present;
+      if (!tab.placeholder && text === doc.text) {
+        if (tab.pendingText) updateTab(tabId, { pendingText: null });
+        return;
+      }
+      try {
+        if (tab.placeholder) {
+          const fixed = parseDocument((doc.format.bom ? BOM : "") + text);
+          updateTab(tabId, { history: startHistory(fixed), placeholder: false, pendingText: null, expanded: initialExpanded(fixed) });
+          return;
+        }
+        const next = withText(doc, text);
+        // A file that was standard JSON stays standard JSON (other programs may require it).
+        const violation = doc.dialect === "json" ? findStrictJsonViolation(text) : null;
+        if (violation) {
+          updateTab(tabId, { pendingText: { text, problem: violation } });
+          return;
+        }
+        updateTab(tabId, { history: pushHistory(tab.history, next), pendingText: null });
+      } catch (error) {
+        if (!(error instanceof JsonSyntaxError)) throw error;
+        updateTab(tabId, { pendingText: { text, problem: error.problems[0] } });
+      }
+    },
   };
 });
 
+/** The text that would be written to disk right now (including text not yet valid). */
+export function currentFileText(tab: Tab): string {
+  if (tab.pendingText) return (tab.history.present.format.bom ? BOM : "") + tab.pendingText.text;
+  return toFileText(tab.history.present);
+}
+
 export function isDirty(tab: Tab): boolean {
-  return toFileText(tab.history.present) !== tab.savedText;
+  return currentFileText(tab) !== tab.savedText;
 }

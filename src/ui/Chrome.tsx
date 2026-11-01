@@ -32,6 +32,27 @@ export function Toolbar({ query, onQuery, onBackups, onSettings }: ToolbarProps)
       <button type="button" onClick={undo} disabled={!tab?.history.past.length} title="Undo (Ctrl+Z)">Undo</button>
       <button type="button" onClick={redo} disabled={!tab?.history.future.length} title="Redo (Ctrl+Y)">Redo</button>
       <button type="button" onClick={formatActive} disabled={!has} title="Re-indent the whole file (Shift+Alt+F)">Format</button>
+      <span className="toolbar-gap" />
+      <span className="segmented" role="group" aria-label="View">
+        <button
+          type="button"
+          className={tab?.view === "tree" ? "on" : ""}
+          disabled={!has}
+          onClick={() => useEditor.getState().setView("tree")}
+          title="Edit with the tree and forms (Ctrl+Shift+T)"
+        >
+          Tree
+        </button>
+        <button
+          type="button"
+          className={tab?.view === "text" ? "on" : ""}
+          disabled={!has}
+          onClick={() => useEditor.getState().setView("text")}
+          title="Edit the JSON text directly (Ctrl+Shift+T)"
+        >
+          Text
+        </button>
+      </span>
       <button type="button" onClick={onBackups} disabled={!tab?.filePath} title="Restore an earlier saved version">Backups…</button>
       <span className="toolbar-spacer" />
       <input
@@ -40,7 +61,7 @@ export function Toolbar({ query, onQuery, onBackups, onSettings }: ToolbarProps)
         placeholder="Search keys and values (Ctrl+F)"
         value={query}
         onChange={(e) => onQuery(e.target.value)}
-        disabled={!has}
+        disabled={!has || tab?.view === "text"}
         aria-label="Search"
       />
       <button type="button" onClick={onSettings} title="Settings (Ctrl+,)" aria-label="Settings">⚙</button>

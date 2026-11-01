@@ -58,11 +58,41 @@ describe("editor store", () => {
     expect(s().tabs.length).toBe(1);
   });
 
-  it("refuses invalid files with a helpful message", async () => {
-    disk.set("C:\\bad.json", { text: '{"a": 1,, }', modifiedMs: 1 });
+  it("opens invalid files in text mode, blocks saving, and switches to the tree once fixed", async () => {
+    disk.set("C:\\bad.json", { text: '\uFEFF{"a": 1,, }', modifiedMs: 1 });
     await s().openFiles(["C:\\bad.json"]);
-    expect(s().tabs.length).toBe(0);
-    expect(s().message?.text).toMatch(/isn't valid JSON yet.*line 1/);
+    expect(tab()).toMatchObject({ view: "text", placeholder: true });
+    expect(s().message?.text).toMatch(/isn't valid JSON yet \(line 1/);
+    expect(s().setView("tree")).toBe(false);
+    expect(await s().save()).toBe(false);
+
+    s().applyText(tab().id, '{"a": 1, "b": 2}');
+    expect(tab()).toMatchObject({ placeholder: false, pendingText: null });
+    expect(tab().history.past.length).toBe(0); // the stand-in isn't an undo step
+    expect(s().setView("tree")).toBe(true);
+    expect(await s().save()).toBe(true);
+    expect(disk.get("C:\\bad.json")!.text).toBe('\uFEFF{"a": 1, "b": 2}'); // BOM kept
+  });
+
+  it("applies valid text as one undo step and keeps invalid text pending", async () => {
+    await s().openFiles([PATH]);
+    s().setView("text");
+    s().applyText(tab().id, '{\n  "a": 1,\n  "b": [1, 2]\n}\n');
+    expect(tab().history.past.length).toBe(1);
+    s().applyText(tab().id, '{\n  "a": 1,\n  "b": [1, 2\n}\n');
+    expect(tab().pendingText?.problem.line).toBe(4);
+    expect(isDirty(tab())).toBe(true);
+    s().undo(); // discards the invalid text too
+    expect(tab().pendingText).toBeNull();
+    expect(tab().history.present.text).toBe('{\n  "a": 1\n}\n');
+  });
+
+  it("keeps standard JSON files free of comments and trailing commas", async () => {
+    await s().openFiles([PATH]);
+    s().applyText(tab().id, '{\n  // note\n  "a": 1\n}\n');
+    expect(tab().pendingText?.problem).toMatchObject({ line: 2, message: expect.stringMatching(/Comments aren't allowed/) });
+    s().applyText(tab().id, '{\n  "a": 1,\n}\n');
+    expect(tab().pendingText?.problem.message).toMatch(/comma before a closing bracket/);
   });
 
   it("asks before overwriting changes made by another program", async () => {

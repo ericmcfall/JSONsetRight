@@ -31,6 +31,11 @@ export default defineConfig(() => ({
     },
   },
 
+  // The text-mode editor (Monaco) is one large file, loaded only when text mode is first opened.
+  build: {
+    chunkSizeWarningLimit: 3000,
+  },
+
   // Unit tests (Vitest) live next to the code as *.test.ts files.
   test: {
     include: ["src/**/*.test.ts"],
