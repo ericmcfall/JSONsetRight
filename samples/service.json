@@ -1,0 +1,11 @@
+{
+  "$schema": "./service.schema.json",
+  "name": "orders-api",
+  "port": 80800,
+  "environment": "prod",
+  "logging": {
+    "level": "info"
+  },
+  "allowedHosts": ["orders.example.com", "bad host name"],
+  "legacyMode": true
+}

@@ -1,4 +1,5 @@
 // Preferences. Changes apply and save immediately.
+import { pickSchemaFile } from "../platform/files";
 import { useSettings, type Settings } from "../store/settings";
 
 export function SettingsDialog({ onClose }: { onClose(): void }) {
@@ -59,6 +60,40 @@ export function SettingsDialog({ onClose }: { onClose(): void }) {
             }}
           />
         </label>
+
+        <div className="setting-block">
+          <span>
+            Schema rules
+            <small>Files whose name matches a pattern (* = anything) are checked against that schema,
+              unless the file names its own "$schema".</small>
+          </span>
+          <div className="schema-rules">
+            {settings.schemaRules.map((rule, i) => (
+              <div className="schema-rule" key={i}>
+                <input
+                  value={rule.pattern}
+                  placeholder="appsettings*.json"
+                  aria-label="File name pattern"
+                  onChange={(e) => update({ schemaRules: settings.schemaRules.map((r, j) => (j === i ? { ...r, pattern: e.target.value } : r)) })}
+                />
+                <input
+                  value={rule.schema}
+                  placeholder="C:\schemas\app.schema.json or https://…"
+                  aria-label="Schema file or address"
+                  onChange={(e) => update({ schemaRules: settings.schemaRules.map((r, j) => (j === i ? { ...r, schema: e.target.value } : r)) })}
+                />
+                <button type="button" title="Choose a schema file" onClick={async () => {
+                  const p = await pickSchemaFile();
+                  if (p) update({ schemaRules: settings.schemaRules.map((r, j) => (j === i ? { ...r, schema: p } : r)) });
+                }}>…</button>
+                <button type="button" className="danger" aria-label="Remove rule" onClick={() => update({ schemaRules: settings.schemaRules.filter((_, j) => j !== i) })}>×</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => update({ schemaRules: [...settings.schemaRules, { pattern: "", schema: "" }] })}>
+              + Add rule
+            </button>
+          </div>
+        </div>
 
         <label className="setting">
           <span>Recent files</span>

@@ -71,13 +71,18 @@ export function rename(path: Path, newKey: string): boolean {
 
 /** Adds a new child to an object (needs `key`) or array (appends). */
 export function addChild(containerPath: Path, kind: ValueKind, key?: string): boolean {
+  return addChildValue(containerPath, defaultValue(kind), key);
+}
+
+/** Like addChild, with a specific starting value (e.g. a schema's default). */
+export function addChildValue(containerPath: Path, value: JsonValue, key?: string): boolean {
   const doc = currentDoc();
   const container = doc && findNode(doc, containerPath);
   if (!container) return false;
   const ok =
     container.type === "object"
-      ? store().apply((d) => addProperty(d, containerPath, key ?? "", defaultValue(kind)), [...containerPath, key ?? ""])
-      : store().apply((d) => insertItem(d, containerPath, defaultValue(kind)), [...containerPath, container.children?.length ?? 0]);
+      ? store().apply((d) => addProperty(d, containerPath, key ?? "", value), [...containerPath, key ?? ""])
+      : store().apply((d) => insertItem(d, containerPath, value), [...containerPath, container.children?.length ?? 0]);
   // Put the cursor in the new value's editor once the details panel has re-rendered.
   if (ok) setTimeout(() => document.getElementById("value-editor")?.focus());
   return ok;

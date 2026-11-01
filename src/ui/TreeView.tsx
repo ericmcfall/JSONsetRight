@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import { commentsFor, findNode, samePath, type Path } from "../engine";
 import { useEditor, type Tab } from "../store/editor";
+import { useTabSchema } from "../store/schemas";
+import { allProblems, problemsByPath } from "./problems";
 import * as actions from "./actions";
 import { ContextMenu, type MenuPosition } from "./ContextMenu";
 import { InlineEditor } from "./InlineEditor";
@@ -25,6 +27,15 @@ export function TreeView({ tab, query }: Props) {
 
   const rows = useMemo(() => buildRows(doc, tab.expanded, query), [doc, tab.expanded, query]);
   const selectedIndex = rows.findIndex((r) => samePath(r.path, selected));
+
+  // Problem markers: on the row itself, and a dot on collapsed rows that hide problems inside.
+  const schema = useTabSchema(tab.id);
+  const { byPath, hidden } = useMemo(() => {
+    const problems = allProblems(tab.id, doc);
+    const inside = new Set<string>();
+    for (const p of problems) for (let i = 0; i < p.path.length; i++) inside.add(pathKey(p.path.slice(0, i)));
+    return { byPath: problemsByPath(problems), hidden: inside };
+  }, [tab.id, doc, schema.compiled]); // schema.compiled: results change when the schema loads
 
   const [editing, setEditing] = useState<Editing>(null);
   const [menu, setMenu] = useState<{ position: MenuPosition; path: Path } | null>(null);
@@ -176,6 +187,17 @@ export function TreeView({ tab, query }: Props) {
               <span className={`value kind-${row.kind}`} onDoubleClick={() => startEdit(row, "value")}>
                 {row.kind === "string" ? `"${row.preview}"` : row.preview}
               </span>
+            )}
+            {byPath.has(key) && (
+              <span
+                className={`problem-flag ${byPath.get(key)!.some((p) => p.severity === "error") ? "error" : "warning"}`}
+                title={byPath.get(key)!.map((p) => p.message).join("\n")}
+              >
+                {byPath.get(key)!.some((p) => p.severity === "error") ? "⛔" : "⚠"}
+              </span>
+            )}
+            {!byPath.has(key) && !row.expanded && hidden.has(key) && (
+              <span className="problem-flag warning" title="Something inside has a problem">●</span>
             )}
             {comments.length > 0 && (
               <span className="comment-flag" title={comments.join("\n")}>

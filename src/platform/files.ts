@@ -1,5 +1,5 @@
 // TypeScript side of the Rust file commands in src-tauri/src/files.rs, plus the Open/Save dialogs.
-import { invoke } from "@tauri-apps/api/core";
+import { invoke, isTauri } from "@tauri-apps/api/core";
 import { open, save } from "@tauri-apps/plugin-dialog";
 
 export interface FileContents {
@@ -61,6 +61,26 @@ export async function listRecoveryDrafts(): Promise<RecoveryDraft[]> {
       return [];
     }
   });
+}
+
+/** Reads a schema from a file path or a web address (downloads are cached for offline use). */
+export async function loadSchemaText(location: string, refresh = false): Promise<string> {
+  if (/^https?:\/\//i.test(location)) {
+    if (!isTauri()) return (await fetch(location)).text(); // browser-only dev preview
+    return invoke("fetch_schema", { url: location, refresh });
+  }
+  // Browser-only dev preview: the sample files are served by the dev server.
+  if (!isTauri()) return (await fetch(`/samples/${fileNameOf(location)}`)).text();
+  return (await readTextFile(location)).text;
+}
+
+export async function pickSchemaFile(): Promise<string | null> {
+  const result = await open({
+    multiple: false,
+    title: "Choose a JSON Schema",
+    filters: [{ name: "JSON Schema", extensions: ["json", "jsonc"] }, { name: "All files", extensions: ["*"] }],
+  });
+  return typeof result === "string" ? result : null;
 }
 
 /** Shows the Open dialog. Returns the chosen paths (empty if cancelled). */

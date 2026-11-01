@@ -2,13 +2,16 @@ import { useEffect, useState } from "react";
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import "./App.css";
+import { declaredSchema } from "./engine/schema";
 import { isDirty, useEditor } from "./store/editor";
+import { updateTabSchema } from "./store/schemas";
 import { useSettings } from "./store/settings";
 import { BackupsDialog } from "./ui/BackupsDialog";
 import { ConfirmDialog, MessageBar, ProblemsPanel, StatusBar, TabBar, Toolbar, Welcome } from "./ui/Chrome";
 import { handleShortcut } from "./ui/commands";
 import { DetailsPanel } from "./ui/DetailsPanel";
 import { startSafetyNet } from "./ui/safety";
+import { SchemaDialog } from "./ui/SchemaDialog";
 import { SettingsDialog } from "./ui/SettingsDialog";
 import { TreeView } from "./ui/TreeView";
 
@@ -22,7 +25,16 @@ function App() {
   const tab = useEditor((s) => s.tabs.find((t) => t.id === s.activeId));
   const theme = useSettings((s) => s.theme);
   const [query, setQuery] = useState("");
-  const [dialog, setDialog] = useState<"backups" | "settings" | null>(null);
+  const [dialog, setDialog] = useState<"backups" | "settings" | "schema" | null>(null);
+
+  // Load the right schema when the file, its "$schema" value, or the schema settings change.
+  const declared = tab ? declaredSchema(tab.history.present) : null;
+  const schemaPairs = useSettings((s) => s.schemaPairs);
+  const schemaRules = useSettings((s) => s.schemaRules);
+  useEffect(() => {
+    const current = useEditor.getState().tabs.find((t) => t.id === tab?.id);
+    if (current) void updateTabSchema(current);
+  }, [tab?.id, tab?.filePath, declared, schemaPairs, schemaRules]);
 
   // One-time startup: settings, then files named on the command line ("Open with").
   useEffect(() => {
@@ -34,8 +46,15 @@ function App() {
         if (paths.length > 0) void useEditor.getState().openFiles(paths);
       });
     } else if (import.meta.env.DEV) {
-      // In a plain browser (no desktop app), open a sample so the UI can be tried.
-      import("../samples/vscode-settings.jsonc?raw").then((m) => useEditor.getState().openText("vscode-settings.jsonc", m.default));
+      // In a plain browser (no desktop app), open samples so the UI can be tried. The second one
+      // gets a pretend file path so its relative "$schema" can be found.
+      void (async () => {
+        const store = useEditor.getState();
+        store.openText("vscode-settings.jsonc", (await import("../samples/vscode-settings.jsonc?raw")).default);
+        store.openText("service.json", (await import("../samples/service.json?raw")).default);
+        const id = useEditor.getState().activeId;
+        useEditor.setState((s) => ({ tabs: s.tabs.map((t) => (t.id === id ? { ...t, filePath: "C:\\samples\\service.json" } : t)) }));
+      })();
     }
   }, []);
 
@@ -85,14 +104,15 @@ function App() {
             <TreeView tab={tab} query={query} />
             <DetailsPanel tab={tab} />
           </main>
-          <ProblemsPanel doc={tab.history.present} />
-          <StatusBar tab={tab} />
+          <ProblemsPanel tab={tab} />
+          <StatusBar tab={tab} onSchema={() => setDialog("schema")} />
         </>
       ) : (
         <Welcome />
       )}
       {dialog === "backups" && tab && <BackupsDialog tab={tab} onClose={() => setDialog(null)} />}
       {dialog === "settings" && <SettingsDialog onClose={() => setDialog(null)} />}
+      {dialog === "schema" && tab && <SchemaDialog tab={tab} onClose={() => setDialog(null)} />}
       <ConfirmDialog />
     </div>
   );

@@ -1,7 +1,10 @@
 // The window's frame around the editor: toolbar, tabs, messages, problems list, status bar,
 // and the confirmation dialog.
 import { useEffect, useRef } from "react";
-import { findProblems, formatPath, type JsonDocument } from "../engine";
+import { formatPath } from "../engine";
+import { schemaDisplayName } from "../engine/schema";
+import { useTabSchema } from "../store/schemas";
+import { allProblems } from "./problems";
 import { fileNameOf } from "../platform/files";
 import { isDirty, useEditor, type Tab } from "../store/editor";
 import { useSettings } from "../store/settings";
@@ -93,9 +96,10 @@ export function MessageBar() {
   );
 }
 
-export function ProblemsPanel({ doc }: { doc: JsonDocument }) {
+export function ProblemsPanel({ tab }: { tab: Tab }) {
   const select = useEditor((s) => s.select);
-  const problems = findProblems(doc);
+  useTabSchema(tab.id); // re-render when the schema finishes loading
+  const problems = allProblems(tab.id, tab.history.present);
   if (problems.length === 0) return null;
   return (
     <section className="problems" aria-label="Problems">
@@ -104,21 +108,31 @@ export function ProblemsPanel({ doc }: { doc: JsonDocument }) {
         <button type="button" key={i} className={`problem ${p.severity}`} onClick={() => select(p.path)}>
           <span className="problem-icon">{p.severity === "error" ? "⛔" : "⚠"}</span>
           <code>{formatPath(p.path)}</code> {p.message}
+          <span className="problem-source">{p.source}</span>
         </button>
       ))}
     </section>
   );
 }
 
-export function StatusBar({ tab }: { tab: Tab }) {
+export function StatusBar({ tab, onSchema }: { tab: Tab; onSchema(): void }) {
   const doc = tab.history.present;
   const { indent, eol, bom } = doc.format;
-  const count = findProblems(doc).length;
+  const schema = useTabSchema(tab.id);
+  const count = allProblems(tab.id, doc).length;
+  const schemaLabel =
+    schema.status === "none" ? "No schema"
+    : schema.status === "loading" ? "Loading schema…"
+    : schema.status === "error" ? "⚠ Schema not loaded"
+    : `Schema: ${schemaDisplayName(schema.source!.location)}`;
   return (
     <footer className="statusbar">
       <span title="Where this file is saved">{tab.filePath ?? "Not saved yet"}</span>
       <span className="toolbar-spacer" />
       {count > 0 && <span>{count} problem{count === 1 ? "" : "s"}</span>}
+      <button type="button" className="status-button" onClick={onSchema} title={schema.error ?? schema.source?.location ?? "Choose a JSON Schema for this file"}>
+        {schemaLabel}
+      </button>
       <span title={doc.dialect === "jsonc" ? "JSON with comments and/or trailing commas" : "Standard JSON"}>
         {doc.dialect === "jsonc" ? "JSON with Comments" : "JSON"}
       </span>

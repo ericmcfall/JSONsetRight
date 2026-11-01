@@ -4,6 +4,7 @@ import { create } from "zustand";
 import {
   childrenOf,
   EditError,
+  formatPath,
   JsonSyntaxError,
   parseDocument,
   pushHistory,
@@ -17,7 +18,8 @@ import {
   type Path,
 } from "../engine";
 import { fileModifiedMs, fileNameOf, pickFilesToOpen, pickSavePath, readTextFile, saveTextFile } from "../platform/files";
-import { confirmDialog } from "../ui/dialog";
+import { askDialog, confirmDialog } from "../ui/dialog";
+import { forgetTabSchema, schemaProblems } from "./schemas";
 import { useSettings } from "./settings";
 import { pathKey } from "../ui/tree-model";
 
@@ -196,6 +198,23 @@ export const useEditor = create<EditorState>((set, get) => {
         tab = get().tabs.find((t) => t.id === tab!.id)!;
       }
       const text = toFileText(tab.history.present);
+      // Warn (but allow saving) when the file breaks its schema's rules.
+      const problems = schemaProblems(tab.id, tab.history.present);
+      if (problems.length > 0) {
+        const list = problems.slice(0, 4).map((p) => `• ${formatPath(p.path)}: ${p.message}`).join("\n");
+        const more = problems.length > 4 ? `\n…and ${problems.length - 4} more.` : "";
+        const answer = await askDialog({
+          title: `${tab.title} doesn't match its schema`,
+          message: `${list}${more}\n\nPrograms that read this file may reject it.`,
+          confirmLabel: "Save anyway",
+          extraLabel: "Show first problem",
+        });
+        if (answer === "extra") {
+          get().activate(tab.id);
+          get().select(problems[0].path);
+        }
+        if (answer !== "confirm") return false;
+      }
       // Don't silently overwrite changes another program made since we loaded the file.
       const onDisk = await fileModifiedMs(filePath).catch(() => null);
       if (onDisk !== null && tab.diskModifiedMs !== null && onDisk !== tab.diskModifiedMs) {
@@ -228,6 +247,7 @@ export const useEditor = create<EditorState>((set, get) => {
     },
 
     closeTab(tabId) {
+      forgetTabSchema(tabId);
       set((state) => {
         const index = state.tabs.findIndex((t) => t.id === tabId);
         const tabs = state.tabs.filter((t) => t.id !== tabId);

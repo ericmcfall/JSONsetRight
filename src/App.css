@@ -163,6 +163,12 @@ input:focus, select:focus, textarea:focus, .tree:focus { outline: 2px solid var(
 .add-row { display: flex; gap: 6px; }
 .add-row input { flex: 1; }
 .comment { color: var(--comment); white-space: pre-wrap; margin: 0 0 4px; font-size: 12px; }
+.schema-help { margin-bottom: 12px; padding: 8px 10px; border-left: 3px solid var(--accent); background: var(--bg); border-radius: 0 4px 4px 0; }
+.schema-help p { margin: 2px 0 0; white-space: pre-line; line-height: 1.4; }
+.required-missing { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.required-missing button { font-size: 12px; padding: 2px 8px; }
+.field-hint .link { margin-left: 6px; }
+.field-body select { max-width: 100%; }
 .details-actions { display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid var(--border); padding-top: 12px; }
 
 /* ---- problems & status */
@@ -170,6 +176,12 @@ input:focus, select:focus, textarea:focus, .tree:focus { outline: 2px solid var(
 .problems-title { font-size: 12px; font-weight: 600; padding: 4px 10px; color: var(--muted); }
 .problem { display: block; width: 100%; text-align: left; border: none; border-radius: 0; background: none; padding: 3px 10px; }
 .problem-icon { margin-right: 6px; }
+.problem-source { float: right; color: var(--muted); font-size: 11px; }
+.status-button { background: none; border: none; color: inherit; padding: 0 4px; font-size: 12px; }
+.status-button:hover:not(:disabled) { background: rgba(255, 255, 255, 0.15); }
+.problem-flag { flex: none; font-size: 12px; cursor: help; }
+.problem-flag.error { color: var(--danger); }
+.problem-flag.warning { color: var(--warning); }
 .statusbar {
   display: flex; gap: 16px; padding: 3px 10px; font-size: 12px;
   background: var(--accent); color: var(--accent-text);
@@ -205,7 +217,7 @@ input:focus, select:focus, textarea:focus, .tree:focus { outline: 2px solid var(
   background: var(--bg); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 .dialog h2 { margin: 0 0 8px; font-size: 17px; }
-.dialog p { margin: 0 0 16px; line-height: 1.45; }
+.dialog p { margin: 0 0 16px; line-height: 1.45; white-space: pre-line; overflow-wrap: anywhere; }
 .dialog-buttons { display: flex; gap: 8px; justify-content: flex-end; }
 
 .backup-list { list-style: none; padding: 0; margin: 0 0 16px; max-height: 240px; overflow: auto; }
@@ -218,6 +230,18 @@ input:focus, select:focus, textarea:focus, .tree:focus { outline: 2px solid var(
 .setting small { color: var(--muted); font-size: 12px; margin-top: 2px; }
 .setting select, .setting input { width: 220px; flex: none; }
 .setting:last-of-type { margin-bottom: 16px; }
+.setting-block { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.setting-block > span { display: flex; flex-direction: column; margin-bottom: 6px; }
+.setting-block small { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.dialog.settings { max-height: 90vh; overflow: auto; }
+
+.schema-current { padding: 8px 10px; margin-bottom: 12px; background: var(--bg-panel); border-radius: 4px; overflow-wrap: anywhere; }
+.schema-current .ok { color: var(--kind-number); }
+.schema-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 16px; }
+.schema-rules { margin: 4px 0 16px; }
+.schema-rule { display: flex; gap: 6px; margin-bottom: 6px; }
+.schema-rule input:first-child { width: 180px; flex: none; }
+.schema-rule input:nth-child(2) { flex: 1; }
 
 /* ---- welcome */
 .welcome { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }

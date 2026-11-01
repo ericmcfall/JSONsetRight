@@ -1,6 +1,7 @@
 // User preferences, saved to %LOCALAPPDATA%\SafeJSON\settings.json.
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { create } from "zustand";
+import type { SchemaPairs, SchemaRule } from "../engine/schema";
 
 export interface Settings {
   theme: "system" | "light" | "dark";
@@ -11,6 +12,10 @@ export interface Settings {
   /** How many earlier versions to keep per file (0 = no backups). */
   backupCount: number;
   recentFiles: string[];
+  /** Schemas the user picked for specific files (key: lower-case file path; "" = no schema). */
+  schemaPairs: SchemaPairs;
+  /** Filename patterns that get a schema automatically. */
+  schemaRules: SchemaRule[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -19,6 +24,8 @@ export const DEFAULT_SETTINGS: Settings = {
   trailingCommas: "keep",
   backupCount: 5,
   recentFiles: [],
+  schemaPairs: {},
+  schemaRules: [],
 };
 
 const MAX_RECENT = 10;
@@ -27,12 +34,14 @@ interface SettingsState extends Settings {
   load(): Promise<void>;
   update(change: Partial<Settings>): void;
   addRecent(path: string): void;
+  /** Picks a schema for one file. "" = no schema; undefined = back to automatic. */
+  setSchemaFor(filePath: string, schema: string | undefined): void;
 }
 
 export const useSettings = create<SettingsState>((set, get) => {
   const persist = () => {
     if (!isTauri()) return;
-    const { load: _l, update: _u, addRecent: _a, ...settings } = get();
+    const { load: _l, update: _u, addRecent: _a, setSchemaFor: _s, ...settings } = get();
     invoke("write_settings", { contents: JSON.stringify(settings, null, 2) }).catch(() => undefined);
   };
 
@@ -60,6 +69,14 @@ export const useSettings = create<SettingsState>((set, get) => {
     addRecent(path) {
       const others = get().recentFiles.filter((p) => p.toLowerCase() !== path.toLowerCase());
       set({ recentFiles: [path, ...others].slice(0, MAX_RECENT) });
+      persist();
+    },
+
+    setSchemaFor(filePath, schema) {
+      const pairs = { ...get().schemaPairs };
+      if (schema === undefined) delete pairs[filePath.toLowerCase()];
+      else pairs[filePath.toLowerCase()] = schema;
+      set({ schemaPairs: pairs });
       persist();
     },
   };

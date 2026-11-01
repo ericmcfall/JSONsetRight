@@ -1,23 +1,32 @@
 // The right-hand panel: everything about the selected value, with an editor suited to its type.
+// When the file has a JSON Schema, it also shows the schema's description, allowed values,
+// default and known properties.
 import { useState, type ReactNode } from "react";
 import {
   childrenOf,
   commentsFor,
+  defaultValue,
   findNode,
   formatPath,
   isUnsafeNumber,
   JSON_NUMBER,
   keysOf,
   kindOf,
+  samePath,
   sourceOf,
   VALUE_KINDS,
+  valueOf,
   type JsonDocument,
+  type JsonValue,
   type Path,
   type ValueKind,
 } from "../engine";
+import { hintsAt, kindOfValue, type PropertyHint, type SchemaHint } from "../engine/schema";
 import type { Tab } from "../store/editor";
+import { useTabSchema } from "../store/schemas";
 import * as actions from "./actions";
 import { KindBadge, kindName } from "./KindBadge";
+import { allProblems } from "./problems";
 import { pathKey } from "./tree-model";
 
 export function DetailsPanel({ tab }: { tab: Tab }) {
@@ -28,6 +37,9 @@ export function DetailsPanel({ tab }: { tab: Tab }) {
   const last = path[path.length - 1];
   const parent = path.length > 0 ? findNode(doc, path.slice(0, -1)) : undefined;
   const comments = commentsFor(doc, path);
+  const schema = useTabSchema(tab.id);
+  const hint = schema.compiled ? hintsAt(schema.compiled, path) : null;
+  const problems = allProblems(tab.id, doc).filter((p) => samePath(p.path, path));
   // Remount editors whenever the value changes underneath them (undo, edits in the tree).
   const editorKey = `${pathKey(path)}:${sourceOf(doc, node)}`;
 
@@ -40,6 +52,19 @@ export function DetailsPanel({ tab }: { tab: Tab }) {
         </button>
       </div>
 
+      {(hint?.title || hint?.description) && (
+        <div className="schema-help">
+          {hint.title && <strong>{hint.title}</strong>}
+          {hint.description && <p>{hint.description}</p>}
+        </div>
+      )}
+      {hint?.deprecated && <div className="field-warning">Deprecated: {hint.deprecated}</div>}
+      {problems.map((p, i) => (
+        <div key={i} className={p.severity === "error" ? "field-error" : "field-warning"}>
+          {p.severity === "error" ? "⛔" : "⚠"} {p.message}
+        </div>
+      ))}
+
       {typeof last === "string" && parent && (
         <Field label="Key">
           <KeyEditor key={pathKey(path)} path={path} siblings={keysOf(parent)} />
@@ -50,25 +75,29 @@ export function DetailsPanel({ tab }: { tab: Tab }) {
       <Field label="Type">
         <span className="type-row">
           <KindBadge kind={kind} />
-          <select
-            value={kind}
-            onChange={(e) => actions.changeKind(path, e.target.value as ValueKind)}
-            aria-label="Type"
-          >
+          <select value={kind} onChange={(e) => actions.changeKind(path, e.target.value as ValueKind)} aria-label="Type">
             {VALUE_KINDS.map((k) => (
-              <option key={k} value={k}>{kindName(k)}</option>
+              <option key={k} value={k}>
+                {kindName(k)}{hint?.kinds.includes(k) ? " (expected)" : ""}
+              </option>
             ))}
           </select>
         </span>
+        {hint && hint.kinds.length > 0 && !hint.kinds.includes(kind) && (
+          <div className="field-warning">The schema expects {hint.kinds.map(kindName).join(" or ")}.</div>
+        )}
       </Field>
 
       <Field label="Value">
-        <ValueEditor key={editorKey} doc={doc} path={path} kind={kind} />
+        <ValueEditor key={editorKey} doc={doc} path={path} kind={kind} hint={hint} />
+        {hint?.hasDefault && (
+          <DefaultHint path={path} current={valueOf(node)} defaultValue={hint.defaultValue!} />
+        )}
       </Field>
 
       {(kind === "object" || kind === "array") && (
         <Field label={kind === "object" ? "Add property" : "Add item"}>
-          <AddChildForm key={pathKey(path)} path={path} kind={kind} existingKeys={kind === "object" ? keysOf(node) : []} />
+          <AddChildForm key={pathKey(path)} path={path} kind={kind} existingKeys={kind === "object" ? keysOf(node) : []} hint={hint} />
         </Field>
       )}
 
@@ -128,13 +157,17 @@ function KeyEditor({ path, siblings }: { path: Path; siblings: string[] }) {
   );
 }
 
-function ValueEditor({ doc, path, kind }: { doc: JsonDocument; path: Path; kind: ValueKind }) {
+function ValueEditor({ doc, path, kind, hint }: { doc: JsonDocument; path: Path; kind: ValueKind; hint: SchemaHint | null }) {
   const node = findNode(doc, path)!;
+  const choices = hint?.enumValues;
+  if (choices && choices.length > 0 && kind !== "object" && kind !== "array" && choices.every((v) => v === null || typeof v !== "object")) {
+    return <EnumEditor path={path} current={valueOf(node)} choices={choices} descriptions={hint?.enumDescriptions} />;
+  }
   switch (kind) {
     case "string":
       return <StringEditor path={path} initial={node.value as string} />;
     case "number":
-      return <NumberEditor path={path} initial={sourceOf(doc, node)} />;
+      return <NumberEditor path={path} initial={sourceOf(doc, node)} integer={hint?.integer ?? false} />;
     case "boolean":
       return (
         <label className="toggle">
@@ -151,6 +184,46 @@ function ValueEditor({ doc, path, kind }: { doc: JsonDocument; path: Path; kind:
       return <span className="muted">{count} {noun}. Select one in the tree to edit it.</span>;
     }
   }
+}
+
+/** A dropdown for values the schema lists as the only ones allowed. */
+function EnumEditor({ path, current, choices, descriptions }: { path: Path; current: JsonValue; choices: JsonValue[]; descriptions?: string[] }) {
+  const currentLabel = JSON.stringify(current);
+  const index = choices.findIndex((c) => JSON.stringify(c) === currentLabel);
+  return (
+    <>
+      <select
+        id="value-editor"
+        className={index === -1 ? "invalid" : ""}
+        value={index}
+        onChange={(e) => actions.setScalar(path, choices[Number(e.target.value)])}
+        aria-label="Value"
+      >
+        {index === -1 && <option value={-1}>{currentLabel} (not allowed)</option>}
+        {choices.map((choice, i) => (
+          <option key={i} value={i}>
+            {typeof choice === "string" ? choice : JSON.stringify(choice)}
+            {descriptions?.[i] ? `: ${descriptions[i]}` : ""}
+          </option>
+        ))}
+      </select>
+      <div className="field-hint">The schema allows only these values.</div>
+    </>
+  );
+}
+
+function DefaultHint({ path, current, defaultValue: value }: { path: Path; current: JsonValue; defaultValue: JsonValue }) {
+  const isDefault = JSON.stringify(current) === JSON.stringify(value);
+  return (
+    <div className="field-hint">
+      Default: <code>{JSON.stringify(value)}</code>
+      {!isDefault && (
+        <button type="button" className="link" onClick={() => actions.setScalar(path, value)}>
+          Use default
+        </button>
+      )}
+    </div>
+  );
 }
 
 function StringEditor({ path, initial }: { path: Path; initial: string }) {
@@ -181,7 +254,7 @@ function StringEditor({ path, initial }: { path: Path; initial: string }) {
   );
 }
 
-function NumberEditor({ path, initial }: { path: Path; initial: string }) {
+function NumberEditor({ path, initial, integer }: { path: Path; initial: string; integer: boolean }) {
   const [text, setText] = useState(initial);
   const valid = JSON_NUMBER.test(text.trim());
   const commit = () => {
@@ -204,6 +277,7 @@ function NumberEditor({ path, initial }: { path: Path; initial: string }) {
         aria-label="Number value"
       />
       {!valid && <div className="field-error">Use digits with an optional minus sign, decimal point or exponent, e.g. -12, 3.5, 1e6.</div>}
+      {valid && integer && !/^-?\d+$/.test(text.trim()) && <div className="field-warning">The schema expects a whole number.</div>}
       {valid && isUnsafeNumber(text.trim()) && (
         <div className="field-warning">This number is too large for many programs to store exactly.</div>
       )}
@@ -211,36 +285,84 @@ function NumberEditor({ path, initial }: { path: Path; initial: string }) {
   );
 }
 
-function AddChildForm({ path, kind, existingKeys }: { path: Path; kind: "object" | "array"; existingKeys: string[] }) {
+/** The starting value for a new property or item, using the schema's default or first allowed value. */
+function startingValue(kind: ValueKind, known?: { hasDefault: boolean; defaultValue?: JsonValue; enumFirst?: JsonValue }): JsonValue {
+  if (known?.hasDefault && kindOfValue(known.defaultValue!) === kind) return known.defaultValue!;
+  if (known?.enumFirst !== undefined && kindOfValue(known.enumFirst) === kind) return known.enumFirst;
+  return defaultValue(kind);
+}
+
+function AddChildForm({ path, kind, existingKeys, hint }: { path: Path; kind: "object" | "array"; existingKeys: string[]; hint: SchemaHint | null }) {
+  const suggestions = (hint?.properties ?? []).filter((p) => !existingKeys.includes(p.name));
+  const missingRequired = suggestions.filter((p) => p.required);
+  const firstItemKind = hint?.itemKinds[0];
   const [key, setKey] = useState("");
-  const [childKind, setChildKind] = useState<ValueKind>("string");
+  const [childKind, setChildKind] = useState<ValueKind>(kind === "array" && firstItemKind ? firstItemKind : "string");
+  const known = suggestions.find((p) => p.name === key);
+
   const error = kind === "object" && key !== "" && existingKeys.includes(key) ? `There is already a key named "${key}"` : null;
+  const unknownKey = kind === "object" && key !== "" && !known && !error && hint && !hint.allowsOtherProperties;
   const canAdd = kind === "array" || (key !== "" && !error);
-  const add = () => {
-    if (canAdd && actions.addChild(path, childKind, kind === "object" ? key : undefined)) setKey("");
+
+  const chooseKey = (name: string) => {
+    setKey(name);
+    const property = suggestions.find((p) => p.name === name);
+    if (property?.kinds[0]) setChildKind(property.kinds[0]);
   };
+  const addProperty = (property: PropertyHint, kindToUse: ValueKind) =>
+    actions.addChildValue(path, startingValue(kindToUse, property), property.name);
+  const add = () => {
+    if (!canAdd) return;
+    const ok = known
+      ? addProperty(known, childKind)
+      : actions.addChildValue(path, startingValue(childKind), kind === "object" ? key : undefined);
+    if (ok) setKey("");
+  };
+
   return (
     <>
+      {missingRequired.length > 0 && (
+        <div className="required-missing">
+          <span className="field-error">Required but missing:</span>
+          {missingRequired.map((p) => (
+            <button type="button" key={p.name} title={p.description} onClick={() => addProperty(p, p.kinds[0] ?? "string")}>
+              + {p.name}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="add-row">
         {kind === "object" && (
-          <input
-            placeholder="New key name"
-            className={error ? "invalid" : ""}
-            value={key}
-            spellCheck={false}
-            onChange={(e) => setKey(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && add()}
-            aria-label="New key name"
-          />
+          <>
+            <input
+              placeholder={suggestions.length > 0 ? "Key name (or pick a suggestion)" : "New key name"}
+              className={error ? "invalid" : ""}
+              value={key}
+              list={`suggest-${pathKey(path)}`}
+              spellCheck={false}
+              onChange={(e) => chooseKey(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && add()}
+              aria-label="New key name"
+            />
+            <datalist id={`suggest-${pathKey(path)}`}>
+              {suggestions.map((p) => (
+                <option key={p.name} value={p.name} label={`${p.required ? "Required. " : ""}${p.deprecated ? "Deprecated. " : ""}${p.description ?? ""}`.slice(0, 120)} />
+              ))}
+            </datalist>
+          </>
         )}
         <select value={childKind} onChange={(e) => setChildKind(e.target.value as ValueKind)} aria-label="New value type">
           {VALUE_KINDS.map((k) => (
-            <option key={k} value={k}>{kindName(k)}</option>
+            <option key={k} value={k}>
+              {kindName(k)}{(known?.kinds ?? (kind === "array" ? hint?.itemKinds : []) ?? []).includes(k) ? " (expected)" : ""}
+            </option>
           ))}
         </select>
         <button type="button" className="primary" disabled={!canAdd} onClick={add}>Add</button>
       </div>
       {error && <div className="field-error">{error}</div>}
+      {known?.description && <div className="field-hint">{known.description}</div>}
+      {unknownKey && <div className="field-warning">The schema doesn't list "{key}" here, so it will be reported as a problem.</div>}
     </>
   );
 }

@@ -1,6 +1,7 @@
 // Entry point for the Rust side of SafeJSON. The interface calls the commands listed in
 // generate_handler! below (see src/platform/files.ts for the TypeScript side).
 mod files;
+mod schemas;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -18,6 +19,7 @@ pub fn run() {
             files::read_settings,
             files::write_settings,
             files::startup_files,
+            schemas::fetch_schema,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

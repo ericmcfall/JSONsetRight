@@ -20,7 +20,12 @@ vi.mock("../platform/files", () => ({
   pickFilesToOpen: async () => [],
   pickSavePath: async () => null,
 }));
-vi.mock("../ui/dialog", () => ({ confirmDialog: async () => confirmAnswers.shift() ?? false }));
+vi.mock("../ui/dialog", () => ({
+  confirmDialog: async () => confirmAnswers.shift() ?? false,
+  askDialog: async () => ((confirmAnswers.shift() ?? false) ? "confirm" : "cancel"),
+}));
+vi.mock("./schemas", () => ({ schemaProblems: () => schemaProblemList, forgetTabSchema: () => undefined }));
+let schemaProblemList: { path: (string | number)[]; message: string }[] = [];
 
 const { useEditor, isDirty } = await import("./editor");
 const { setValue } = await import("../engine");
@@ -84,6 +89,19 @@ describe("editor store", () => {
     s().undo();
     expect(tab().history.present.text).toBe('{"a": [1, 2,],}');
     useSettings.setState({ trailingCommas: "keep" });
+  });
+
+  it("warns about schema problems on save, but lets the user save anyway", async () => {
+    await s().openFiles([PATH]);
+    s().apply((doc) => setValue(doc, ["a"], 2));
+    schemaProblemList = [{ path: ["a"], message: "Must be <= 1" }];
+    confirmAnswers.push(false);
+    expect(await s().save()).toBe(false);
+    expect(disk.get(PATH)!.text).toContain('"a": 1');
+    confirmAnswers.push(true);
+    expect(await s().save()).toBe(true);
+    expect(disk.get(PATH)!.text).toContain('"a": 2');
+    schemaProblemList = [];
   });
 
   it("reloads from disk as an undoable step", async () => {
