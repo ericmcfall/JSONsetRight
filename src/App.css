@@ -1,4 +1,5 @@
-/* Colors follow the Windows light/dark setting automatically. */
+/* Light colors by default; App.tsx sets data-theme="dark" from the Settings choice
+   (or from the Windows light/dark setting when the choice is "Match Windows"). */
 :root {
   --bg: #ffffff;
   --bg-panel: #f3f3f3;
@@ -28,8 +29,7 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+:root[data-theme="dark"] {
     --bg: #1e1e1e;
     --bg-panel: #252526;
     --bg-hover: #2a2d2e;
@@ -50,7 +50,6 @@
     --kind-null: #9d9d9d;
     --comment: #6a9955;
     color-scheme: dark;
-  }
 }
 
 * { box-sizing: border-box; }
@@ -212,7 +211,19 @@ input:focus, select:focus, textarea:focus, .tree:focus { outline: 2px solid var(
 .backup-list { list-style: none; padding: 0; margin: 0 0 16px; max-height: 240px; overflow: auto; }
 .backup-list li { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--border); }
 
+/* ---- settings */
+.dialog.settings { width: min(560px, 92vw); }
+.setting { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.setting > span { display: flex; flex-direction: column; }
+.setting small { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.setting select, .setting input { width: 220px; flex: none; }
+.setting:last-of-type { margin-bottom: 16px; }
+
 /* ---- welcome */
 .welcome { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
 .welcome h1 { margin: 0 0 4px; }
 .welcome-buttons { display: flex; gap: 8px; margin: 12px 0; }
+.recent { display: flex; flex-direction: column; align-items: stretch; width: min(560px, 90vw); margin: 8px 0 12px; }
+.recent-file { text-align: left; padding: 4px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+.recent-file:hover { background: var(--bg-hover); }
+.recent-file .muted { margin-left: 8px; font-size: 12px; }

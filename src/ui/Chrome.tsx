@@ -2,11 +2,20 @@
 // and the confirmation dialog.
 import { useEffect, useRef } from "react";
 import { findProblems, formatPath, type JsonDocument } from "../engine";
+import { fileNameOf } from "../platform/files";
 import { isDirty, useEditor, type Tab } from "../store/editor";
+import { useSettings } from "../store/settings";
 import { useDialog } from "./dialog";
 import { closeTabWithPrompt, formatActive } from "./commands";
 
-export function Toolbar({ query, onQuery, onBackups }: { query: string; onQuery(q: string): void; onBackups(): void }) {
+interface ToolbarProps {
+  query: string;
+  onQuery(q: string): void;
+  onBackups(): void;
+  onSettings(): void;
+}
+
+export function Toolbar({ query, onQuery, onBackups, onSettings }: ToolbarProps) {
   const { newFile, openFiles, save, saveAs, undo, redo } = useEditor.getState();
   const tab = useEditor((s) => s.tabs.find((t) => t.id === s.activeId));
   const has = !!tab;
@@ -31,6 +40,7 @@ export function Toolbar({ query, onQuery, onBackups }: { query: string; onQuery(
         disabled={!has}
         aria-label="Search"
       />
+      <button type="button" onClick={onSettings} title="Settings (Ctrl+,)" aria-label="Settings">⚙</button>
     </header>
   );
 }
@@ -146,6 +156,7 @@ export function ConfirmDialog() {
 
 export function Welcome() {
   const { newFile, openFiles } = useEditor.getState();
+  const recent = useSettings((s) => s.recentFiles);
   return (
     <div className="welcome">
       <h1>SafeJSON</h1>
@@ -154,7 +165,17 @@ export function Welcome() {
         <button type="button" className="primary" onClick={() => openFiles()}>Open a file…</button>
         <button type="button" onClick={newFile}>New file</button>
       </div>
-      <p className="muted">Tip: you can open several files at once; each gets its own tab.</p>
+      {recent.length > 0 && (
+        <div className="recent">
+          <div className="field-label">Recent files</div>
+          {recent.map((path) => (
+            <button type="button" key={path} className="link recent-file" title={path} onClick={() => openFiles([path])}>
+              <strong>{fileNameOf(path)}</strong> <span className="muted">{path}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <p className="muted">Tip: drag files onto this window to open them. Each file gets its own tab.</p>
     </div>
   );
 }

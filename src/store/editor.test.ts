@@ -74,6 +74,18 @@ describe("editor store", () => {
     expect(disk.get(PATH)!.text).toContain('"a": 2');
   });
 
+  it("removes trailing commas on save when that setting is on (undoable)", async () => {
+    const { useSettings } = await import("./settings");
+    disk.set(PATH, { text: '{"a": [1, 2,],}', modifiedMs: 100 });
+    await s().openFiles([PATH]);
+    useSettings.setState({ trailingCommas: "remove" });
+    expect(await s().save()).toBe(true);
+    expect(disk.get(PATH)!.text).toBe('{"a": [1, 2]}');
+    s().undo();
+    expect(tab().history.present.text).toBe('{"a": [1, 2,],}');
+    useSettings.setState({ trailingCommas: "keep" });
+  });
+
   it("reloads from disk as an undoable step", async () => {
     await s().openFiles([PATH]);
     s().reloadFromDisk(tab().id, '{"a": 5}', 300);

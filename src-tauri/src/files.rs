@@ -93,6 +93,31 @@ pub fn list_backups(path: String) -> Result<Vec<BackupInfo>, String> {
     Ok(backups)
 }
 
+// ---- settings: %LOCALAPPDATA%\SafeJSON\settings.json (the interface owns the format)
+
+#[tauri::command]
+pub fn read_settings() -> Result<Option<String>, String> {
+    let path = app_data_dir()?.join("settings.json");
+    Ok(fs::read_to_string(path).ok())
+}
+
+#[tauri::command]
+pub fn write_settings(contents: String) -> Result<(), String> {
+    let dir = app_data_dir()?;
+    fs::create_dir_all(&dir).map_err(|e| describe(e, &dir))?;
+    let path = dir.join("settings.json");
+    let temp = dir.join("settings.json.tmp");
+    fs::write(&temp, contents)
+        .and_then(|_| fs::rename(&temp, &path))
+        .map_err(|e| describe(e, &path))
+}
+
+/// Files named on the command line, e.g. from "Open with > SafeJSON" in File Explorer.
+#[tauri::command]
+pub fn startup_files() -> Vec<String> {
+    std::env::args().skip(1).filter(|a| !a.starts_with('-')).collect()
+}
+
 // ---- auto-recovery drafts: %LOCALAPPDATA%\SafeJSON\recovery\<id>.json
 // The interface decides what goes in a draft (file path, title, text); Rust only stores it.
 

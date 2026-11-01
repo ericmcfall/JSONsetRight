@@ -1,6 +1,7 @@
 // Window-level commands used by the toolbar, tabs and keyboard shortcuts.
 import { formatDocument } from "../engine";
 import { isDirty, useEditor } from "../store/editor";
+import { formatIndentFor } from "../store/settings";
 import { askDialog } from "./dialog";
 
 const store = () => useEditor.getState();
@@ -29,10 +30,10 @@ export function formatActive(): void {
   const { tabs, activeId, apply } = store();
   const tab = tabs.find((t) => t.id === activeId);
   if (!tab) return;
-  const indent = tab.history.present.format.indent;
+  const indent = formatIndentFor(tab.history.present.format.indent);
   apply((doc) => {
     const formatted = formatDocument(doc, indent);
-    return formatted.text === doc.text ? doc : formatted;
+    return formatted.text === doc.text && formatted.format.indent === doc.format.indent ? doc : formatted;
   });
 }
 

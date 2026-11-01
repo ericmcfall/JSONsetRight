@@ -2,7 +2,7 @@
 
 A standalone Windows app for creating and editing JSON config files through a GUI, built so that **syntax errors are impossible** and schema mistakes are caught before saving.
 
-Status: **Planning complete. No code written yet.**
+Status: **Phase 0 and Phase 1 (v1) built.** Phase 2 (schemas, raw mode) is next.
 
 ---
 

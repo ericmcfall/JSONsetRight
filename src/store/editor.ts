@@ -8,6 +8,7 @@ import {
   parseDocument,
   pushHistory,
   redoHistory,
+  removeTrailingCommas,
   startHistory,
   toFileText,
   undoHistory,
@@ -17,6 +18,7 @@ import {
 } from "../engine";
 import { fileModifiedMs, fileNameOf, pickFilesToOpen, pickSavePath, readTextFile, saveTextFile } from "../platform/files";
 import { confirmDialog } from "../ui/dialog";
+import { useSettings } from "./settings";
 import { pathKey } from "../ui/tree-model";
 
 export interface Tab {
@@ -43,7 +45,6 @@ interface EditorState {
   tabs: Tab[];
   activeId: string | null;
   message: Message | null;
-  backupCount: number;
 
   newFile(): void;
   /** Opens text that didn't come from a file on disk (used for the browser-only dev preview). */
@@ -106,7 +107,6 @@ export const useEditor = create<EditorState>((set, get) => {
     tabs: [],
     activeId: null,
     message: null,
-    backupCount: 5,
 
     newFile() {
       untitledCount++;
@@ -131,6 +131,7 @@ export const useEditor = create<EditorState>((set, get) => {
           const file = await readTextFile(path);
           const tab = makeTab(path, fileNameOf(path), parseDocument(file.text), file.text, file.modifiedMs);
           set((state) => ({ tabs: [...state.tabs, tab], activeId: tab.id }));
+          useSettings.getState().addRecent(path);
         } catch (error) {
           if (error instanceof JsonSyntaxError) {
             fail(
@@ -184,12 +185,19 @@ export const useEditor = create<EditorState>((set, get) => {
     },
 
     async save(tabId) {
-      const tab = tabId ? get().tabs.find((t) => t.id === tabId) : activeTab();
+      let tab = tabId ? get().tabs.find((t) => t.id === tabId) : activeTab();
       if (!tab) return false;
-      if (!tab.filePath) return get().saveAs(tab.id);
+      const filePath = tab.filePath;
+      if (!filePath) return get().saveAs(tab.id);
+      const settings = useSettings.getState();
+      if (settings.trailingCommas === "remove" && tab.history.present.hasTrailingCommas) {
+        // Recorded as an edit, so it shows in the tree and can be undone.
+        updateTab(tab.id, { history: pushHistory(tab.history, removeTrailingCommas(tab.history.present)) });
+        tab = get().tabs.find((t) => t.id === tab!.id)!;
+      }
       const text = toFileText(tab.history.present);
       // Don't silently overwrite changes another program made since we loaded the file.
-      const onDisk = await fileModifiedMs(tab.filePath).catch(() => null);
+      const onDisk = await fileModifiedMs(filePath).catch(() => null);
       if (onDisk !== null && tab.diskModifiedMs !== null && onDisk !== tab.diskModifiedMs) {
         const overwrite = await confirmDialog({
           title: `${tab.title} was changed by another program`,
@@ -200,8 +208,9 @@ export const useEditor = create<EditorState>((set, get) => {
         if (!overwrite) return false;
       }
       try {
-        const modifiedMs = await saveTextFile(tab.filePath, text, get().backupCount);
+        const modifiedMs = await saveTextFile(filePath, text, settings.backupCount);
         updateTab(tab.id, { savedText: text, diskModifiedMs: modifiedMs });
+        settings.addRecent(filePath);
         return true;
       } catch (error) {
         fail(`Could not save: ${error}`);
