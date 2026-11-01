@@ -2,7 +2,8 @@
 name = "safejson"
 version = "3.0.0"
 description = "SafeJSON - a GUI editor for JSON config files"
-authors = ["SafeJSON contributors"]
+authors = ["Eric McFall"]
+license = "MIT"
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

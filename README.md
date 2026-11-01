@@ -119,3 +119,7 @@ files only works in the desktop app.
 | `src/platform/` | Calls into the Rust side (files, dialogs). |
 | `src-tauri/src/` | Rust: reading/saving files, backups, recovery drafts, settings. |
 | `samples/` | Test files. They must round-trip byte-for-byte, so git leaves their line endings alone. |
+
+## License
+
+SafeJSON is released under the [MIT License](LICENSE). Copyright (c) 2026 Eric McFall.
