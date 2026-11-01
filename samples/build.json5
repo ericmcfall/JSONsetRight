@@ -1,0 +1,17 @@
+// JSON5 sample: unquoted keys, single quotes, hex, trailing commas.
+{
+  name: 'build-tools',
+  outputDir: './dist',
+  workers: 0x04,
+  timeoutSeconds: 2.5e1,
+  minify: true,
+  /* Files the build should skip */
+  exclude: [
+    '**/*.test.ts',
+    'docs/**',
+  ],
+  targets: {
+    browser: { enabled: true, version: 'last 2 versions', },
+    node: { enabled: false, version: '>=20', },
+  },
+}

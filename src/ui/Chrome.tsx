@@ -136,6 +136,12 @@ export function ProblemsPanel({ tab }: { tab: Tab }) {
   );
 }
 
+const DIALECTS = {
+  json: { name: "JSON", description: "Standard JSON" },
+  jsonc: { name: "JSON with Comments", description: "JSON with comments and/or trailing commas" },
+  json5: { name: "JSON5", description: "JSON5: allows unquoted keys, single quotes, hex numbers and more" },
+};
+
 export function StatusBar({ tab, onSchema }: { tab: Tab; onSchema(): void }) {
   const doc = tab.history.present;
   const { indent, eol, bom } = doc.format;
@@ -154,9 +160,7 @@ export function StatusBar({ tab, onSchema }: { tab: Tab; onSchema(): void }) {
       <button type="button" className="status-button" onClick={onSchema} title={schema.error ?? schema.source?.location ?? "Choose a JSON Schema for this file"}>
         {schemaLabel}
       </button>
-      <span title={doc.dialect === "jsonc" ? "JSON with comments and/or trailing commas" : "Standard JSON"}>
-        {doc.dialect === "jsonc" ? "JSON with Comments" : "JSON"}
-      </span>
+      <span title={DIALECTS[doc.dialect].description}>{DIALECTS[doc.dialect].name}</span>
       <span>{indent === "\t" ? "Tabs" : `Spaces: ${indent.length}`}</span>
       <span>{eol === "\r\n" ? "CRLF" : "LF"}</span>
       <span>{bom ? "UTF-8 with BOM" : "UTF-8"}</span>

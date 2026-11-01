@@ -9,13 +9,14 @@ import {
   findNode,
   formatPath,
   isUnsafeNumber,
-  JSON_NUMBER,
+  isValidNumber,
   keysOf,
   kindOf,
   samePath,
   sourceOf,
   VALUE_KINDS,
   valueOf,
+  type Dialect,
   type JsonDocument,
   type JsonValue,
   type Path,
@@ -167,7 +168,7 @@ function ValueEditor({ doc, path, kind, hint }: { doc: JsonDocument; path: Path;
     case "string":
       return <StringEditor path={path} initial={node.value as string} />;
     case "number":
-      return <NumberEditor path={path} initial={sourceOf(doc, node)} integer={hint?.integer ?? false} />;
+      return <NumberEditor path={path} initial={sourceOf(doc, node)} integer={hint?.integer ?? false} dialect={doc.dialect} />;
     case "boolean":
       return (
         <label className="toggle">
@@ -254,9 +255,9 @@ function StringEditor({ path, initial }: { path: Path; initial: string }) {
   );
 }
 
-function NumberEditor({ path, initial, integer }: { path: Path; initial: string; integer: boolean }) {
+function NumberEditor({ path, initial, integer, dialect }: { path: Path; initial: string; integer: boolean; dialect: Dialect }) {
   const [text, setText] = useState(initial);
-  const valid = JSON_NUMBER.test(text.trim());
+  const valid = isValidNumber(text, dialect);
   const commit = () => {
     if (valid && text.trim() !== initial) actions.setNumber(path, text);
   };

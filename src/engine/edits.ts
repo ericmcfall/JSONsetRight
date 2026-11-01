@@ -4,7 +4,8 @@
 // makes undo simple). Each edit changes only the text it has to, then the result is re-parsed:
 // if an edit would ever produce invalid JSON, it throws EditError and nothing changes.
 import { modify, applyEdits, type FormattingOptions, type ModificationOptions, type Node } from "jsonc-parser";
-import { JsonSyntaxError, withText, type JsonDocument } from "./document";
+import { JsonSyntaxError, withText, type Dialect, type JsonDocument } from "./document";
+import { isIdentifier, modifyJson5, quote } from "./json5";
 import {
   findNode,
   keysOf,
@@ -24,6 +25,7 @@ export type EditErrorCode =
   | "invalid-number"
   | "cannot-remove-root"
   | "index-out-of-range"
+  | "not-supported"
   | "internal";
 
 export class EditError extends Error {
@@ -39,6 +41,15 @@ export class EditError extends Error {
 /** Strict JSON number: no leading zeros, no NaN/Infinity, no leading "+". */
 export const JSON_NUMBER = /^-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?$/;
 
+/** JSON5 numbers also allow hex, a leading "+", .5 / 5., Infinity and NaN. */
+export const JSON5_NUMBER = /^[+-]?(Infinity|NaN|0[xX][0-9a-fA-F]+|(0|[1-9]\d*)(\.\d*)?([eE][+-]?\d+)?|\.\d+([eE][+-]?\d+)?)$/;
+
+/** Whether `text` is a number that can be written in a file of this dialect. */
+export function isValidNumber(text: string, dialect: Dialect): boolean {
+  const t = text.trim();
+  return JSON_NUMBER.test(t) || (dialect === "json5" && JSON5_NUMBER.test(t));
+}
+
 // ---------------------------------------------------------------- values
 
 /** Replaces the value at `path` (which must exist). */
@@ -46,7 +57,7 @@ export function setValue(doc: JsonDocument, path: Path, value: JsonValue): JsonD
   const node = requireNode(doc, path);
   if (isScalar(value)) {
     // Scalars are swapped in place, so nothing around them moves.
-    return replaceNodeText(doc, node, JSON.stringify(value));
+    return replaceNodeText(doc, node, scalarText(doc, node, value));
   }
   if (path.length === 0) {
     const content = JSON.stringify(value, null, doc.format.indent).replace(/\n/g, doc.format.eol);
@@ -61,7 +72,7 @@ export function setValue(doc: JsonDocument, path: Path, value: JsonValue): JsonD
  */
 export function setNumberText(doc: JsonDocument, path: Path, numberText: string): JsonDocument {
   const trimmed = numberText.trim();
-  if (!JSON_NUMBER.test(trimmed)) {
+  if (!isValidNumber(trimmed, doc.dialect)) {
     throw new EditError("invalid-number", `"${numberText}" is not a valid JSON number`);
   }
   return replaceNodeText(doc, requireNode(doc, path), trimmed);
@@ -115,7 +126,7 @@ export function renameKey(doc: JsonDocument, objectPath: Path, oldKey: string, n
   const property = (object.children ?? []).find((p) => p.children![0].value === oldKey);
   if (!property) throw new EditError("not-found", `There is no key "${oldKey}"`);
   checkNewKey(object, newKey);
-  return replaceNodeText(doc, property.children![0], JSON.stringify(newKey));
+  return replaceNodeText(doc, property.children![0], keyLike(doc, property.children![0], newKey));
 }
 
 // ---------------------------------------------------------------- arrays
@@ -273,11 +284,29 @@ function replaceNodeText(doc: JsonDocument, node: Node, content: string): JsonDo
   return commit(doc, applyEdits(doc.text, [{ offset: node.offset, length: node.length, content }]));
 }
 
+/** Text for a new scalar value. In JSON5 files a 'single-quoted' string stays single-quoted. */
+function scalarText(doc: JsonDocument, node: Node, value: string | number | boolean | null): string {
+  if (doc.dialect === "json5" && typeof value === "string" && doc.text[node.offset] === "'") return quote(value, "'");
+  return JSON.stringify(value);
+}
+
+/** Text for a renamed key, keeping a JSON5 key's style (unquoted or 'single') where possible. */
+function keyLike(doc: JsonDocument, keyNode: Node, key: string): string {
+  if (doc.dialect !== "json5") return JSON.stringify(key);
+  const style = doc.text[keyNode.offset];
+  if (style === "'") return quote(key, "'");
+  if (style !== '"' && isIdentifier(key)) return key;
+  return JSON.stringify(key);
+}
+
 /**
  * Runs jsonc-parser's modify() and applies the result. Containers written on one line, like
  * [1, 2, 3], are kept on one line; otherwise new content is indented to match the file.
  */
 function modifyText(doc: JsonDocument, path: Path, value: JsonValue | undefined, extra: ModificationOptions = {}): string {
+  if (doc.dialect === "json5") {
+    return modifyJson5(doc.text, doc.root, path, value, { indent: doc.format.indent, eol: doc.format.eol }, extra);
+  }
   const container = findNode(doc, path.slice(0, -1));
   const containerText = container ? sourceOf(doc, container) : "";
   const oneLine = (container?.children?.length ?? 0) > 0 && !containerText.includes("\n");

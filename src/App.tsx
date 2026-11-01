@@ -52,6 +52,7 @@ function App() {
       void (async () => {
         const store = useEditor.getState();
         store.openText("vscode-settings.jsonc", (await import("../samples/vscode-settings.jsonc?raw")).default);
+        store.openText("build.json5", (await import("../samples/build.json5?raw")).default);
         store.openText("service.json", (await import("../samples/service.json?raw")).default);
         const id = useEditor.getState().activeId;
         useEditor.setState((s) => ({ tabs: s.tabs.map((t) => (t.id === id ? { ...t, filePath: "C:\\samples\\service.json" } : t)) }));

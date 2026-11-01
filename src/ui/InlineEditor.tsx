@@ -1,17 +1,19 @@
 // A small text box used inside a tree row to rename a key or edit a text/number value.
 // Enter saves, Escape cancels, clicking away saves. Invalid input is shown in red and not saved.
 import { useEffect, useRef, useState } from "react";
-import { JSON_NUMBER } from "../engine";
+import { isValidNumber, type Dialect } from "../engine";
 
 interface Props {
   kind: "key" | "string" | "number";
   initial: string;
+  /** Which number spellings are allowed (JSON5 files also allow hex, Infinity, ...). */
+  dialect: Dialect;
   /** Returns false if the edit was refused (the store shows why). */
   onCommit(text: string): boolean;
   onDone(): void;
 }
 
-export function InlineEditor({ kind, initial, onCommit, onDone }: Props) {
+export function InlineEditor({ kind, initial, dialect, onCommit, onDone }: Props) {
   const [text, setText] = useState(initial);
   const input = useRef<HTMLInputElement>(null);
   const finished = useRef(false);
@@ -22,7 +24,7 @@ export function InlineEditor({ kind, initial, onCommit, onDone }: Props) {
   }, []);
 
   const error =
-    kind === "number" && !JSON_NUMBER.test(text.trim())
+    kind === "number" && !isValidNumber(text, dialect)
       ? "Not a valid number"
       : kind === "key" && text === ""
         ? "Key can't be empty"

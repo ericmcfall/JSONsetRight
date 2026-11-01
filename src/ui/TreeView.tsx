@@ -166,6 +166,7 @@ export function TreeView({ tab, query }: Props) {
             <KindBadge kind={row.kind} />
             {isEditing === "key" ? (
               <InlineEditor
+                dialect={doc.dialect}
                 kind="key"
                 initial={String(row.key)}
                 onCommit={(text) => actions.rename(row.path, text)}
@@ -178,6 +179,7 @@ export function TreeView({ tab, query }: Props) {
             )}
             {isEditing === "value" ? (
               <InlineEditor
+                dialect={doc.dialect}
                 kind={row.kind === "number" ? "number" : "string"}
                 initial={row.kind === "string" ? fullString(row) : row.preview}
                 onCommit={(text) => (row.kind === "number" ? actions.setNumber(row.path, text) : actions.setScalar(row.path, text))}

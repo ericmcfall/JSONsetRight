@@ -58,7 +58,7 @@ describe("parseDocument", () => {
   });
 
   it("keeps a BOM and CRLF line endings on save", () => {
-    const text = '﻿{\r\n  "a": 1\r\n}\r\n';
+    const text = '\uFEFF{\r\n  "a": 1\r\n}\r\n';
     const doc = parseDocument(text);
     expect(doc.format).toEqual({ indent: "  ", eol: "\r\n", bom: true });
     expect(toFileText(doc)).toBe(text);

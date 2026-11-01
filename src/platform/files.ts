@@ -13,7 +13,7 @@ export interface BackupInfo {
 }
 
 const JSON_FILTERS = [
-  { name: "JSON files", extensions: ["json", "jsonc", "code-workspace", "babelrc", "eslintrc"] },
+  { name: "JSON files", extensions: ["json", "jsonc", "json5", "code-workspace", "babelrc", "eslintrc"] },
   { name: "All files", extensions: ["*"] },
 ];
 

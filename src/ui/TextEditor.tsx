@@ -127,7 +127,8 @@ export function TextEditor({ tab }: { tab: Tab }) {
     const modelUri = `inmemory://safejson/${tab.id}.json`;
     const lenient = tab.placeholder || doc.dialect === "jsonc";
     setup.jsonDefaults.setDiagnosticsOptions({
-      validate: true,
+      // The JSON checker doesn't understand JSON5, so JSON5 files rely on SafeJSON's own check.
+      validate: doc.dialect !== "json5",
       allowComments: lenient,
       trailingCommas: lenient ? "ignore" : "error",
       enableSchemaRequest: false,

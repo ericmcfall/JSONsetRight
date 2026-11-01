@@ -10,10 +10,14 @@ import {
   type ParseError,
   type SyntaxKind,
 } from "jsonc-parser";
+import { Json5SyntaxError, parseJson5 } from "./json5";
 import { isTrivia, Token } from "./tokens";
 
-/** "json" = strict JSON. "jsonc" = the file had comments or trailing commas when opened. */
-export type Dialect = "json" | "jsonc";
+/**
+ * "json" = strict JSON. "jsonc" = the file had comments or trailing commas when opened.
+ * "json5" = the file used JSON5 features (unquoted keys, single quotes, hex numbers, ...).
+ */
+export type Dialect = "json" | "jsonc" | "json5";
 
 /** How the file was written, so edits and saves can match it. */
 export interface FormatInfo {
@@ -58,23 +62,37 @@ export class JsonSyntaxError extends Error {
   }
 }
 
-const BOM = "﻿";
+const BOM = "\uFEFF";
 const DEFAULT_INDENT = "  ";
 
 /** Parses file text (which may start with a BOM). Throws JsonSyntaxError if it is not valid. */
 export function parseDocument(fileText: string): JsonDocument {
   const bom = fileText.startsWith(BOM);
   const text = bom ? fileText.slice(1) : fileText;
-  const scan = scanText(text);
   const format: FormatInfo = { indent: detectIndent(text), eol: detectEol(text), bom };
-  return {
-    text,
-    root: parseOrThrow(text),
-    dialect: scan.hasComments || scan.hasTrailingCommas ? "jsonc" : "json",
-    hasComments: scan.hasComments,
-    hasTrailingCommas: scan.hasTrailingCommas,
-    format,
-  };
+  try {
+    const root = parseOrThrow(text);
+    const scan = scanText(text);
+    return {
+      text,
+      root,
+      dialect: scan.hasComments || scan.hasTrailingCommas ? "jsonc" : "json",
+      hasComments: scan.hasComments,
+      hasTrailingCommas: scan.hasTrailingCommas,
+      format,
+    };
+  } catch (jsoncError) {
+    if (!(jsoncError instanceof JsonSyntaxError)) throw jsoncError;
+    // Not JSON or JSONC; it may be JSON5.
+    try {
+      const result = parseJson5(text);
+      return { text, root: result.root, dialect: "json5", hasComments: result.hasComments, hasTrailingCommas: result.hasTrailingCommas, format };
+    } catch (json5Error) {
+      if (!(json5Error instanceof Json5SyntaxError)) throw json5Error;
+      // Report whichever reading got further into the file: that's usually where the mistake is.
+      throw json5Error.problem.offset > jsoncError.problems[0].offset ? fromJson5Error(text, json5Error) : jsoncError;
+    }
+  }
 }
 
 /**
@@ -82,6 +100,14 @@ export function parseDocument(fileText: string): JsonDocument {
  * Throws JsonSyntaxError if the new text is invalid.
  */
 export function withText(doc: JsonDocument, text: string): JsonDocument {
+  if (doc.dialect === "json5") {
+    try {
+      const result = parseJson5(text);
+      return { ...doc, text, root: result.root, hasComments: result.hasComments, hasTrailingCommas: result.hasTrailingCommas };
+    } catch (error) {
+      throw error instanceof Json5SyntaxError ? fromJson5Error(text, error) : error;
+    }
+  }
   const scan = scanText(text);
   return {
     ...doc,
@@ -90,6 +116,11 @@ export function withText(doc: JsonDocument, text: string): JsonDocument {
     hasComments: scan.hasComments,
     hasTrailingCommas: scan.hasTrailingCommas,
   };
+}
+
+function fromJson5Error(text: string, error: Json5SyntaxError): JsonSyntaxError {
+  const { message, offset } = error.problem;
+  return new JsonSyntaxError([{ message, offset, ...lineAndColumn(text, offset) }]);
 }
 
 /** The exact text to write to disk (BOM restored if the original had one). */

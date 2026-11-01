@@ -129,7 +129,7 @@ function makeTab(filePath: string | null, title: string, doc: JsonDocument, save
   };
 }
 
-const BOM = "﻿";
+const BOM = "\uFEFF";
 
 /**
  * Makes a tab for file text. Text that isn't valid JSON opens in text mode so it can be fixed,
@@ -246,7 +246,7 @@ export const useEditor = create<EditorState>((set, get) => {
       const filePath = tab.filePath;
       if (!filePath) return get().saveAs(tab.id);
       const settings = useSettings.getState();
-      if (settings.trailingCommas === "remove" && tab.history.present.hasTrailingCommas) {
+      if (settings.trailingCommas === "remove" && tab.history.present.hasTrailingCommas && tab.history.present.dialect !== "json5") {
         // Recorded as an edit, so it shows in the tree and can be undone.
         updateTab(tab.id, { history: pushHistory(tab.history, removeTrailingCommas(tab.history.present)) });
         tab = get().tabs.find((t) => t.id === tab!.id)!;
