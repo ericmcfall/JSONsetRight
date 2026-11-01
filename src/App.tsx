@@ -7,6 +7,8 @@ import { isDirty, useEditor } from "./store/editor";
 import { updateTabSchema } from "./store/schemas";
 import { useSettings } from "./store/settings";
 import { BackupsDialog } from "./ui/BackupsDialog";
+import { CompareDialog } from "./ui/CompareDialog";
+import { CompareView } from "./ui/CompareView";
 import { ConfirmDialog, MessageBar, ProblemsPanel, StatusBar, TabBar, Toolbar, Welcome } from "./ui/Chrome";
 import { handleShortcut } from "./ui/commands";
 import { DetailsPanel } from "./ui/DetailsPanel";
@@ -27,7 +29,7 @@ function App() {
   const tab = useEditor((s) => s.tabs.find((t) => t.id === s.activeId));
   const theme = useSettings((s) => s.theme);
   const [query, setQuery] = useState("");
-  const [dialog, setDialog] = useState<"backups" | "settings" | "schema" | null>(null);
+  const [dialog, setDialog] = useState<"backups" | "settings" | "schema" | "compare" | null>(null);
 
   // Load the right schema when the file, its "$schema" value, or the schema settings change.
   const declared = tab ? declaredSchema(tab.history.present) : null;
@@ -99,7 +101,7 @@ function App() {
 
   return (
     <div className="app">
-      <Toolbar query={query} onQuery={setQuery} onBackups={() => setDialog("backups")} onSettings={() => setDialog("settings")} />
+      <Toolbar query={query} onQuery={setQuery} onBackups={() => setDialog("backups")} onSettings={() => setDialog("settings")} onCompare={() => setDialog("compare")} />
       <TabBar />
       <MessageBar />
       {tab ? (
@@ -109,6 +111,8 @@ function App() {
               <TextEditor tab={tab} />
             ) : tab.view === "table" ? (
               <TableView tab={tab} />
+            ) : tab.view === "compare" && tab.compare ? (
+              <CompareView tab={tab} />
             ) : (
               <>
                 <TreeView tab={tab} query={query} />
@@ -125,6 +129,7 @@ function App() {
       {dialog === "backups" && tab && <BackupsDialog tab={tab} onClose={() => setDialog(null)} />}
       {dialog === "settings" && <SettingsDialog onClose={() => setDialog(null)} />}
       {dialog === "schema" && tab && <SchemaDialog tab={tab} onClose={() => setDialog(null)} />}
+      {dialog === "compare" && tab && <CompareDialog tab={tab} onClose={() => setDialog(null)} />}
       <ConfirmDialog />
     </div>
   );

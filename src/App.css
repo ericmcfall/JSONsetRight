@@ -141,6 +141,23 @@ tr:hover .row-actions { display: inline-flex; gap: 2px; }
 .table-missing { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .table-open { margin: 0 0 14px; }
 
+/* ---- compare */
+.compare-view { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.compare-filters { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.compare-filters button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.compare-table td { vertical-align: top; white-space: normal; max-width: 420px; }
+.compare-table .diff-value code { white-space: pre-wrap; overflow-wrap: anywhere; }
+.diff-actions { white-space: nowrap; }
+.diff-actions button { display: block; width: 100%; margin: 2px 0; font-size: 12px; padding: 2px 8px; }
+.diff-badge { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 3px; }
+.diff-badge.different { background: color-mix(in srgb, var(--warning) 25%, transparent); }
+.diff-badge.onlyLeft { background: color-mix(in srgb, var(--danger) 22%, transparent); }
+.diff-badge.onlyRight { background: color-mix(in srgb, var(--kind-number) 25%, transparent); }
+.compare-same { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.compare-same p { margin: 4px; }
+.compare-choices { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.compare-choices button { display: flex; justify-content: space-between; gap: 12px; text-align: left; padding: 8px 10px; }
+
 /* ---- tabs */
 .tabbar { display: flex; background: var(--bg-panel); border-bottom: 1px solid var(--border); overflow-x: auto; }
 .tab {

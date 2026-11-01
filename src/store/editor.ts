@@ -44,6 +44,8 @@ export interface Tab {
   view: View;
   /** The list shown in table view. */
   tablePath: Path | null;
+  /** What this tab is being compared with, in compare view. */
+  compare: CompareTarget | null;
   /**
    * Text typed in text mode that isn't valid yet, so it hasn't been applied to the document.
    * While set, switching to the tree and saving are blocked.
@@ -53,7 +55,15 @@ export interface Tab {
   placeholder: boolean;
 }
 
-export type View = "tree" | "table" | "text";
+export type View = "tree" | "table" | "text" | "compare";
+
+export interface CompareTarget {
+  /** Shown to the user, e.g. "Saved version on disk" or a file name. */
+  label: string;
+  /** The other version. If it's an open tab, its live document is used instead. */
+  doc: JsonDocument;
+  otherTabId: string | null;
+}
 
 export interface PendingText {
   text: string;
@@ -90,7 +100,9 @@ interface EditorState {
   select(path: Path): void;
   setExpanded(path: Path, open: boolean): void;
   /** Runs an engine edit on the active document. Returns false (and shows why) if it was refused. */
-  apply(edit: (doc: JsonDocument) => JsonDocument, selectAfter?: Path): boolean;
+  apply(edit: (doc: JsonDocument) => JsonDocument, selectAfter?: Path, tabId?: string): boolean;
+  /** Shows the active tab side by side with another version of the data. */
+  startCompare(target: CompareTarget): void;
   undo(): void;
   redo(): void;
   showMessage(message: Message | null): void;
@@ -130,6 +142,7 @@ function makeTab(filePath: string | null, title: string, doc: JsonDocument, save
     expanded: initialExpanded(doc),
     view: "tree",
     tablePath: null,
+    compare: null,
     pendingText: null,
     placeholder: false,
   };
@@ -338,8 +351,8 @@ export const useEditor = create<EditorState>((set, get) => {
       updateTab(tab.id, { expanded });
     },
 
-    apply(edit, selectAfter) {
-      const tab = activeTab();
+    apply(edit, selectAfter, tabId) {
+      const tab = tabId ? get().tabs.find((t) => t.id === tabId) : activeTab();
       if (!tab) return false;
       try {
         const next = edit(tab.history.present);
@@ -347,7 +360,7 @@ export const useEditor = create<EditorState>((set, get) => {
         // No change (same text and layout): don't add an empty undo step.
         if (next === present || (next.text === present.text && next.format.indent === present.format.indent)) return true;
         updateTab(tab.id, { history: pushHistory(tab.history, next) });
-        if (selectAfter) get().select(selectAfter);
+        if (selectAfter && tab.id === get().activeId) get().select(selectAfter);
         return true;
       } catch (error) {
         fail(error instanceof EditError ? error.message : `Unexpected problem: ${error}`);
@@ -370,6 +383,17 @@ export const useEditor = create<EditorState>((set, get) => {
       set({ message });
     },
 
+    startCompare(target) {
+      flushTextEditor?.();
+      const tab = activeTab();
+      if (!tab) return;
+      if (tab.pendingText) {
+        fail("Fix the text first: comparing needs valid JSON.");
+        return;
+      }
+      updateTab(tab.id, { compare: target, view: "compare" });
+    },
+
     setView(view) {
       flushTextEditor?.();
       const tab = activeTab();
@@ -379,6 +403,7 @@ export const useEditor = create<EditorState>((set, get) => {
         fail(`Fix the text first: line ${line}, column ${column}: ${message}. The ${view} needs valid JSON.`);
         return false;
       }
+      if (view === "compare" && !tab.compare) return false;
       if (view === "table") {
         // Show the list that the selection is in (or the selected list itself).
         const target = tableTarget(tab.history.present, tab.selectedPath);

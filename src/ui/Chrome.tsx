@@ -17,9 +17,10 @@ interface ToolbarProps {
   onQuery(q: string): void;
   onBackups(): void;
   onSettings(): void;
+  onCompare(): void;
 }
 
-export function Toolbar({ query, onQuery, onBackups, onSettings }: ToolbarProps) {
+export function Toolbar({ query, onQuery, onBackups, onSettings, onCompare }: ToolbarProps) {
   const { newFile, openFiles, save, saveAs, undo, redo } = useEditor.getState();
   const tab = useEditor((s) => s.tabs.find((t) => t.id === s.activeId));
   const has = !!tab;
@@ -65,6 +66,7 @@ export function Toolbar({ query, onQuery, onBackups, onSettings }: ToolbarProps)
         </button>
       </span>
       <button type="button" onClick={onBackups} disabled={!tab?.filePath} title="Restore an earlier saved version">Backups…</button>
+      <button type="button" onClick={onCompare} disabled={!tab || !!tab.pendingText} title="Compare this file with its saved version, another file, or a backup">Compare…</button>
       <span className="toolbar-spacer" />
       <input
         id="search"

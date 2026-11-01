@@ -6,3 +6,4 @@ export * from "./validate";
 export * from "./format";
 export * from "./history";
 export * from "./comments";
+export * from "./diff";
