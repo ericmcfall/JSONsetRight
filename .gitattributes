@@ -1,0 +1,10 @@
+# Source files are stored and checked out with LF line endings on every machine.
+* text=auto eol=lf
+
+# Sample files are test fixtures: keep their exact bytes, because line endings matter
+# for SafeJSON's "save produces identical bytes" round-trip tests.
+samples/** -text
+
+*.png binary
+*.ico binary
+*.icns binary

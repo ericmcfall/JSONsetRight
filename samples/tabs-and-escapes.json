@@ -1,0 +1,8 @@
+{
+	"description": "Tab-indented file with escapes: \"quotes\", back\\slash, unicode é, newline\nhere",
+	"emptyObject": {},
+	"emptyArray": [],
+	"nested": [[1, 2], [3, [4, {"deep": true}]]],
+	"bigNumber": 12345678901234567890,
+	"negativeExp": -2.5e-3
+}

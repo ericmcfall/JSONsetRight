@@ -1,0 +1,9 @@
+{
+  // Type-checks the unit tests, which run in Node.js (so they may use Node APIs like fs).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src"],
+  "exclude": []
+}

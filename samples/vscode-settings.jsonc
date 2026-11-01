@@ -1,0 +1,12 @@
+// VS Code-style settings: comments and trailing commas (JSONC).
+{
+  /* Editor appearance */
+  "editor.fontSize": 14,
+  "editor.tabSize": 2, // two-space indent
+  "editor.rulers": [80, 120,],
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+  },
+  "workbench.colorTheme": "Default Dark Modern",
+}

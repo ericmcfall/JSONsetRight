@@ -1,0 +1,35 @@
+/* Colors follow the Windows light/dark setting automatically. */
+:root {
+  --bg: #f6f6f6;
+  --text: #1f1f1f;
+  --muted: #5f5f5f;
+
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e1e1e;
+    --text: #e6e6e6;
+    --muted: #a0a0a0;
+  }
+}
+
+body {
+  margin: 0;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.container p {
+  color: var(--muted);
+}
