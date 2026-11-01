@@ -6,6 +6,7 @@
 import { modify, applyEdits, type FormattingOptions, type ModificationOptions, type Node } from "jsonc-parser";
 import { JsonSyntaxError, withText, type Dialect, type JsonDocument } from "./document";
 import { isIdentifier, modifyJson5, quote } from "./json5";
+import { removeChildText } from "./text-edits";
 import {
   findNode,
   keysOf,
@@ -146,7 +147,10 @@ export function insertItem(doc: JsonDocument, arrayPath: Path, value: JsonValue,
 export function removeValue(doc: JsonDocument, path: Path): JsonDocument {
   if (path.length === 0) throw new EditError("cannot-remove-root", "The top-level value cannot be deleted");
   requireNode(doc, path);
-  return commit(doc, modifyText(doc, path, undefined));
+  const container = requireContainer(doc, path.slice(0, -1));
+  const last = path[path.length - 1];
+  const index = typeof last === "number" ? last : keysOf(container).indexOf(last);
+  return commit(doc, removeChildText(doc.text, container, index));
 }
 
 /**

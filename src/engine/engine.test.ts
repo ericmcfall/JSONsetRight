@@ -163,6 +163,20 @@ describe("arrays", () => {
 });
 
 describe("removeValue", () => {
+  it("works in compact files written on one line", () => {
+    const compact = parseDocument('{"u":[{"n":"A"},{"n":"B"},{"n":"C"}],"x":1}');
+    expect(removeValue(compact, ["u", 2]).text).toBe('{"u":[{"n":"A"},{"n":"B"}],"x":1}');
+    expect(removeValue(compact, ["u", 0]).text).toBe('{"u":[{"n":"B"},{"n":"C"}],"x":1}');
+    expect(removeValue(compact, ["u", 1]).text).toBe('{"u":[{"n":"A"},{"n":"C"}],"x":1}');
+    expect(removeValue(compact, ["x"]).text).toBe('{"u":[{"n":"A"},{"n":"B"},{"n":"C"}]}');
+    expect(removeValue(parseDocument('{"a":[1]}'), ["a", 0]).text).toBe('{"a":[]}');
+  });
+
+  it("keeps the comment of the item before a removed last item", () => {
+    const doc = parseDocument('{\n  "a": 1, // about a\n  "b": 2\n}\n');
+    expect(removeValue(doc, ["b"]).text).toBe('{\n  "a": 1 // about a\n}\n');
+  });
+
   it("removes properties and items, keeping the file valid", () => {
     let doc = removeValue(parseDocument(CONFIG), ["tags", 1]);
     doc = removeValue(doc, ["nested"]);
@@ -276,13 +290,17 @@ describe("helpers", () => {
 
 /** Random edits must never produce invalid JSON (each one is re-parsed inside the engine). */
 describe("stress: random edit sequences", () => {
-  it("stays valid across 500 random edits", () => {
+  for (const [label, start] of [
+    ["formatted file", CONFIG],
+    ["compact one-line file", JSON.stringify({ a: [1, [2, 3], { b: 4 }], c: { d: [], e: {} }, f: "x" })],
+  ] as const)
+  it(`stays valid across 500 random edits (${label})`, () => {
     let seed = 42;
     const random = (n: number) => {
       seed = (seed * 1103515245 + 12345) % 2 ** 31;
       return seed % n;
     };
-    let doc = parseDocument(CONFIG);
+    let doc = parseDocument(start);
     const pickContainer = (): (string | number)[] => {
       const paths: (string | number)[][] = [[]];
       const visit = (path: (string | number)[]) => {
