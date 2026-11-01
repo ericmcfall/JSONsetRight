@@ -23,11 +23,12 @@ import {
   type ValueKind,
 } from "../engine";
 import { hintsAt, kindOfValue, type PropertyHint, type SchemaHint } from "../engine/schema";
-import type { Tab } from "../store/editor";
+import { useEditor, type Tab } from "../store/editor";
 import { useTabSchema } from "../store/schemas";
 import * as actions from "./actions";
 import { KindBadge, kindName } from "./KindBadge";
 import { allProblems } from "./problems";
+import { isTableArray } from "./table-model";
 import { pathKey } from "./tree-model";
 
 export function DetailsPanel({ tab }: { tab: Tab }) {
@@ -95,6 +96,12 @@ export function DetailsPanel({ tab }: { tab: Tab }) {
           <DefaultHint path={path} current={valueOf(node)} defaultValue={hint.defaultValue!} />
         )}
       </Field>
+
+      {isTableArray(node) && (
+        <button type="button" className="table-open" onClick={() => useEditor.getState().setView("table")}>
+          ▦ Show this list as a table
+        </button>
+      )}
 
       {(kind === "object" || kind === "array") && (
         <Field label={kind === "object" ? "Add property" : "Add item"}>

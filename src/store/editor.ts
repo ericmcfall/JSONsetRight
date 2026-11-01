@@ -24,6 +24,7 @@ import { fileModifiedMs, fileNameOf, pickFilesToOpen, pickSavePath, readTextFile
 import { askDialog, confirmDialog } from "../ui/dialog";
 import { forgetTabSchema, schemaProblems } from "./schemas";
 import { useSettings } from "./settings";
+import { tableTarget } from "../ui/table-model";
 import { pathKey } from "../ui/tree-model";
 
 export interface Tab {
@@ -39,8 +40,10 @@ export interface Tab {
   selectedPath: Path;
   /** Tree nodes that are expanded, as pathKey() strings. */
   expanded: Set<string>;
-  /** Tree editing, or plain-text editing (Monaco). */
-  view: "tree" | "text";
+  /** Tree editing, a table of a list of objects, or plain-text editing (Monaco). */
+  view: View;
+  /** The list shown in table view. */
+  tablePath: Path | null;
   /**
    * Text typed in text mode that isn't valid yet, so it hasn't been applied to the document.
    * While set, switching to the tree and saving are blocked.
@@ -49,6 +52,8 @@ export interface Tab {
   /** True when the file was invalid on open: the document is a stand-in until the text is fixed. */
   placeholder: boolean;
 }
+
+export type View = "tree" | "table" | "text";
 
 export interface PendingText {
   text: string;
@@ -90,7 +95,7 @@ interface EditorState {
   redo(): void;
   showMessage(message: Message | null): void;
   /** Switches the active tab between tree and text editing. Returns false if blocked. */
-  setView(view: "tree" | "text"): boolean;
+  setView(view: View): boolean;
   /** Applies text typed in text mode (one undo step), or keeps it pending if it isn't valid. */
   applyText(tabId: string, text: string): void;
 }
@@ -124,6 +129,7 @@ function makeTab(filePath: string | null, title: string, doc: JsonDocument, save
     selectedPath: [],
     expanded: initialExpanded(doc),
     view: "tree",
+    tablePath: null,
     pendingText: null,
     placeholder: false,
   };
@@ -337,7 +343,9 @@ export const useEditor = create<EditorState>((set, get) => {
       if (!tab) return false;
       try {
         const next = edit(tab.history.present);
-        if (next === tab.history.present) return true; // no change
+        const present = tab.history.present;
+        // No change (same text and layout): don't add an empty undo step.
+        if (next === present || (next.text === present.text && next.format.indent === present.format.indent)) return true;
         updateTab(tab.id, { history: pushHistory(tab.history, next) });
         if (selectAfter) get().select(selectAfter);
         return true;
@@ -366,10 +374,20 @@ export const useEditor = create<EditorState>((set, get) => {
       flushTextEditor?.();
       const tab = activeTab();
       if (!tab) return false;
-      if (view === "tree" && tab.pendingText) {
+      if (view !== "text" && tab.pendingText) {
         const { line, column, message } = tab.pendingText.problem;
-        fail(`Fix the text first: line ${line}, column ${column}: ${message}. The tree needs valid JSON.`);
+        fail(`Fix the text first: line ${line}, column ${column}: ${message}. The ${view} needs valid JSON.`);
         return false;
+      }
+      if (view === "table") {
+        // Show the list that the selection is in (or the selected list itself).
+        const target = tableTarget(tab.history.present, tab.selectedPath);
+        if (!target) {
+          fail("Table view works on a list of objects. Select one in the tree (or something inside one) first.");
+          return false;
+        }
+        updateTab(tab.id, { view, tablePath: target });
+        return true;
       }
       updateTab(tab.id, { view });
       return true;

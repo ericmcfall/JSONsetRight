@@ -5,6 +5,7 @@ import { formatPath } from "../engine";
 import { schemaDisplayName } from "../engine/schema";
 import { useTabSchema } from "../store/schemas";
 import { allProblems } from "./problems";
+import { tableTarget } from "./table-model";
 import { fileNameOf } from "../platform/files";
 import { isDirty, useEditor, type Tab } from "../store/editor";
 import { useSettings } from "../store/settings";
@@ -22,6 +23,7 @@ export function Toolbar({ query, onQuery, onBackups, onSettings }: ToolbarProps)
   const { newFile, openFiles, save, saveAs, undo, redo } = useEditor.getState();
   const tab = useEditor((s) => s.tabs.find((t) => t.id === s.activeId));
   const has = !!tab;
+  const canTable = !!tab && !tab.pendingText && tableTarget(tab.history.present, tab.selectedPath) !== null;
   return (
     <header className="toolbar" role="toolbar">
       <button type="button" onClick={newFile} title="New file (Ctrl+N)">New</button>
@@ -42,6 +44,15 @@ export function Toolbar({ query, onQuery, onBackups, onSettings }: ToolbarProps)
           title="Edit with the tree and forms (Ctrl+Shift+T)"
         >
           Tree
+        </button>
+        <button
+          type="button"
+          className={tab?.view === "table" ? "on" : ""}
+          disabled={!tab || (tab.view !== "table" && !canTable)}
+          onClick={() => useEditor.getState().setView("table")}
+          title="Show a list of objects as a table (select the list, or something in it, first)"
+        >
+          Table
         </button>
         <button
           type="button"

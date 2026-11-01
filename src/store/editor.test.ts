@@ -150,6 +150,12 @@ describe("editor store", () => {
     expect(s().message?.text).toMatch(/isn't valid JSON/);
   });
 
+  it("doesn't add an undo step for an edit that changes nothing", async () => {
+    await s().openFiles([PATH]);
+    s().apply((doc) => setValue(doc, ["a"], 1));
+    expect(tab().history.past.length).toBe(0);
+  });
+
   it("reports refused edits instead of applying them", async () => {
     await s().openFiles([PATH]);
     const { addProperty } = await import("../engine");
