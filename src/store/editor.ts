@@ -15,7 +15,8 @@ import {
   type JsonDocument,
   type Path,
 } from "../engine";
-import { fileNameOf, pickFilesToOpen, pickSavePath, readTextFile, saveTextFile } from "../platform/files";
+import { fileModifiedMs, fileNameOf, pickFilesToOpen, pickSavePath, readTextFile, saveTextFile } from "../platform/files";
+import { confirmDialog } from "../ui/dialog";
 import { pathKey } from "../ui/tree-model";
 
 export interface Tab {
@@ -48,6 +49,14 @@ interface EditorState {
   /** Opens text that didn't come from a file on disk (used for the browser-only dev preview). */
   openText(title: string, text: string): void;
   openFiles(paths?: string[]): Promise<void>;
+  /** Re-opens unsaved work found after a crash. `diskText` is the file's current text, if any. */
+  openRecovered(filePath: string | null, title: string, text: string, diskText: string, diskModifiedMs: number | null): void;
+  /** Replaces a tab's content with the file's new text from disk (undoable). */
+  reloadFromDisk(tabId: string, text: string, modifiedMs: number): void;
+  /** Replaces the active document with other text, e.g. a backup (undoable; not saved yet). */
+  replaceText(text: string): boolean;
+  /** Marks the file's current disk state as seen, so the outside-change prompt isn't repeated. */
+  acknowledgeDisk(tabId: string, modifiedMs: number | null): void;
   save(tabId?: string): Promise<boolean>;
   saveAs(tabId?: string): Promise<boolean>;
   closeTab(tabId: string): void;
@@ -135,11 +144,61 @@ export const useEditor = create<EditorState>((set, get) => {
       }
     },
 
+    openRecovered(filePath, title, text, diskText, diskModifiedMs) {
+      try {
+        const tab = makeTab(filePath, title, parseDocument(text), diskText, diskModifiedMs);
+        set((state) => ({ tabs: [...state.tabs, tab], activeId: tab.id }));
+      } catch {
+        fail(`The recovered copy of ${title} was damaged and could not be restored.`);
+      }
+    },
+
+    reloadFromDisk(tabId, text, modifiedMs) {
+      const tab = get().tabs.find((t) => t.id === tabId);
+      if (!tab) return;
+      try {
+        updateTab(tabId, {
+          history: pushHistory(tab.history, parseDocument(text)),
+          savedText: text,
+          diskModifiedMs: modifiedMs,
+        });
+      } catch (error) {
+        // The other program left the file invalid (maybe mid-edit). Keep ours and say so.
+        updateTab(tabId, { diskModifiedMs: modifiedMs });
+        fail(`${tab.title} was changed by another program, but the new version isn't valid JSON (${error}). Your version is still open here.`);
+      }
+    },
+
+    replaceText(text) {
+      try {
+        const doc = parseDocument(text);
+        return get().apply(() => doc, []);
+      } catch (error) {
+        fail(String(error));
+        return false;
+      }
+    },
+
+    acknowledgeDisk(tabId, modifiedMs) {
+      updateTab(tabId, { diskModifiedMs: modifiedMs });
+    },
+
     async save(tabId) {
       const tab = tabId ? get().tabs.find((t) => t.id === tabId) : activeTab();
       if (!tab) return false;
       if (!tab.filePath) return get().saveAs(tab.id);
       const text = toFileText(tab.history.present);
+      // Don't silently overwrite changes another program made since we loaded the file.
+      const onDisk = await fileModifiedMs(tab.filePath).catch(() => null);
+      if (onDisk !== null && tab.diskModifiedMs !== null && onDisk !== tab.diskModifiedMs) {
+        const overwrite = await confirmDialog({
+          title: `${tab.title} was changed by another program`,
+          message: "Saving will replace those changes with your version. (The other version is kept as a backup.)",
+          confirmLabel: "Save anyway",
+          danger: true,
+        });
+        if (!overwrite) return false;
+      }
       try {
         const modifiedMs = await saveTextFile(tab.filePath, text, get().backupCount);
         updateTab(tab.id, { savedText: text, diskModifiedMs: modifiedMs });

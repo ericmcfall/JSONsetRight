@@ -12,6 +12,9 @@ pub fn run() {
             files::save_text_file,
             files::file_modified_ms,
             files::list_backups,
+            files::write_recovery_draft,
+            files::delete_recovery_draft,
+            files::list_recovery_drafts,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

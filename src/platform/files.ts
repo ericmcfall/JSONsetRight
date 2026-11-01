@@ -35,6 +35,34 @@ export function listBackups(path: string): Promise<BackupInfo[]> {
   return invoke("list_backups", { path });
 }
 
+/** An unsaved tab's state, written every 30 seconds so it survives a crash. */
+export interface RecoveryDraft {
+  id: string;
+  filePath: string | null;
+  title: string;
+  text: string;
+  savedAtMs: number;
+}
+
+export function writeRecoveryDraft(draft: RecoveryDraft): Promise<void> {
+  return invoke("write_recovery_draft", { id: draft.id, contents: JSON.stringify(draft) });
+}
+
+export function deleteRecoveryDraft(id: string): Promise<void> {
+  return invoke("delete_recovery_draft", { id });
+}
+
+export async function listRecoveryDrafts(): Promise<RecoveryDraft[]> {
+  const contents: string[] = await invoke("list_recovery_drafts");
+  return contents.flatMap((c) => {
+    try {
+      return [JSON.parse(c) as RecoveryDraft];
+    } catch {
+      return [];
+    }
+  });
+}
+
 /** Shows the Open dialog. Returns the chosen paths (empty if cancelled). */
 export async function pickFilesToOpen(): Promise<string[]> {
   const result = await open({ multiple: true, filters: JSON_FILTERS, title: "Open JSON file" });

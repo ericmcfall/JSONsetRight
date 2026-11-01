@@ -6,7 +6,7 @@ import { isDirty, useEditor, type Tab } from "../store/editor";
 import { useDialog } from "./dialog";
 import { closeTabWithPrompt, formatActive } from "./commands";
 
-export function Toolbar({ query, onQuery }: { query: string; onQuery(q: string): void }) {
+export function Toolbar({ query, onQuery, onBackups }: { query: string; onQuery(q: string): void; onBackups(): void }) {
   const { newFile, openFiles, save, saveAs, undo, redo } = useEditor.getState();
   const tab = useEditor((s) => s.tabs.find((t) => t.id === s.activeId));
   const has = !!tab;
@@ -20,6 +20,7 @@ export function Toolbar({ query, onQuery }: { query: string; onQuery(q: string):
       <button type="button" onClick={undo} disabled={!tab?.history.past.length} title="Undo (Ctrl+Z)">Undo</button>
       <button type="button" onClick={redo} disabled={!tab?.history.future.length} title="Redo (Ctrl+Y)">Redo</button>
       <button type="button" onClick={formatActive} disabled={!has} title="Re-indent the whole file (Shift+Alt+F)">Format</button>
+      <button type="button" onClick={onBackups} disabled={!tab?.filePath} title="Restore an earlier saved version">Backups…</button>
       <span className="toolbar-spacer" />
       <input
         id="search"

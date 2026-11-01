@@ -93,6 +93,50 @@ pub fn list_backups(path: String) -> Result<Vec<BackupInfo>, String> {
     Ok(backups)
 }
 
+// ---- auto-recovery drafts: %LOCALAPPDATA%\SafeJSON\recovery\<id>.json
+// The interface decides what goes in a draft (file path, title, text); Rust only stores it.
+
+#[tauri::command]
+pub fn write_recovery_draft(id: String, contents: String) -> Result<(), String> {
+    let dir = recovery_dir()?;
+    fs::create_dir_all(&dir).map_err(|e| describe(e, &dir))?;
+    let target = dir.join(format!("{}.json", safe_id(&id)));
+    let temp = dir.join(format!("{}.tmp", safe_id(&id)));
+    fs::write(&temp, contents)
+        .and_then(|_| fs::rename(&temp, &target))
+        .map_err(|e| describe(e, &target))
+}
+
+#[tauri::command]
+pub fn delete_recovery_draft(id: String) -> Result<(), String> {
+    let target = recovery_dir()?.join(format!("{}.json", safe_id(&id)));
+    match fs::remove_file(&target) {
+        Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(describe(e, &target)),
+        _ => Ok(()),
+    }
+}
+
+/// Contents of every draft left behind (normally none, unless SafeJSON did not close cleanly).
+#[tauri::command]
+pub fn list_recovery_drafts() -> Result<Vec<String>, String> {
+    let dir = recovery_dir()?;
+    let Ok(entries) = fs::read_dir(&dir) else { return Ok(vec![]) };
+    Ok(entries
+        .filter_map(|e| e.ok().map(|e| e.path()))
+        .filter(|p| p.extension().is_some_and(|ext| ext == "json"))
+        .filter_map(|p| fs::read_to_string(p).ok())
+        .collect())
+}
+
+fn recovery_dir() -> Result<PathBuf, String> {
+    Ok(app_data_dir()?.join("recovery"))
+}
+
+/// Draft ids come from the interface; keep only characters that are safe in a file name.
+fn safe_id(id: &str) -> String {
+    id.chars().filter(|c| c.is_ascii_alphanumeric() || *c == '-').collect()
+}
+
 fn make_backup(path: &Path, keep: u32) -> Result<(), String> {
     let dir = backup_dir(path)?;
     fs::create_dir_all(&dir).map_err(|e| describe(e, &dir))?;
