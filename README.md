@@ -5,7 +5,7 @@ errors such as missing commas, unclosed quotes or mismatched brackets.
 
 ## Using it
 
-- **Open** a `.json` / `.jsonc` file (or drag it onto the window). Each file opens in a tab.
+- **Open** a `.json`, `.jsonc` or `.json5` file (or drag it onto the window). Each file opens in a tab.
 - **Click** a value in the tree to edit it on the right. Each type has its own editor: text box,
   number box, true/false checkbox. Double-click in the tree to edit in place.
 - **Right-click** for Duplicate, Move, Delete, Change type, Copy path.
@@ -29,6 +29,24 @@ Click **Text** (Ctrl+Shift+T) to edit the JSON directly in a code editor with sc
 autocomplete. Changes apply once the text is valid. Until then a banner shows the problem, and
 saving and the tree are blocked. Files that aren't valid JSON open in text mode so you can fix
 them. Files that were standard JSON stay that way: comments and trailing commas are refused there.
+
+### Table view
+Select a list of objects (or anything inside one) and click **Table** to see it as a grid: one
+row per item, one column per key. Cells use the same safe editors as the tree. Empty cells mean
+that row doesn't have the key yet; filling one in adds it. Rows can be added, moved, duplicated
+and deleted; columns can be added, renamed (double-click the header) and removed. Clicking a
+column header sorts the rows on screen only. **Save this order to the file** makes it permanent.
+
+### Compare
+**Compare…** shows what differs between this file and its saved version, another open tab, a
+backup, or another file. Only the data is compared: formatting, comments and key order are
+ignored. Each difference has buttons to make one side match the other (both ways when the other
+side is an open tab), and every change can be undone.
+
+### JSON5
+JSON5 files (unquoted keys, 'single quotes', hex numbers, trailing commas, comments) are edited
+the same way. SafeJSON keeps the file's style: new keys and strings are written the way the file
+already writes them. Format isn't available for JSON5 yet.
 
 ### Guardrails
 - Numbers reject letters; text is escaped automatically; keys can't be duplicated or empty.
@@ -79,6 +97,9 @@ files only works in the desktop app.
 |---|---|
 | `src/engine/` | JSON document engine: parsing, format-preserving edits, validation, undo history. No UI. |
 | `src/engine/schema/` | Finding a file's JSON Schema, validating with Ajv, and reading hints for the UI. |
+| `src/engine/json5/` | JSON5 parser that builds the same syntax tree as the JSON/JSONC parser. |
+| `src/engine/text-edits.ts` | All structural edits (set, insert, remove), touching only the text they must. |
+| `src/engine/diff.ts` | Structural comparison of two documents (for Compare). |
 | `src/store/` | App state (open tabs, settings). |
 | `src/ui/` | React components and editing actions. |
 | `src/platform/` | Calls into the Rust side (files, dialogs). |

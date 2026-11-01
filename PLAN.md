@@ -2,7 +2,7 @@
 
 A standalone Windows app for creating and editing JSON config files through a GUI, built so that **syntax errors are impossible** and schema mistakes are caught before saving.
 
-Status: **v1.0.0 released. Phase 2 (schemas, text mode) built.** Phase 3 (JSON5, table view, compare) is next.
+Status: **v1.0.0 and v2.0.0 released. Phase 3 (JSON5, table view, compare) built.** All planned phases are done.
 
 Changes from the original plan, made during Phase 2:
 - Schema discovery order: a schema the user picks for a file now comes *first* (before `$schema`),
@@ -10,6 +10,16 @@ Changes from the original plan, made during Phase 2:
 - Raw mode is called "Text" mode in the app. It also opens files that aren't valid JSON, so they
   can be fixed in SafeJSON (v1 refused them).
 - Files that were strict JSON when opened stay strict in text mode (comments/trailing commas refused).
+
+Changes from the original plan, made during Phase 3:
+- JSON5 went with Option A, in a stronger form: SafeJSON has its own JSON5 parser (checked against
+  the official `json5` package) and its own offset-based editor, so JSON5 files keep comments,
+  unquoted keys and quote styles. Format isn't offered for JSON5 yet.
+- That editor now handles *all* structural edits for every file type. jsonc-parser's edit
+  function re-formatted neighbouring lines and mishandled compact one-line files; jsonc-parser is
+  still used for parsing JSON/JSONC and for the Format command.
+- Compare is a list of differences with both values side by side (plus copy buttons), rather
+  than two aligned trees: clearer for non-technical users and easy to act on.
 
 ---
 
@@ -205,7 +215,7 @@ Each milestone ends with a working app, a git commit, and a tag.
 
 | Risk | Plan |
 |---|---|
-| **JSON5 format preservation.** No mainstream library edits JSON5 while keeping comments and unquoted keys. | In M10, prototype first. Option A: extend jsonc-parser's tokenizer to accept JSON5 tokens (best result, more work). Option B: edit via `json5` and re-serialize, losing comments, with a clear warning. Decide after the prototype. |
+| **JSON5 format preservation.** No mainstream library edits JSON5 while keeping comments and unquoted keys. | **Resolved in M10:** SafeJSON's own JSON5 parser and offset-based editor keep comments, quoting and layout. |
 | **SmartScreen warning.** Unsigned portable .exe files trigger "Windows protected your PC" for teammates. | Acceptable for internal use ("More info → Run anyway"). Code-signing certificate (~$100–300/yr) can be added later. |
 | **WebView2 requirement.** | Built into Windows 11 and current Windows 10. The portable build will show a clear message if it's missing. |
 | **"Portable" settings location.** | Settings in `%LOCALAPPDATA%`. If you later want a USB-stick mode, add "store settings next to the exe" when a `portable.flag` file is present. |
