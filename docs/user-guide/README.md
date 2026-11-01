@@ -8,7 +8,7 @@ you can't introduce mistakes like a missing comma, an unclosed quote or a mismat
 This guide is for people who use SafeJSON. You don't need to know how to program, and you don't
 need to know JSON in detail. Where a JSON term matters, the guide explains it.
 
-**Version:** this guide describes SafeJSON 3.0.
+**Version:** this guide describes SafeJSON 3.1.
 
 ## Contents
 
