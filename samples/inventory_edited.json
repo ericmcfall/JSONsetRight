@@ -1,0 +1,8 @@
+{
+  "warehouse": "South",
+  "items": [
+    { "sku": "C-300", "name": "Washer", "qty": 200, "price": 0.02, "active": true, "tags": ["metal"] },
+    { "sku": "A-100", "name": "Bolt", "qty": 250, "price": 0.12, "active": true },
+    { "sku": "B-200", "name": "Nut", "qty": 1200, "price": 0.05 }
+  ]
+}
