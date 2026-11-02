@@ -1,6 +1,7 @@
 # Plan: rename SafeJSON to JSONsetRight
 
-Status: **Planned. Nothing renamed yet.**
+Status: **Done (2 Nov 2026).** R1–R4 completed and v3.2.0 published as JSONsetRight. R5 (renaming the
+project folder on the PC to `C:\Users\Eric\Projects\JSONsetRight`) is the final local step.
 
 "SafeJSON" is already used by several other JSON tools. The app becomes **JSONsetRight**,
 released as **v3.2.0**. The icon stays as it is.
