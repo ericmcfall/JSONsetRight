@@ -62,8 +62,8 @@ value or the schema's default.
 
 - **+ Add column** adds an empty column. It becomes part of the file as soon as you fill in a cell.
 - **Rename a column:** double-click its name. Every row that has the setting is renamed. If any
-  row already has a setting with the new name, nothing is renamed and SafeJSON explains why.
-- **Remove a column:** hover over its name and click **×**. SafeJSON asks before removing the
+  row already has a setting with the new name, nothing is renamed and JSONsetRight explains why.
+- **Remove a column:** hover over its name and click **×**. JSONsetRight asks before removing the
   setting from every row.
 
 ## Sorting

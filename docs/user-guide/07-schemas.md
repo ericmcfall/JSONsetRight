@@ -5,7 +5,7 @@ settings exist, what type each one is, which values are allowed, which are requi
 mean. Many programs publish schemas for their settings files, for example on
 [schemastore.org](https://www.schemastore.org).
 
-When a file has a schema, SafeJSON becomes much more helpful:
+When a file has a schema, JSONsetRight becomes much more helpful:
 
 - **It checks the file.** Problems are listed in plain language ("Must be one of: development,
   staging, production"), marked in the tree, and shown in the details panel.
@@ -19,9 +19,9 @@ When a file has a schema, SafeJSON becomes much more helpful:
 - **It warns on save.** Saving a file that breaks its schema shows the problems and lets you choose
   **Save anyway**, **Show first problem**, or **Cancel**.
 
-## How SafeJSON finds a file's schema
+## How JSONsetRight finds a file's schema
 
-SafeJSON looks in this order and uses the first one it finds:
+JSONsetRight looks in this order and uses the first one it finds:
 
 1. **A schema you chose for this file** (see below).
 2. **The file's own `"$schema"` setting**, a top-level setting that names its schema, for example:
@@ -71,7 +71,7 @@ program expects. Programs reading the file may reject it or behave unexpectedly.
 
 ## Notes
 
-- SafeJSON supports the common schema versions (draft-04, -06, -07, 2019-09 and 2020-12), including
+- JSONsetRight supports the common schema versions (draft-04, -06, -07, 2019-09 and 2020-12), including
   schemas that refer to other schema files.
 - Deprecated settings (ones the schema says are no longer used) are marked *Deprecated* in the
   details panel.

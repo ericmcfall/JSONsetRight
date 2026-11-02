@@ -1,30 +1,40 @@
 # Troubleshooting and FAQ
 
-## Starting SafeJSON
+## Starting JSONsetRight
 
 **"Windows protected your PC" appears.**
 Click **More info**, check the publisher is **Eric McFall**, and click **Run anyway**. This warning
-appears for new releases until Windows has seen them often.
+appears for new releases until Windows has seen them often. It's likely right after the change from
+SafeJSON to JSONsetRight, because Windows sees a program file with a new name.
 
 **"Smart App Control blocked an app" / "An Application Control policy has blocked this file".**
-You're running SafeJSON 1.0 or 2.0, which aren't signed. Download version 3.0 or later.
+You're running SafeJSON 1.0 or 2.0 (JSONsetRight's former name), which aren't signed. Download the
+latest JSONsetRight.
+
+**My settings, recent files or backups are gone after switching from SafeJSON.**
+JSONsetRight keeps its data in a new folder and starts fresh. Your old backups are still in
+`%LOCALAPPDATA%\SafeJSON\backups`. See [Coming from SafeJSON?](01-installing.md#coming-from-safejson).
+
+**Double-clicking a .json file still opens SafeJSON (or nothing).**
+File associations point to the old program. Set up "Open with" again for `JSONsetRight.exe`; see
+[Installing](01-installing.md#opening-files-with-jsonsetright-from-file-explorer).
 
 **Nothing happens, or an error mentions WebView2.**
-SafeJSON needs Microsoft Edge WebView2, which comes with Windows 11 and current Windows 10. Run Windows
+JSONsetRight needs Microsoft Edge WebView2, which comes with Windows 11 and current Windows 10. Run Windows
 Update, or install the "Evergreen WebView2 Runtime" from Microsoft's website.
 
 ## Opening files
 
 **"…isn't valid JSON yet (line 3, column 5: …)".**
-The file has a mistake. SafeJSON opens it in [text mode](06-text-mode.md) so you can fix it.
+The file has a mistake. JSONsetRight opens it in [text mode](06-text-mode.md) so you can fix it.
 See the table of common mistakes there.
 
-**"…is not UTF-8 text, so SafeJSON can't open it safely."**
+**"…is not UTF-8 text, so JSONsetRight can't open it safely."**
 The file uses an older text encoding. Open it in Notepad, choose **File → Save as**, set
-**Encoding** to **UTF-8**, and save. Then open it in SafeJSON.
+**Encoding** to **UTF-8**, and save. Then open it in JSONsetRight.
 
-**"…is larger than SafeJSON supports (10 MB)."**
-SafeJSON is designed for configuration files. Use a text editor for very large data files.
+**"…is larger than JSONsetRight supports (10 MB)."**
+JSONsetRight is designed for configuration files. Use a text editor for very large data files.
 
 **Table is greyed out.**
 Select a list whose items are all groups of settings (`{ }`), or something inside one. See
@@ -80,21 +90,21 @@ Click **Backups…** and restore the previous version, then save again. Or press
 
 ## FAQ
 
-**Does SafeJSON send my files anywhere?**
+**Does JSONsetRight send my files anywhere?**
 No. Files are read and saved only on your PC. The only internet access is downloading schemas from
 web addresses that a file (or you) names.
 
-**Will SafeJSON change parts of my file I didn't touch?**
+**Will JSONsetRight change parts of my file I didn't touch?**
 No. Only the part you change is rewritten; comments, spacing, order and line endings are kept. The
 exceptions are things you ask for: **Format**, and removing trailing commas if you turned that on.
 
 **Can several people edit the same file?**
-SafeJSON notices when another program or person saves the file while you have it open, and
+JSONsetRight notices when another program or person saves the file while you have it open, and
 asks before overwriting their changes. It doesn't merge edits automatically, but
 [Compare](08-compare.md) helps you combine them.
 
-**Can I use SafeJSON on a Mac or Linux?**
-Not currently. SafeJSON is built for Windows.
+**Can I use JSONsetRight on a Mac or Linux?**
+Not currently. JSONsetRight is built for Windows.
 
 **Where are my backups and settings?**
-In `%LOCALAPPDATA%\SafeJSON`. See [Installing](01-installing.md#where-safejson-keeps-its-own-data).
+In `%LOCALAPPDATA%\JSONsetRight`. See [Installing](01-installing.md#where-jsonsetright-keeps-its-own-data).

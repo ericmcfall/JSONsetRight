@@ -14,7 +14,7 @@ Click **Compare…** in the toolbar and choose what to compare with:
 | Choice | Compares with |
 |---|---|
 | **Saved version** | The file as it was when you last saved, so you see your unsaved changes. Only available when there are unsaved changes |
-| *Another open tab* | Another file that's open in SafeJSON. Changes can be copied in **both** directions |
+| *Another open tab* | Another file that's open in JSONsetRight. Changes can be copied in **both** directions |
 | **Backup** | One of the automatic [backups](10-safety.md#backups) of this file |
 | **Another file…** | Any file you choose |
 
@@ -44,7 +44,7 @@ Each difference is one row:
 The filter buttons at the top show the count of each kind and let you show just one kind.
 Click a highlighted location (left column) to show it in the tree.
 
-If there are no differences, SafeJSON says so: both contain the same data.
+If there are no differences, JSONsetRight says so: both contain the same data.
 
 ## Copying differences across
 

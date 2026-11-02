@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SafeJSON User Guide</title>
-<meta name="description" content="How to use SafeJSON 3.1.0, a Windows app for editing JSON files safely.">
+<title>JSONsetRight User Guide</title>
+<meta name="description" content="How to use JSONsetRight 3.2.0, a Windows app for editing JSON files safely.">
 <style>
 :root {
   --bg: #ffffff; --bg-side: #f5f6f8; --text: #1f2328; --muted: #59636e; --border: #d8dee4;
@@ -72,69 +72,69 @@ footer { color: var(--muted); font-size: 13px; }
 <body>
 <div class="layout">
 <nav class="toc" aria-label="Contents">
-<p class="brand">SafeJSON</p>
-<p class="version">User Guide · version 3.1.0</p>
+<p class="brand">JSONsetRight</p>
+<p class="version">User Guide · version 3.2.0</p>
 <ul>
-<li><a href="#introduction">SafeJSON User Guide</a><ul><li><a href="#introduction--contents">Contents</a></li><li><a href="#introduction--how-to-read-this-guide">How to read this guide</a></li></ul></li>
-<li><a href="#01-installing">Installing SafeJSON</a><ul><li><a href="#01-installing--what-you-need">What you need</a></li><li><a href="#01-installing--download">Download</a></li><li><a href="#01-installing--starting-safejson-for-the-first-time">Starting SafeJSON for the first time</a></li><li><a href="#01-installing--opening-files-with-safejson-from-file-explorer">Opening files with SafeJSON from File Explorer</a></li><li><a href="#01-installing--updating">Updating</a></li><li><a href="#01-installing--where-safejson-keeps-its-own-data">Where SafeJSON keeps its own data</a></li><li><a href="#01-installing--removing-safejson">Removing SafeJSON</a></li></ul></li>
+<li><a href="#introduction">JSONsetRight User Guide</a><ul><li><a href="#introduction--contents">Contents</a></li><li><a href="#introduction--how-to-read-this-guide">How to read this guide</a></li></ul></li>
+<li><a href="#01-installing">Installing JSONsetRight</a><ul><li><a href="#01-installing--what-you-need">What you need</a></li><li><a href="#01-installing--download">Download</a></li><li><a href="#01-installing--starting-jsonsetright-for-the-first-time">Starting JSONsetRight for the first time</a></li><li><a href="#01-installing--opening-files-with-jsonsetright-from-file-explorer">Opening files with JSONsetRight from File Explorer</a></li><li><a href="#01-installing--updating">Updating</a></li><li><a href="#01-installing--coming-from-safejson">Coming from SafeJSON?</a></li><li><a href="#01-installing--where-jsonsetright-keeps-its-own-data">Where JSONsetRight keeps its own data</a></li><li><a href="#01-installing--removing-jsonsetright">Removing JSONsetRight</a></li></ul></li>
 <li><a href="#02-quick-start">Quick start</a><ul><li><a href="#02-quick-start--1-open-a-file">1. Open a file</a></li><li><a href="#02-quick-start--2-look-around-the-tree">2. Look around the tree</a></li><li><a href="#02-quick-start--3-change-a-value">3. Change a value</a></li><li><a href="#02-quick-start--4-add-a-new-setting">4. Add a new setting</a></li><li><a href="#02-quick-start--5-save">5. Save</a></li><li><a href="#02-quick-start--6-undo-a-mistake">6. Undo a mistake</a></li><li><a href="#02-quick-start--what-next">What next?</a></li></ul></li>
 <li><a href="#03-window-tour">A tour of the window</a><ul><li><a href="#03-window-tour--toolbar">Toolbar</a></li><li><a href="#03-window-tour--tabs">Tabs</a></li><li><a href="#03-window-tour--message-bar">Message bar</a></li><li><a href="#03-window-tour--tree">Tree</a></li><li><a href="#03-window-tour--details-panel">Details panel</a></li><li><a href="#03-window-tour--problems-panel">Problems panel</a></li><li><a href="#03-window-tour--status-bar">Status bar</a></li><li><a href="#03-window-tour--welcome-screen">Welcome screen</a></li></ul></li>
 <li><a href="#04-editing">Editing in the tree</a><ul><li><a href="#04-editing--selecting-and-moving-around">Selecting and moving around</a></li><li><a href="#04-editing--changing-a-value">Changing a value</a></li><li><a href="#04-editing--renaming-a-setting">Renaming a setting</a></li><li><a href="#04-editing--adding-settings-and-list-items">Adding settings and list items</a></li><li><a href="#04-editing--deleting">Deleting</a></li><li><a href="#04-editing--duplicating">Duplicating</a></li><li><a href="#04-editing--moving-changing-the-order">Moving (changing the order)</a></li><li><a href="#04-editing--changing-a-values-type">Changing a value&amp;#39;s type</a></li><li><a href="#04-editing--right-click-menu">Right-click menu</a></li><li><a href="#04-editing--searching">Searching</a></li><li><a href="#04-editing--comments">Comments</a></li><li><a href="#04-editing--undo-and-redo">Undo and redo</a></li></ul></li>
 <li><a href="#05-table-view">Table view</a><ul><li><a href="#05-table-view--opening-a-table">Opening a table</a></li><li><a href="#05-table-view--reading-the-table">Reading the table</a></li><li><a href="#05-table-view--editing-cells">Editing cells</a></li><li><a href="#05-table-view--rows">Rows</a></li><li><a href="#05-table-view--columns">Columns</a></li><li><a href="#05-table-view--sorting">Sorting</a></li><li><a href="#05-table-view--undo">Undo</a></li></ul></li>
 <li><a href="#06-text-mode">Text mode</a><ul><li><a href="#06-text-mode--how-it-stays-safe">How it stays safe</a></li><li><a href="#06-text-mode--opening-files-that-arent-valid-json">Opening files that aren&amp;#39;t valid JSON</a></li><li><a href="#06-text-mode--editor-features">Editor features</a></li><li><a href="#06-text-mode--checking-a-selected-setting">Checking a selected setting</a></li></ul></li>
-<li><a href="#07-schemas">Schemas</a><ul><li><a href="#07-schemas--how-safejson-finds-a-files-schema">How SafeJSON finds a file&amp;#39;s schema</a></li><li><a href="#07-schemas--choosing-a-schema-for-a-file">Choosing a schema for a file</a></li><li><a href="#07-schemas--schemas-from-the-web">Schemas from the web</a></li><li><a href="#07-schemas--when-a-schema-problem-is-reported">When a schema problem is reported</a></li><li><a href="#07-schemas--notes">Notes</a></li></ul></li>
+<li><a href="#07-schemas">Schemas</a><ul><li><a href="#07-schemas--how-jsonsetright-finds-a-files-schema">How JSONsetRight finds a file&amp;#39;s schema</a></li><li><a href="#07-schemas--choosing-a-schema-for-a-file">Choosing a schema for a file</a></li><li><a href="#07-schemas--schemas-from-the-web">Schemas from the web</a></li><li><a href="#07-schemas--when-a-schema-problem-is-reported">When a schema problem is reported</a></li><li><a href="#07-schemas--notes">Notes</a></li></ul></li>
 <li><a href="#08-compare">Comparing files</a><ul><li><a href="#08-compare--starting-a-comparison">Starting a comparison</a></li><li><a href="#08-compare--reading-the-comparison">Reading the comparison</a></li><li><a href="#08-compare--copying-differences-across">Copying differences across</a></li></ul></li>
-<li><a href="#09-file-types">File types and formatting</a><ul><li><a href="#09-file-types--the-three-kinds-of-json-file">The three kinds of JSON file</a></li><li><a href="#09-file-types--what-safejson-keeps-exactly-as-it-was">What SafeJSON keeps exactly as it was</a></li><li><a href="#09-file-types--formatting">Formatting</a></li><li><a href="#09-file-types--trailing-commas">Trailing commas</a></li><li><a href="#09-file-types--encoding-and-size-limits">Encoding and size limits</a></li><li><a href="#09-file-types--large-numbers">Large numbers</a></li><li><a href="#09-file-types--duplicate-names">Duplicate names</a></li></ul></li>
+<li><a href="#09-file-types">File types and formatting</a><ul><li><a href="#09-file-types--the-three-kinds-of-json-file">The three kinds of JSON file</a></li><li><a href="#09-file-types--what-jsonsetright-keeps-exactly-as-it-was">What JSONsetRight keeps exactly as it was</a></li><li><a href="#09-file-types--formatting">Formatting</a></li><li><a href="#09-file-types--trailing-commas">Trailing commas</a></li><li><a href="#09-file-types--encoding-and-size-limits">Encoding and size limits</a></li><li><a href="#09-file-types--large-numbers">Large numbers</a></li><li><a href="#09-file-types--duplicate-names">Duplicate names</a></li></ul></li>
 <li><a href="#10-safety">Saving and safety features</a><ul><li><a href="#10-safety--the-file-is-always-valid">The file is always valid</a></li><li><a href="#10-safety--saving">Saving</a></li><li><a href="#10-safety--backups">Backups</a></li><li><a href="#10-safety--crash-recovery">Crash recovery</a></li><li><a href="#10-safety--changes-made-by-other-programs">Changes made by other programs</a></li><li><a href="#10-safety--closing">Closing</a></li><li><a href="#10-safety--undo">Undo</a></li></ul></li>
 <li><a href="#11-settings">Settings</a><ul><li><a href="#11-settings--schema-rules">Schema rules</a></li><li><a href="#11-settings--where-settings-are-stored">Where settings are stored</a></li></ul></li>
 <li><a href="#12-keyboard-shortcuts">Keyboard shortcuts</a><ul><li><a href="#12-keyboard-shortcuts--files-and-tabs">Files and tabs</a></li><li><a href="#12-keyboard-shortcuts--editing">Editing</a></li><li><a href="#12-keyboard-shortcuts--in-the-tree">In the tree</a></li><li><a href="#12-keyboard-shortcuts--while-editing-a-value">While editing a value</a></li><li><a href="#12-keyboard-shortcuts--in-table-view">In table view</a></li><li><a href="#12-keyboard-shortcuts--in-text-mode">In text mode</a></li></ul></li>
-<li><a href="#13-troubleshooting">Troubleshooting and FAQ</a><ul><li><a href="#13-troubleshooting--starting-safejson">Starting SafeJSON</a></li><li><a href="#13-troubleshooting--opening-files">Opening files</a></li><li><a href="#13-troubleshooting--editing">Editing</a></li><li><a href="#13-troubleshooting--schemas">Schemas</a></li><li><a href="#13-troubleshooting--saving">Saving</a></li><li><a href="#13-troubleshooting--faq">FAQ</a></li></ul></li>
+<li><a href="#13-troubleshooting">Troubleshooting and FAQ</a><ul><li><a href="#13-troubleshooting--starting-jsonsetright">Starting JSONsetRight</a></li><li><a href="#13-troubleshooting--opening-files">Opening files</a></li><li><a href="#13-troubleshooting--editing">Editing</a></li><li><a href="#13-troubleshooting--schemas">Schemas</a></li><li><a href="#13-troubleshooting--saving">Saving</a></li><li><a href="#13-troubleshooting--faq">FAQ</a></li></ul></li>
 <li><a href="#14-glossary">Glossary</a></li>
 </ul>
 </nav>
 <main>
 <section class="chapter" id="section-introduction">
-<h1 id="introduction">SafeJSON User Guide</h1>
-<p>SafeJSON is a Windows app for creating and editing JSON files, such as the settings files used by
+<h1 id="introduction">JSONsetRight User Guide</h1>
+<p>JSONsetRight is a Windows app for creating and editing JSON files, such as the settings files used by
 programs and websites, without having to type JSON yourself. You change values with ordinary
-controls: text boxes, number boxes, checkboxes and lists. SafeJSON writes the JSON for you, so
+controls: text boxes, number boxes, checkboxes and lists. JSONsetRight writes the JSON for you, so
 you can&#39;t introduce mistakes like a missing comma, an unclosed quote or a mismatched bracket.</p>
-<p>This guide is for people who use SafeJSON. You don&#39;t need to know how to program, and you don&#39;t
+<p>This guide is for people who use JSONsetRight. You don&#39;t need to know how to program, and you don&#39;t
 need to know JSON in detail. Where a JSON term matters, the guide explains it.</p>
-<p><strong>Version:</strong> this guide describes SafeJSON 3.1.</p>
+<p><strong>Version:</strong> this guide describes JSONsetRight 3.2. (JSONsetRight was called SafeJSON before version 3.2.)</p>
 <h2 id="introduction--contents">Contents</h2>
 <ol>
-<li><a href="#01-installing">Installing SafeJSON</a>: download, first run, updating, removing</li>
+<li><a href="#01-installing">Installing JSONsetRight</a>: download, first run, updating, removing</li>
 <li><a href="#02-quick-start">Quick start</a>: open, change and save a file in five minutes</li>
 <li><a href="#03-window-tour">A tour of the window</a>: what each part of the screen does</li>
 <li><a href="#04-editing">Editing in the tree</a>: changing values, adding, renaming, moving and deleting</li>
 <li><a href="#05-table-view">Table view</a>: working with lists of similar items as a grid</li>
 <li><a href="#06-text-mode">Text mode</a>: editing the JSON text directly, and fixing broken files</li>
-<li><a href="#07-schemas">Schemas</a>: letting SafeJSON check a file against its rules</li>
+<li><a href="#07-schemas">Schemas</a>: letting JSONsetRight check a file against its rules</li>
 <li><a href="#08-compare">Comparing files</a>: seeing and copying differences</li>
 <li><a href="#09-file-types">File types and formatting</a>: JSON, JSONC, JSON5, layout and line endings</li>
 <li><a href="#10-safety">Saving and safety features</a>: undo, backups, crash recovery and more</li>
 <li><a href="#11-settings">Settings</a></li>
 <li><a href="#12-keyboard-shortcuts">Keyboard shortcuts</a></li>
 <li><a href="#13-troubleshooting">Troubleshooting and FAQ</a></li>
-<li><a href="#14-glossary">Glossary</a>: JSON and SafeJSON terms explained</li>
+<li><a href="#14-glossary">Glossary</a>: JSON and JSONsetRight terms explained</li>
 </ol>
 <h2 id="introduction--how-to-read-this-guide">How to read this guide</h2>
 <ul>
-<li><strong>New to SafeJSON?</strong> Read <a href="#01-installing">Installing</a> and the <a href="#02-quick-start">Quick start</a>.
+<li><strong>New to JSONsetRight?</strong> Read <a href="#01-installing">Installing</a> and the <a href="#02-quick-start">Quick start</a>.
 That&#39;s enough to get going.</li>
 <li><strong>Looking for something specific?</strong> Use the contents above, or the
 <a href="#12-keyboard-shortcuts">Keyboard shortcuts</a> and <a href="#13-troubleshooting">Troubleshooting</a> pages.</li>
 <li>Names of buttons and menu items are shown in <strong>bold</strong>, for example <strong>Save as…</strong>.</li>
 <li>Keyboard shortcuts are written like <strong>Ctrl+S</strong>: hold Ctrl and press S.</li>
 </ul>
-<p>This guide is also available as a single web page, <code>SafeJSON-User-Guide.html</code>, which you can open
+<p>This guide is also available as a single web page, <code>JSONsetRight-User-Guide.html</code>, which you can open
 in any browser or print. The latest version is online at
-<a href="https://ericmcfall.github.io/SafeJSON/" target="_blank" rel="noopener">https://ericmcfall.github.io/SafeJSON/</a>. Click <strong>Help</strong> in SafeJSON&#39;s toolbar (or press <strong>F1</strong>) to open it.</p>
+<a href="https://ericmcfall.github.io/JSONsetRight/" target="_blank" rel="noopener">https://ericmcfall.github.io/JSONsetRight/</a>. Click <strong>Help</strong> in JSONsetRight&#39;s toolbar (or press <strong>F1</strong>) to open it.</p>
 </section>
 <p class="top-link"><a href="#introduction">↑ Back to top</a></p>
 <section class="chapter" id="section-01-installing">
-<h1 id="01-installing">Installing SafeJSON</h1>
+<h1 id="01-installing">Installing JSONsetRight</h1>
 <h2 id="01-installing--what-you-need">What you need</h2>
 <ul>
 <li><strong>Windows 10 or Windows 11.</strong></li>
@@ -144,20 +144,20 @@ certainly have it already.</li>
 </ul>
 <h2 id="01-installing--download">Download</h2>
 <ol>
-<li>Open the SafeJSON releases page on GitHub (your administrator can give you the link).</li>
-<li>Under the newest release (marked <strong>Latest</strong>), click <strong>SafeJSON.exe</strong> to download it.</li>
+<li>Open the JSONsetRight releases page on GitHub (your administrator can give you the link).</li>
+<li>Under the newest release (marked <strong>Latest</strong>), click <strong>JSONsetRight.exe</strong> to download it.</li>
 </ol>
-<p>SafeJSON is <strong>portable</strong>: there is no installer. The <code>.exe</code> file <em>is</em> the app.</p>
+<p>JSONsetRight is <strong>portable</strong>: there is no installer. The <code>.exe</code> file <em>is</em> the app.</p>
 <ol start="3">
-<li>Move <code>SafeJSON.exe</code> somewhere convenient, for example a <code>Programs</code> or <code>Tools</code> folder in your
+<li>Move <code>JSONsetRight.exe</code> somewhere convenient, for example a <code>Programs</code> or <code>Tools</code> folder in your
 Documents. Avoid leaving it in Downloads, where it&#39;s easy to delete by accident.</li>
-<li>To make it easy to start, right-click <code>SafeJSON.exe</code> and choose <strong>Pin to Start</strong> or <strong>Send to →
+<li>To make it easy to start, right-click <code>JSONsetRight.exe</code> and choose <strong>Pin to Start</strong> or <strong>Send to →
 Desktop (create shortcut)</strong>.</li>
 </ol>
-<h2 id="01-installing--starting-safejson-for-the-first-time">Starting SafeJSON for the first time</h2>
-<p>Double-click <code>SafeJSON.exe</code>.</p>
-<p>SafeJSON 3.0 is <strong>digitally signed</strong> by its publisher, Eric McFall, using a Microsoft-verified
-identity. You can check this yourself: right-click <code>SafeJSON.exe</code> → <strong>Properties</strong> →
+<h2 id="01-installing--starting-jsonsetright-for-the-first-time">Starting JSONsetRight for the first time</h2>
+<p>Double-click <code>JSONsetRight.exe</code>.</p>
+<p>JSONsetRight is <strong>digitally signed</strong> by its publisher, Eric McFall, using a Microsoft-verified
+identity. You can check this yourself: right-click <code>JSONsetRight.exe</code> → <strong>Properties</strong> →
 <strong>Digital Signatures</strong>.</p>
 <p>Windows may still show a warning for a new release:</p>
 <div class="table-wrap"><table>
@@ -173,24 +173,44 @@ identity. You can check this yourself: right-click <code>SafeJSON.exe</code> →
 </tr>
 <tr>
 <td><strong>&quot;Smart App Control blocked an app&quot;</strong> or <strong>&quot;An Application Control policy has blocked this file&quot;</strong></td>
-<td>You have an older, unsigned version (1.0 or 2.0). Download SafeJSON 3.0 or later.</td>
+<td>You have an old, unsigned version: SafeJSON 1.0 or 2.0 (JSONsetRight&#39;s former name). Download the latest JSONsetRight.</td>
 </tr>
 </tbody></table></div>
-<h2 id="01-installing--opening-files-with-safejson-from-file-explorer">Opening files with SafeJSON from File Explorer</h2>
-<p>You can open a JSON file straight into SafeJSON:</p>
+<h2 id="01-installing--opening-files-with-jsonsetright-from-file-explorer">Opening files with JSONsetRight from File Explorer</h2>
+<p>You can open a JSON file straight into JSONsetRight:</p>
 <ol>
 <li>In File Explorer, right-click a <code>.json</code> file.</li>
 <li>Choose <strong>Open with → Choose another app</strong>.</li>
-<li>Click <strong>More apps → Look for another app on this PC</strong>, find <code>SafeJSON.exe</code> and select it.</li>
-<li>Tick <strong>Always use this app to open .json files</strong> if you want double-clicking to use SafeJSON.</li>
+<li>Click <strong>More apps → Look for another app on this PC</strong>, find <code>JSONsetRight.exe</code> and select it.</li>
+<li>Tick <strong>Always use this app to open .json files</strong> if you want double-clicking to use JSONsetRight.</li>
 </ol>
-<p>You can also <strong>drag files</strong> from File Explorer onto the SafeJSON window.</p>
+<p>You can also <strong>drag files</strong> from File Explorer onto the JSONsetRight window.</p>
 <h2 id="01-installing--updating">Updating</h2>
-<p>Download the new <code>SafeJSON.exe</code> and replace the old one. Your settings, recent files and
+<p>Download the new <code>JSONsetRight.exe</code> and replace the old one. Your settings, recent files and
 backups are kept, because they&#39;re stored separately (see below).</p>
-<h2 id="01-installing--where-safejson-keeps-its-own-data">Where SafeJSON keeps its own data</h2>
-<p>SafeJSON never changes your files except when you save. Its own data lives in
-<code>%LOCALAPPDATA%\SafeJSON</code> (paste that into File Explorer&#39;s address bar to open it):</p>
+<h2 id="01-installing--coming-from-safejson">Coming from SafeJSON?</h2>
+<p>JSONsetRight used to be called <strong>SafeJSON</strong>. Version 3.2 is the first under the new name, with the
+same features. If you used SafeJSON before:</p>
+<ol>
+<li><strong>Save your work in SafeJSON first.</strong> JSONsetRight doesn&#39;t pick up unsaved changes or
+crash-recovery copies from SafeJSON.</li>
+<li><strong>Settings start fresh.</strong> JSONsetRight keeps its data in a new folder,
+<code>%LOCALAPPDATA%\JSONsetRight</code>, so your theme, schema rules, backup count, recent files and
+per-file schema choices need setting up again in <a href="#11-settings">Settings</a>.</li>
+<li><strong>Old backups stay where they were</strong>, in <code>%LOCALAPPDATA%\SafeJSON\backups</code>. <strong>Backups…</strong> in
+JSONsetRight doesn&#39;t list them, but you can still open them: each folder there holds earlier
+versions of one file (<code>source.txt</code> says which), and you can open a <code>.bak</code> file with
+<strong>Compare… → Another file…</strong> after choosing <strong>All files</strong> in the file picker.</li>
+<li><strong>Set up &quot;Open with&quot; again</strong> for <code>JSONsetRight.exe</code> (see
+<a href="#01-installing--opening-files-with-jsonsetright-from-file-explorer">Opening files with JSONsetRight from File Explorer</a>).</li>
+<li><strong>Delete the old program and folder when you&#39;re ready:</strong> remove <code>SafeJSON.exe</code>, and once you
+no longer need its backups, the <code>%LOCALAPPDATA%\SafeJSON</code> folder.</li>
+</ol>
+<p>The <strong>Help</strong> button in old SafeJSON versions no longer works; the guide is now at
+<a href="https://ericmcfall.github.io/JSONsetRight/" target="_blank" rel="noopener">https://ericmcfall.github.io/JSONsetRight/</a>.</p>
+<h2 id="01-installing--where-jsonsetright-keeps-its-own-data">Where JSONsetRight keeps its own data</h2>
+<p>JSONsetRight never changes your files except when you save. Its own data lives in
+<code>%LOCALAPPDATA%\JSONsetRight</code> (paste that into File Explorer&#39;s address bar to open it):</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -208,17 +228,17 @@ backups are kept, because they&#39;re stored separately (see below).</p>
 </tr>
 <tr>
 <td><code>recovery\</code></td>
-<td>Unsaved work, kept in case SafeJSON closes unexpectedly</td>
+<td>Unsaved work, kept in case JSONsetRight closes unexpectedly</td>
 </tr>
 <tr>
 <td><code>schema-cache\</code></td>
 <td>Downloaded schemas, so they work offline</td>
 </tr>
 </tbody></table></div>
-<h2 id="01-installing--removing-safejson">Removing SafeJSON</h2>
+<h2 id="01-installing--removing-jsonsetright">Removing JSONsetRight</h2>
 <ol>
-<li>Delete <code>SafeJSON.exe</code> (and any shortcuts you made).</li>
-<li>Optionally, delete the <code>%LOCALAPPDATA%\SafeJSON</code> folder to remove settings and backups.</li>
+<li>Delete <code>JSONsetRight.exe</code> (and any shortcuts you made).</li>
+<li>Optionally, delete the <code>%LOCALAPPDATA%\JSONsetRight</code> folder to remove settings and backups.</li>
 </ol>
 <p>Your JSON files are not affected.</p>
 </section>
@@ -229,7 +249,7 @@ backups are kept, because they&#39;re stored separately (see below).</p>
 setting, save, and undo a mistake.</p>
 <h2 id="02-quick-start--1-open-a-file">1. Open a file</h2>
 <ol>
-<li>Start SafeJSON. The welcome screen appears.</li>
+<li>Start JSONsetRight. The welcome screen appears.</li>
 <li>Click <strong>Open a file…</strong> (or press <strong>Ctrl+O</strong>) and choose a <code>.json</code> file.</li>
 </ol>
 <p>The file opens in a <strong>tab</strong>. On the left is the <strong>tree</strong>, which shows everything in the file. On
@@ -259,9 +279,9 @@ but practising on a copy is reassuring.</p>
 </ol>
 <p>The change appears in the tree, and a <strong>●</strong> dot on the tab shows you have unsaved changes.</p>
 <p>Now try typing something that isn&#39;t a number, such as <code>12px</code>. The box turns red and explains what
-it expects. SafeJSON won&#39;t save an invalid value, so you can&#39;t break the file.</p>
+it expects. JSONsetRight won&#39;t save an invalid value, so you can&#39;t break the file.</p>
 <p>For a text value (<code>Aa</code>), type anything you like, including quotes <code>&quot;</code> and backslashes <code>\</code>.
-SafeJSON handles the special characters for you.</p>
+JSONsetRight handles the special characters for you.</p>
 <p>For true/false (<code>✓</code>), just tick or untick the checkbox.</p>
 <h2 id="02-quick-start--4-add-a-new-setting">4. Add a new setting</h2>
 <ol>
@@ -270,11 +290,11 @@ SafeJSON handles the special characters for you.</p>
 <li>Choose its type (for example <strong>Text</strong> or <strong>Number</strong>) and click <strong>Add</strong>.</li>
 <li>The new setting is selected, so type its value straight away.</li>
 </ol>
-<p>If you type a name that already exists in that group, SafeJSON tells you and won&#39;t add it.
+<p>If you type a name that already exists in that group, JSONsetRight tells you and won&#39;t add it.
 Duplicate names are a common cause of hard-to-find mistakes.</p>
 <h2 id="02-quick-start--5-save">5. Save</h2>
 <p>Click <strong>Save</strong> (or press <strong>Ctrl+S</strong>). The <strong>●</strong> dot disappears.</p>
-<p>SafeJSON keeps a copy of the previous version as a <strong>backup</strong> each time you save, so you can go
+<p>JSONsetRight keeps a copy of the previous version as a <strong>backup</strong> each time you save, so you can go
 back later with <strong>Backups…</strong>.</p>
 <h2 id="02-quick-start--6-undo-a-mistake">6. Undo a mistake</h2>
 <p>Delete something: select it and press <strong>Delete</strong>. Then click <strong>Undo</strong> (or press <strong>Ctrl+Z</strong>).
@@ -284,7 +304,7 @@ re-applies what you undid.</p>
 <ul>
 <li><a href="#03-window-tour">A tour of the window</a> explains every part of the screen.</li>
 <li><a href="#04-editing">Editing in the tree</a> covers renaming, moving, duplicating and more.</li>
-<li>If your file has a <strong>schema</strong> (a description of what it may contain), SafeJSON can check the
+<li>If your file has a <strong>schema</strong> (a description of what it may contain), JSONsetRight can check the
 file and suggest settings: see <a href="#07-schemas">Schemas</a>.</li>
 </ul>
 </section>
@@ -382,7 +402,7 @@ second row of the toolbar.</p>
 <ul>
 <li>Click a tab to switch to it, or press <strong>Ctrl+Tab</strong> to go to the next tab.</li>
 <li>Click <strong>×</strong>, middle-click the tab, or press <strong>Ctrl+W</strong> to close it. If it has unsaved changes,
-SafeJSON asks whether to <strong>Save</strong>, <strong>Don&#39;t save</strong>, or <strong>Cancel</strong>.</li>
+JSONsetRight asks whether to <strong>Save</strong>, <strong>Don&#39;t save</strong>, or <strong>Cancel</strong>.</li>
 <li>Opening a file that&#39;s already open just switches to its tab.</li>
 </ul>
 <h2 id="03-window-tour--message-bar">Message bar</h2>
@@ -487,7 +507,7 @@ another program. Click <strong>Dismiss</strong> to hide the message.</p>
 <p>Appears at the bottom when the file has problems. Each line shows where the problem is, what&#39;s
 wrong, and where the check came from:</p>
 <ul>
-<li><strong>SafeJSON:</strong> built-in checks, such as duplicate names or numbers too large to store exactly.</li>
+<li><strong>JSONsetRight:</strong> built-in checks, such as duplicate names or numbers too large to store exactly.</li>
 <li><strong>Schema:</strong> the file breaks a rule in its <a href="#07-schemas">schema</a>.</li>
 </ul>
 <p>Click a problem to jump to it.</p>
@@ -530,13 +550,13 @@ wrong, and where the check came from:</p>
 </tr>
 </tbody></table></div>
 <h2 id="03-window-tour--welcome-screen">Welcome screen</h2>
-<p>When no files are open, SafeJSON shows <strong>Open a file…</strong>, <strong>New file</strong>, and your <strong>Recent files</strong>.
+<p>When no files are open, JSONsetRight shows <strong>Open a file…</strong>, <strong>New file</strong>, and your <strong>Recent files</strong>.
 Click a recent file to reopen it.</p>
 </section>
 <p class="top-link"><a href="#introduction">↑ Back to top</a></p>
 <section class="chapter" id="section-04-editing">
 <h1 id="04-editing">Editing in the tree</h1>
-<p>Everything you change goes through SafeJSON&#39;s checks, so the file always stays valid. Every change
+<p>Everything you change goes through JSONsetRight&#39;s checks, so the file always stays valid. Every change
 can be undone with <strong>Undo</strong> (<strong>Ctrl+Z</strong>).</p>
 <h2 id="04-editing--selecting-and-moving-around">Selecting and moving around</h2>
 <ul>
@@ -582,14 +602,14 @@ can be undone with <strong>Undo</strong> (<strong>Ctrl+Z</strong>).</p>
 </tr>
 </tbody></table></div>
 <p>Press <strong>Escape</strong> in a text or number box to cancel your typing.</p>
-<p><strong>Under the text box</strong>, SafeJSON shows how the text will be saved, for example
+<p><strong>Under the text box</strong>, JSONsetRight shows how the text will be saved, for example
 <code>&quot;He said \&quot;hi\&quot;&quot;</code>. Quotes, backslashes and line breaks are converted automatically. You never
 need to type escape codes yourself.</p>
-<p><strong>Numbers</strong> can be written as <code>42</code>, <code>-7</code>, <code>3.14</code>, or <code>1e6</code> (one million). SafeJSON rejects things
+<p><strong>Numbers</strong> can be written as <code>42</code>, <code>-7</code>, <code>3.14</code>, or <code>1e6</code> (one million). JSONsetRight rejects things
 like <code>12px</code>, <code>1,000</code>, <code>.5</code>, or <code>NaN</code>, because standard JSON doesn&#39;t allow them. (JSON5 files are
 more relaxed: there, <code>.5</code>, <code>+1</code>, hex numbers like <code>0xFF</code>, <code>Infinity</code> and <code>NaN</code> are accepted. See
 <a href="#09-file-types">File types</a>.) If a whole number
-is too large for most programs to store exactly (more than about 9 million billion), SafeJSON
+is too large for most programs to store exactly (more than about 9 million billion), JSONsetRight
 saves it exactly as you typed it and shows a warning.</p>
 <h3 id="04-editing--editing-directly-in-the-tree">Editing directly in the tree</h3>
 <p><strong>Double-click</strong> a value in the tree to edit it in place, then press <strong>Enter</strong> to save or <strong>Escape</strong>
@@ -600,7 +620,7 @@ details panel instead, so no line breaks are lost.</p>
 <li>Select it and change the <strong>Key</strong> box in the details panel, then press <strong>Enter</strong>, or</li>
 <li>Double-click the name in the tree, or press <strong>F2</strong>.</li>
 </ul>
-<p>SafeJSON won&#39;t accept an empty name, or a name already used by another setting in the same group.
+<p>JSONsetRight won&#39;t accept an empty name, or a name already used by another setting in the same group.
 List items don&#39;t have names; they&#39;re numbered by position.</p>
 <h2 id="04-editing--adding-settings-and-list-items">Adding settings and list items</h2>
 <p>Select the group (<code>{ }</code>) or list (<code>[ ]</code>) you want to add to. In the details panel:</p>
@@ -632,7 +652,7 @@ The order of items in a <strong>list</strong> often does matter.</p>
 </blockquote>
 <h2 id="04-editing--changing-a-values-type">Changing a value&#39;s type</h2>
 <p>Use the <strong>Type</strong> dropdown in the details panel, or right-click → <strong>Change type to</strong>.</p>
-<p>SafeJSON converts the value where it can: <code>5</code> becomes <code>&quot;5&quot;</code> as text, and <code>&quot;42&quot;</code> becomes <code>42</code> as a
+<p>JSONsetRight converts the value where it can: <code>5</code> becomes <code>&quot;5&quot;</code> as text, and <code>&quot;42&quot;</code> becomes <code>42</code> as a
 number. If something would be lost, it asks first. For example, changing a group that contains
 3 settings into text would delete those settings. You can undo any type change.</p>
 <h2 id="04-editing--right-click-menu">Right-click menu</h2>
@@ -680,9 +700,9 @@ capital letters. Clear the box to see everything again. Drag-to-reorder is turne
 searching.</p>
 <h2 id="04-editing--comments">Comments</h2>
 <p>Files that allow comments (see <a href="#09-file-types">File types</a>) may contain notes like
-<code>// The port to listen on</code>. SafeJSON shows a setting&#39;s comment in green next to it in the tree,
+<code>// The port to listen on</code>. JSONsetRight shows a setting&#39;s comment in green next to it in the tree,
 and in full in the details panel. Comments are always kept exactly as they are when you edit and
-save. SafeJSON doesn&#39;t add, edit or delete comments in the tree; use <a href="#06-text-mode">Text mode</a>
+save. JSONsetRight doesn&#39;t add, edit or delete comments in the tree; use <a href="#06-text-mode">Text mode</a>
 for that.</p>
 <h2 id="04-editing--undo-and-redo">Undo and redo</h2>
 <ul>
@@ -762,8 +782,8 @@ value or the schema&#39;s default.</p>
 <ul>
 <li><strong>+ Add column</strong> adds an empty column. It becomes part of the file as soon as you fill in a cell.</li>
 <li><strong>Rename a column:</strong> double-click its name. Every row that has the setting is renamed. If any
-row already has a setting with the new name, nothing is renamed and SafeJSON explains why.</li>
-<li><strong>Remove a column:</strong> hover over its name and click <strong>×</strong>. SafeJSON asks before removing the
+row already has a setting with the new name, nothing is renamed and JSONsetRight explains why.</li>
+<li><strong>Remove a column:</strong> hover over its name and click <strong>×</strong>. JSONsetRight asks before removing the
 setting from every row.</li>
 </ul>
 <h2 id="05-table-view--sorting">Sorting</h2>
@@ -788,12 +808,12 @@ that aren&#39;t valid JSON</strong>.</p>
 <h2 id="06-text-mode--how-it-stays-safe">How it stays safe</h2>
 <p>What you type is <strong>applied to the file only once it&#39;s valid</strong>:</p>
 <ul>
-<li>When you pause typing, SafeJSON checks the text. If it&#39;s valid, the change is applied, and each
+<li>When you pause typing, JSONsetRight checks the text. If it&#39;s valid, the change is applied, and each
 pause becomes one undo step.</li>
 <li>If it isn&#39;t valid, a red banner shows exactly where the problem is, for example
 <em>&quot;Line 5, column 3: Expected &#39;,&#39;&quot;</em>. Click <strong>Go to problem</strong> to jump there.</li>
 <li><strong>While there&#39;s a problem, you can&#39;t save or switch to the tree.</strong> Fix the text first.
-The rest of SafeJSON keeps using the last valid version.</li>
+The rest of JSONsetRight keeps using the last valid version.</li>
 </ul>
 <p>The editor underlines mistakes as you type, and if the file has a <a href="#07-schemas">schema</a>, it
 suggests setting names and values as you type (press <strong>Ctrl+Space</strong> to see suggestions).</p>
@@ -801,7 +821,7 @@ suggests setting names and values as you type (press <strong>Ctrl+Space</strong>
 won&#39;t accept comments or trailing commas, because the programs that read it might not understand them.
 See <a href="#09-file-types">File types</a>.</p>
 <h2 id="06-text-mode--opening-files-that-arent-valid-json">Opening files that aren&#39;t valid JSON</h2>
-<p>If you open a file that has a mistake in it, SafeJSON opens it in text mode instead of refusing
+<p>If you open a file that has a mistake in it, JSONsetRight opens it in text mode instead of refusing
 it. A message says what&#39;s wrong and where. Fix the mistake, and once the text is valid the tree
 and saving become available. The file&#39;s original line endings and encoding are kept.</p>
 <p>Common mistakes and their messages:</p>
@@ -884,7 +904,7 @@ the text.</p>
 settings exist, what type each one is, which values are allowed, which are required, and what they
 mean. Many programs publish schemas for their settings files, for example on
 <a href="https://www.schemastore.org" target="_blank" rel="noopener">schemastore.org</a>.</p>
-<p>When a file has a schema, SafeJSON becomes much more helpful:</p>
+<p>When a file has a schema, JSONsetRight becomes much more helpful:</p>
 <ul>
 <li><strong>It checks the file.</strong> Problems are listed in plain language (&quot;Must be one of: development,
 staging, production&quot;), marked in the tree, and shown in the details panel.</li>
@@ -898,8 +918,8 @@ about, with their descriptions. New settings start with the schema&#39;s default
 <li><strong>It warns on save.</strong> Saving a file that breaks its schema shows the problems and lets you choose
 <strong>Save anyway</strong>, <strong>Show first problem</strong>, or <strong>Cancel</strong>.</li>
 </ul>
-<h2 id="07-schemas--how-safejson-finds-a-files-schema">How SafeJSON finds a file&#39;s schema</h2>
-<p>SafeJSON looks in this order and uses the first one it finds:</p>
+<h2 id="07-schemas--how-jsonsetright-finds-a-files-schema">How JSONsetRight finds a file&#39;s schema</h2>
+<p>JSONsetRight looks in this order and uses the first one it finds:</p>
 <ol>
 <li><strong>A schema you chose for this file</strong> (see below).</li>
 <li><strong>The file&#39;s own <code>&quot;$schema&quot;</code> setting</strong>, a top-level setting that names its schema, for example:<pre><code class="language-json">{ &quot;$schema&quot;: &quot;https://json.schemastore.org/package.json&quot;, &quot;name&quot;: &quot;my-app&quot; }
@@ -982,7 +1002,7 @@ program expects. Programs reading the file may reject it or behave unexpectedly.
 </tbody></table></div>
 <h2 id="07-schemas--notes">Notes</h2>
 <ul>
-<li>SafeJSON supports the common schema versions (draft-04, -06, -07, 2019-09 and 2020-12), including
+<li>JSONsetRight supports the common schema versions (draft-04, -06, -07, 2019-09 and 2020-12), including
 schemas that refer to other schema files.</li>
 <li>Deprecated settings (ones the schema says are no longer used) are marked <em>Deprecated</em> in the
 details panel.</li>
@@ -1013,7 +1033,7 @@ Common uses:</p>
 </tr>
 <tr>
 <td><em>Another open tab</em></td>
-<td>Another file that&#39;s open in SafeJSON. Changes can be copied in <strong>both</strong> directions</td>
+<td>Another file that&#39;s open in JSONsetRight. Changes can be copied in <strong>both</strong> directions</td>
 </tr>
 <tr>
 <td><strong>Backup</strong></td>
@@ -1059,7 +1079,7 @@ making everything after it look changed.</p>
 </tbody></table></div>
 <p>The filter buttons at the top show the count of each kind and let you show just one kind.
 Click a highlighted location (left column) to show it in the tree.</p>
-<p>If there are no differences, SafeJSON says so: both contain the same data.</p>
+<p>If there are no differences, JSONsetRight says so: both contain the same data.</p>
 <h2 id="08-compare--copying-differences-across">Copying differences across</h2>
 <p>Each row has buttons to make the two sides match at that spot:</p>
 <div class="table-wrap"><table>
@@ -1096,7 +1116,7 @@ undo changes to the other file in that file&#39;s own tab.</p>
 <section class="chapter" id="section-09-file-types">
 <h1 id="09-file-types">File types and formatting</h1>
 <h2 id="09-file-types--the-three-kinds-of-json-file">The three kinds of JSON file</h2>
-<p>SafeJSON works with three closely related formats. It detects the format automatically and shows
+<p>JSONsetRight works with three closely related formats. It detects the format automatically and shows
 it in the status bar.</p>
 <div class="table-wrap"><table>
 <thead>
@@ -1127,15 +1147,15 @@ it in the status bar.</p>
 </tr>
 </tbody></table></div>
 <p>A <em>trailing comma</em> is a comma after the last item: <code>[1, 2, 3,]</code>.</p>
-<p><strong>SafeJSON never changes a file&#39;s format by itself.</strong> A standard JSON file stays standard JSON:
-SafeJSON never adds comments to it, and <a href="#06-text-mode">text mode</a> refuses comments and trailing
+<p><strong>JSONsetRight never changes a file&#39;s format by itself.</strong> A standard JSON file stays standard JSON:
+JSONsetRight never adds comments to it, and <a href="#06-text-mode">text mode</a> refuses comments and trailing
 commas in it, because programs that expect standard JSON would fail to read them.</p>
 <h3 id="09-file-types--json5-files-keep-their-style">JSON5 files keep their style</h3>
-<p>In JSON5 files, SafeJSON writes new content the way the file already does: if the file uses
+<p>In JSON5 files, JSONsetRight writes new content the way the file already does: if the file uses
 unquoted names and single-quoted text, new settings follow suit. Renamed settings and edited text
 keep their original quoting. (Format is not available for JSON5 files yet.)</p>
-<h2 id="09-file-types--what-safejson-keeps-exactly-as-it-was">What SafeJSON keeps exactly as it was</h2>
-<p>When you change something, SafeJSON rewrites only that part of the file. Everything else stays
+<h2 id="09-file-types--what-jsonsetright-keeps-exactly-as-it-was">What JSONsetRight keeps exactly as it was</h2>
+<p>When you change something, JSONsetRight rewrites only that part of the file. Everything else stays
 byte-for-byte the same:</p>
 <ul>
 <li>comments, wherever they are</li>
@@ -1158,29 +1178,29 @@ or tabs instead in <a href="#11-settings">Settings</a>.</p>
 <p>JSONC files may contain trailing commas. In <a href="#11-settings">Settings</a>, choose:</p>
 <ul>
 <li><strong>Keep them</strong> (default), or</li>
-<li><strong>Remove them when saving:</strong> SafeJSON removes them as an undoable step just before saving.</li>
+<li><strong>Remove them when saving:</strong> JSONsetRight removes them as an undoable step just before saving.</li>
 </ul>
 <p>JSON5 files always keep their trailing commas, since they&#39;re a normal part of JSON5.</p>
 <h2 id="09-file-types--encoding-and-size-limits">Encoding and size limits</h2>
 <ul>
 <li>Files must be <strong>UTF-8</strong> text, the standard for JSON. Other encodings are refused with a message,
 rather than risking damage to the file.</li>
-<li>Files up to <strong>10 MB</strong> can be opened. SafeJSON is designed for configuration files, which are
+<li>Files up to <strong>10 MB</strong> can be opened. JSONsetRight is designed for configuration files, which are
 usually far smaller.</li>
 </ul>
 <h2 id="09-file-types--large-numbers">Large numbers</h2>
 <p>Most programs can only store whole numbers up to about 9 million billion (9,007,199,254,740,991)
-exactly. SafeJSON keeps larger numbers exactly as written, but shows a warning in the
+exactly. JSONsetRight keeps larger numbers exactly as written, but shows a warning in the
 <strong>Problems</strong> panel, because the program reading the file may round them.</p>
 <h2 id="09-file-types--duplicate-names">Duplicate names</h2>
-<p>If a file somehow contains the same setting name twice in one group, SafeJSON reports it in the
+<p>If a file somehow contains the same setting name twice in one group, JSONsetRight reports it in the
 <strong>Problems</strong> panel. Most programs silently use only the last one, which is a common source of
-confusing bugs. SafeJSON never lets you create duplicates yourself.</p>
+confusing bugs. JSONsetRight never lets you create duplicates yourself.</p>
 </section>
 <p class="top-link"><a href="#introduction">↑ Back to top</a></p>
 <section class="chapter" id="section-10-safety">
 <h1 id="10-safety">Saving and safety features</h1>
-<p>SafeJSON is built so that you can&#39;t damage a file by accident, and so that you can get your work
+<p>JSONsetRight is built so that you can&#39;t damage a file by accident, and so that you can get your work
 back if something goes wrong.</p>
 <h2 id="10-safety--the-file-is-always-valid">The file is always valid</h2>
 <p>Every change you make in the tree, the table or the details panel is checked before it&#39;s applied.
@@ -1191,9 +1211,9 @@ applied once it&#39;s valid, and saving is blocked while it isn&#39;t.</p>
 <li><strong>Save</strong> (<strong>Ctrl+S</strong>) writes the file. A file that has never been saved asks for a name first.</li>
 <li><strong>Save as…</strong> (<strong>Ctrl+Shift+S</strong>) saves under a new name or location. The tab then refers to the new file.</li>
 </ul>
-<p><strong>Crash-safe saving:</strong> SafeJSON writes to a temporary file next to yours and swaps it in only once
+<p><strong>Crash-safe saving:</strong> JSONsetRight writes to a temporary file next to yours and swaps it in only once
 it&#39;s complete. If the PC loses power mid-save, your original file is still intact.</p>
-<p><strong>Before saving, SafeJSON may ask you about:</strong></p>
+<p><strong>Before saving, JSONsetRight may ask you about:</strong></p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -1214,7 +1234,7 @@ it&#39;s complete. If the PC loses power mid-save, your original file is still i
 </tr>
 </tbody></table></div>
 <h2 id="10-safety--backups">Backups</h2>
-<p>Each time you save over a file, SafeJSON first keeps a copy of the previous version. By default
+<p>Each time you save over a file, JSONsetRight first keeps a copy of the previous version. By default
 it keeps the <strong>5 most recent</strong> per file; you can change this, or turn backups off, in
 <a href="#11-settings">Settings</a>.</p>
 <p>To restore one:</p>
@@ -1225,10 +1245,10 @@ it keeps the <strong>5 most recent</strong> per file; you can change this, or tu
 <p>The restored version replaces what&#39;s on screen but <strong>isn&#39;t saved yet</strong>: check it, then <strong>Save</strong>,
 or press <strong>Ctrl+Z</strong> to undo the restore. You can also <a href="#08-compare">compare</a> the current file
 with a backup first.</p>
-<p>Backups are stored in <code>%LOCALAPPDATA%\SafeJSON\backups</code>, not next to your files, so they don&#39;t
+<p>Backups are stored in <code>%LOCALAPPDATA%\JSONsetRight\backups</code>, not next to your files, so they don&#39;t
 clutter your folders or project repositories.</p>
 <h2 id="10-safety--crash-recovery">Crash recovery</h2>
-<p>Every 30 seconds, SafeJSON keeps a private copy of any unsaved changes. If SafeJSON closes
+<p>Every 30 seconds, JSONsetRight keeps a private copy of any unsaved changes. If JSONsetRight closes
 unexpectedly (a crash, a power cut, or Windows restarting for updates), the next time you start it
 you&#39;ll see <strong>&quot;Recover unsaved work?&quot;</strong>:</p>
 <ul>
@@ -1238,18 +1258,18 @@ you&#39;ll see <strong>&quot;Recover unsaved work?&quot;</strong>:</p>
 </ul>
 <p>Recovery copies are deleted when you save or close normally.</p>
 <h2 id="10-safety--changes-made-by-other-programs">Changes made by other programs</h2>
-<p>SafeJSON checks open files every few seconds, and whenever you switch back to its window:</p>
+<p>JSONsetRight checks open files every few seconds, and whenever you switch back to its window:</p>
 <ul>
 <li><strong>If you have no unsaved changes</strong>, it reloads the file automatically and tells you. Press
 <strong>Ctrl+Z</strong> to go back to what you had.</li>
 <li><strong>If you do have unsaved changes</strong>, it asks: <strong>Load their version</strong> (undoable) or <strong>Keep mine</strong>.</li>
 <li>If the file was <strong>deleted or moved</strong>, it tells you; saving creates it again.</li>
-<li>If the other program left the file <strong>invalid</strong> (for example mid-save), SafeJSON keeps your version and tells you.</li>
+<li>If the other program left the file <strong>invalid</strong> (for example mid-save), JSONsetRight keeps your version and tells you.</li>
 </ul>
 <h2 id="10-safety--closing">Closing</h2>
 <ul>
 <li>Closing a tab with unsaved changes asks: <strong>Save</strong>, <strong>Don&#39;t save</strong>, or <strong>Cancel</strong>.</li>
-<li>Closing the SafeJSON window asks about each file with unsaved changes.</li>
+<li>Closing the JSONsetRight window asks about each file with unsaved changes.</li>
 </ul>
 <h2 id="10-safety--undo">Undo</h2>
 <p>Every change, including deleting, moving, changing type, restoring a backup, reloading after another
@@ -1316,7 +1336,7 @@ that don&#39;t name their own schema.</p>
 <p>Click <strong>×</strong> to remove a rule. A file&#39;s own <code>&quot;$schema&quot;</code>, or a schema you chose for that file in the
 schema dialog, takes priority over these rules.</p>
 <h2 id="11-settings--where-settings-are-stored">Where settings are stored</h2>
-<p>In <code>%LOCALAPPDATA%\SafeJSON\settings.json</code>. To reset everything to the defaults, close SafeJSON
+<p>In <code>%LOCALAPPDATA%\JSONsetRight\settings.json</code>. To reset everything to the defaults, close JSONsetRight
 and delete that file.</p>
 </section>
 <p class="top-link"><a href="#introduction">↑ Back to top</a></p>
@@ -1520,24 +1540,32 @@ and delete that file.</p>
 <p class="top-link"><a href="#introduction">↑ Back to top</a></p>
 <section class="chapter" id="section-13-troubleshooting">
 <h1 id="13-troubleshooting">Troubleshooting and FAQ</h1>
-<h2 id="13-troubleshooting--starting-safejson">Starting SafeJSON</h2>
+<h2 id="13-troubleshooting--starting-jsonsetright">Starting JSONsetRight</h2>
 <p><strong>&quot;Windows protected your PC&quot; appears.</strong>
 Click <strong>More info</strong>, check the publisher is <strong>Eric McFall</strong>, and click <strong>Run anyway</strong>. This warning
-appears for new releases until Windows has seen them often.</p>
+appears for new releases until Windows has seen them often. It&#39;s likely right after the change from
+SafeJSON to JSONsetRight, because Windows sees a program file with a new name.</p>
 <p><strong>&quot;Smart App Control blocked an app&quot; / &quot;An Application Control policy has blocked this file&quot;.</strong>
-You&#39;re running SafeJSON 1.0 or 2.0, which aren&#39;t signed. Download version 3.0 or later.</p>
+You&#39;re running SafeJSON 1.0 or 2.0 (JSONsetRight&#39;s former name), which aren&#39;t signed. Download the
+latest JSONsetRight.</p>
+<p><strong>My settings, recent files or backups are gone after switching from SafeJSON.</strong>
+JSONsetRight keeps its data in a new folder and starts fresh. Your old backups are still in
+<code>%LOCALAPPDATA%\SafeJSON\backups</code>. See <a href="#01-installing--coming-from-safejson">Coming from SafeJSON?</a>.</p>
+<p><strong>Double-clicking a .json file still opens SafeJSON (or nothing).</strong>
+File associations point to the old program. Set up &quot;Open with&quot; again for <code>JSONsetRight.exe</code>; see
+<a href="#01-installing--opening-files-with-jsonsetright-from-file-explorer">Installing</a>.</p>
 <p><strong>Nothing happens, or an error mentions WebView2.</strong>
-SafeJSON needs Microsoft Edge WebView2, which comes with Windows 11 and current Windows 10. Run Windows
+JSONsetRight needs Microsoft Edge WebView2, which comes with Windows 11 and current Windows 10. Run Windows
 Update, or install the &quot;Evergreen WebView2 Runtime&quot; from Microsoft&#39;s website.</p>
 <h2 id="13-troubleshooting--opening-files">Opening files</h2>
 <p><strong>&quot;…isn&#39;t valid JSON yet (line 3, column 5: …)&quot;.</strong>
-The file has a mistake. SafeJSON opens it in <a href="#06-text-mode">text mode</a> so you can fix it.
+The file has a mistake. JSONsetRight opens it in <a href="#06-text-mode">text mode</a> so you can fix it.
 See the table of common mistakes there.</p>
-<p><strong>&quot;…is not UTF-8 text, so SafeJSON can&#39;t open it safely.&quot;</strong>
+<p><strong>&quot;…is not UTF-8 text, so JSONsetRight can&#39;t open it safely.&quot;</strong>
 The file uses an older text encoding. Open it in Notepad, choose <strong>File → Save as</strong>, set
-<strong>Encoding</strong> to <strong>UTF-8</strong>, and save. Then open it in SafeJSON.</p>
-<p><strong>&quot;…is larger than SafeJSON supports (10 MB).&quot;</strong>
-SafeJSON is designed for configuration files. Use a text editor for very large data files.</p>
+<strong>Encoding</strong> to <strong>UTF-8</strong>, and save. Then open it in JSONsetRight.</p>
+<p><strong>&quot;…is larger than JSONsetRight supports (10 MB).&quot;</strong>
+JSONsetRight is designed for configuration files. Use a text editor for very large data files.</p>
 <p><strong>Table is greyed out.</strong>
 Select a list whose items are all groups of settings (<code>{ }</code>), or something inside one. See
 <a href="#05-table-view">Table view</a>.</p>
@@ -1576,20 +1604,20 @@ another program. Close the other program, or use <strong>Save as…</strong> to 
 Click <strong>Backups…</strong> and restore the previous version, then save again. Or press <strong>Ctrl+Z</strong>
 (undo still works after saving) and save again.</p>
 <h2 id="13-troubleshooting--faq">FAQ</h2>
-<p><strong>Does SafeJSON send my files anywhere?</strong>
+<p><strong>Does JSONsetRight send my files anywhere?</strong>
 No. Files are read and saved only on your PC. The only internet access is downloading schemas from
 web addresses that a file (or you) names.</p>
-<p><strong>Will SafeJSON change parts of my file I didn&#39;t touch?</strong>
+<p><strong>Will JSONsetRight change parts of my file I didn&#39;t touch?</strong>
 No. Only the part you change is rewritten; comments, spacing, order and line endings are kept. The
 exceptions are things you ask for: <strong>Format</strong>, and removing trailing commas if you turned that on.</p>
 <p><strong>Can several people edit the same file?</strong>
-SafeJSON notices when another program or person saves the file while you have it open, and
+JSONsetRight notices when another program or person saves the file while you have it open, and
 asks before overwriting their changes. It doesn&#39;t merge edits automatically, but
 <a href="#08-compare">Compare</a> helps you combine them.</p>
-<p><strong>Can I use SafeJSON on a Mac or Linux?</strong>
-Not currently. SafeJSON is built for Windows.</p>
+<p><strong>Can I use JSONsetRight on a Mac or Linux?</strong>
+Not currently. JSONsetRight is built for Windows.</p>
 <p><strong>Where are my backups and settings?</strong>
-In <code>%LOCALAPPDATA%\SafeJSON</code>. See <a href="#01-installing--where-safejson-keeps-its-own-data">Installing</a>.</p>
+In <code>%LOCALAPPDATA%\JSONsetRight</code>. See <a href="#01-installing--where-jsonsetright-keeps-its-own-data">Installing</a>.</p>
 </section>
 <p class="top-link"><a href="#introduction">↑ Back to top</a></p>
 <section class="chapter" id="section-14-glossary">
@@ -1601,21 +1629,21 @@ A copy of a file&#39;s previous version, kept automatically each time you save. 
 <p><strong>Boolean (true / false)</strong>
 A value that is either <code>true</code> or <code>false</code>. Badge: <code>✓</code>.</p>
 <p><strong>BOM (byte-order mark)</strong>
-An invisible marker some programs put at the start of a text file. SafeJSON keeps it if it&#39;s there.</p>
+An invisible marker some programs put at the start of a text file. JSONsetRight keeps it if it&#39;s there.</p>
 <p><strong>Comment</strong>
 A note in a file that programs ignore: <code>// like this</code> or <code>/* like this */</code>. Allowed in JSON with
 Comments and JSON5, not in standard JSON.</p>
 <p><strong>CRLF / LF</strong>
-The two styles of line ending. Windows traditionally uses CRLF; Linux and macOS use LF. SafeJSON
+The two styles of line ending. Windows traditionally uses CRLF; Linux and macOS use LF. JSONsetRight
 keeps whichever the file uses.</p>
 <p><strong>Default</strong>
 The value a <a href="#07-schemas">schema</a> says a setting has when it isn&#39;t specified.</p>
 <p><strong>Deprecated</strong>
 A setting the schema says is no longer used, or will be removed.</p>
 <p><strong>Enum (allowed values)</strong>
-A fixed list of values a schema allows for a setting. SafeJSON shows these as a dropdown.</p>
+A fixed list of values a schema allows for a setting. JSONsetRight shows these as a dropdown.</p>
 <p><strong>Escape characters</strong>
-Codes like <code>\&quot;</code> or <code>\n</code> used inside JSON text to represent quotes and line breaks. SafeJSON adds
+Codes like <code>\&quot;</code> or <code>\n</code> used inside JSON text to represent quotes and line breaks. JSONsetRight adds
 them automatically; you never type them.</p>
 <p><strong>JSON</strong>
 JavaScript Object Notation: a common text format for settings and data, made of objects, arrays,
@@ -1650,7 +1678,7 @@ The standard way of storing text in files, and the encoding JSON files use.</p>
 <p><strong>Value</strong>
 The data part of a setting: text, a number, true/false, null, an object or a list.</p>
 </section>
-<footer>SafeJSON 3.1.0 User Guide. Generated from the Markdown files in docs/user-guide.</footer>
+<footer>JSONsetRight 3.2.0 User Guide. Generated from the Markdown files in docs/user-guide.</footer>
 </main>
 </div>
 </body>

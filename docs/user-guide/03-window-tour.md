@@ -42,7 +42,7 @@ Each open file has a tab. A **●** after the name means the file has unsaved ch
 
 - Click a tab to switch to it, or press **Ctrl+Tab** to go to the next tab.
 - Click **×**, middle-click the tab, or press **Ctrl+W** to close it. If it has unsaved changes,
-  SafeJSON asks whether to **Save**, **Don't save**, or **Cancel**.
+  JSONsetRight asks whether to **Save**, **Don't save**, or **Cancel**.
 - Opening a file that's already open just switches to its tab.
 
 ## Message bar
@@ -95,7 +95,7 @@ The right-hand panel shows the selected setting:
 Appears at the bottom when the file has problems. Each line shows where the problem is, what's
 wrong, and where the check came from:
 
-- **SafeJSON:** built-in checks, such as duplicate names or numbers too large to store exactly.
+- **JSONsetRight:** built-in checks, such as duplicate names or numbers too large to store exactly.
 - **Schema:** the file breaks a rule in its [schema](07-schemas.md).
 
 Click a problem to jump to it.
@@ -116,5 +116,5 @@ The blue bar at the bottom shows, from left to right:
 
 ## Welcome screen
 
-When no files are open, SafeJSON shows **Open a file…**, **New file**, and your **Recent files**.
+When no files are open, JSONsetRight shows **Open a file…**, **New file**, and your **Recent files**.
 Click a recent file to reopen it.

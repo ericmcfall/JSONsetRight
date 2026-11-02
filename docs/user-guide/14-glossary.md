@@ -10,14 +10,14 @@ A copy of a file's previous version, kept automatically each time you save. See 
 A value that is either `true` or `false`. Badge: `✓`.
 
 **BOM (byte-order mark)**
-An invisible marker some programs put at the start of a text file. SafeJSON keeps it if it's there.
+An invisible marker some programs put at the start of a text file. JSONsetRight keeps it if it's there.
 
 **Comment**
 A note in a file that programs ignore: `// like this` or `/* like this */`. Allowed in JSON with
 Comments and JSON5, not in standard JSON.
 
 **CRLF / LF**
-The two styles of line ending. Windows traditionally uses CRLF; Linux and macOS use LF. SafeJSON
+The two styles of line ending. Windows traditionally uses CRLF; Linux and macOS use LF. JSONsetRight
 keeps whichever the file uses.
 
 **Default**
@@ -27,10 +27,10 @@ The value a [schema](07-schemas.md) says a setting has when it isn't specified.
 A setting the schema says is no longer used, or will be removed.
 
 **Enum (allowed values)**
-A fixed list of values a schema allows for a setting. SafeJSON shows these as a dropdown.
+A fixed list of values a schema allows for a setting. JSONsetRight shows these as a dropdown.
 
 **Escape characters**
-Codes like `\"` or `\n` used inside JSON text to represent quotes and line breaks. SafeJSON adds
+Codes like `\"` or `\n` used inside JSON text to represent quotes and line breaks. JSONsetRight adds
 them automatically; you never type them.
 
 **JSON**

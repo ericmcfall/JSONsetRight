@@ -29,5 +29,5 @@ schema dialog, takes priority over these rules.
 
 ## Where settings are stored
 
-In `%LOCALAPPDATA%\SafeJSON\settings.json`. To reset everything to the defaults, close SafeJSON
+In `%LOCALAPPDATA%\JSONsetRight\settings.json`. To reset everything to the defaults, close JSONsetRight
 and delete that file.

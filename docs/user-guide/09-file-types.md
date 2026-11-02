@@ -2,7 +2,7 @@
 
 ## The three kinds of JSON file
 
-SafeJSON works with three closely related formats. It detects the format automatically and shows
+JSONsetRight works with three closely related formats. It detects the format automatically and shows
 it in the status bar.
 
 | Status bar | Format | Typical files | What it allows |
@@ -13,19 +13,19 @@ it in the status bar.
 
 A *trailing comma* is a comma after the last item: `[1, 2, 3,]`.
 
-**SafeJSON never changes a file's format by itself.** A standard JSON file stays standard JSON:
-SafeJSON never adds comments to it, and [text mode](06-text-mode.md) refuses comments and trailing
+**JSONsetRight never changes a file's format by itself.** A standard JSON file stays standard JSON:
+JSONsetRight never adds comments to it, and [text mode](06-text-mode.md) refuses comments and trailing
 commas in it, because programs that expect standard JSON would fail to read them.
 
 ### JSON5 files keep their style
 
-In JSON5 files, SafeJSON writes new content the way the file already does: if the file uses
+In JSON5 files, JSONsetRight writes new content the way the file already does: if the file uses
 unquoted names and single-quoted text, new settings follow suit. Renamed settings and edited text
 keep their original quoting. (Format is not available for JSON5 files yet.)
 
-## What SafeJSON keeps exactly as it was
+## What JSONsetRight keeps exactly as it was
 
-When you change something, SafeJSON rewrites only that part of the file. Everything else stays
+When you change something, JSONsetRight rewrites only that part of the file. Everything else stays
 byte-for-byte the same:
 
 - comments, wherever they are
@@ -54,7 +54,7 @@ or tabs instead in [Settings](11-settings.md).
 JSONC files may contain trailing commas. In [Settings](11-settings.md), choose:
 
 - **Keep them** (default), or
-- **Remove them when saving:** SafeJSON removes them as an undoable step just before saving.
+- **Remove them when saving:** JSONsetRight removes them as an undoable step just before saving.
 
 JSON5 files always keep their trailing commas, since they're a normal part of JSON5.
 
@@ -62,17 +62,17 @@ JSON5 files always keep their trailing commas, since they're a normal part of JS
 
 - Files must be **UTF-8** text, the standard for JSON. Other encodings are refused with a message,
   rather than risking damage to the file.
-- Files up to **10 MB** can be opened. SafeJSON is designed for configuration files, which are
+- Files up to **10 MB** can be opened. JSONsetRight is designed for configuration files, which are
   usually far smaller.
 
 ## Large numbers
 
 Most programs can only store whole numbers up to about 9 million billion (9,007,199,254,740,991)
-exactly. SafeJSON keeps larger numbers exactly as written, but shows a warning in the
+exactly. JSONsetRight keeps larger numbers exactly as written, but shows a warning in the
 **Problems** panel, because the program reading the file may round them.
 
 ## Duplicate names
 
-If a file somehow contains the same setting name twice in one group, SafeJSON reports it in the
+If a file somehow contains the same setting name twice in one group, JSONsetRight reports it in the
 **Problems** panel. Most programs silently use only the last one, which is a common source of
-confusing bugs. SafeJSON never lets you create duplicates yourself.
+confusing bugs. JSONsetRight never lets you create duplicates yourself.

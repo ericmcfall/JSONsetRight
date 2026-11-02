@@ -1,18 +1,22 @@
-# SafeJSON — Project Plan
+# JSONsetRight — Project Plan
 
 A standalone Windows app for creating and editing JSON config files through a GUI, built so that **syntax errors are impossible** and schema mistakes are caught before saving.
 
-Status: **v1.0.0, v2.0.0 and v3.0.0 released.** All planned phases are done. Next: a browser version, see [PLAN-WEB.md](PLAN-WEB.md).
+> Originally named **SafeJSON**; renamed to **JSONsetRight** in v3.2.0 (see [RENAME-PLAN.md](RENAME-PLAN.md)).
+> This plan has been updated to the new name throughout.
+
+Status: **All planned phases are done.** Released as SafeJSON v1.0.0–v3.1.0, then as JSONsetRight from
+v3.2.0 (code-signed since v3.0.0). The browser version ([PLAN-WEB.md](PLAN-WEB.md)) is on hold.
 
 Changes from the original plan, made during Phase 2:
 - Schema discovery order: a schema the user picks for a file now comes *first* (before `$schema`),
   so an explicit choice always wins. "Don't use a schema" is also a per-file choice.
 - Raw mode is called "Text" mode in the app. It also opens files that aren't valid JSON, so they
-  can be fixed in SafeJSON (v1 refused them).
+  can be fixed in JSONsetRight (v1 refused them).
 - Files that were strict JSON when opened stay strict in text mode (comments/trailing commas refused).
 
 Changes from the original plan, made during Phase 3:
-- JSON5 went with Option A, in a stronger form: SafeJSON has its own JSON5 parser (checked against
+- JSON5 went with Option A, in a stronger form: JSONsetRight has its own JSON5 parser (checked against
   the official `json5` package) and its own offset-based editor, so JSON5 files keep comments,
   unquoted keys and quote styles. Format isn't offered for JSON5 yet.
 - That editor now handles *all* structural edits for every file type. jsonc-parser's edit
@@ -80,7 +84,7 @@ Because the GUI only ever applies validated edits, the file on disk is always va
 ## 4. Architecture
 
 ```
-┌─────────────────────────── SafeJSON window ───────────────────────────┐
+┌─────────────────────────── JSONsetRight window ───────────────────────────┐
 │  Menu / Toolbar   [Open] [Save] [Undo] [Redo] [Format] [View: Tree ▾]  │
 │  Tabs:  appsettings.json ●  |  tsconfig.json  |  + …                    │
 ├───────────────────────────────┬─────────────────────────────────────────┤
@@ -108,7 +112,7 @@ Because the GUI only ever applies validated edits, the file on disk is always va
 
 **Backend (`src-tauri/`, Rust):** commands `read_file`, `write_file_atomic`, `make_backup`, `save_recovery_draft`, `list_recovery_drafts`, `watch_file`.
 
-**App data location:** `%LOCALAPPDATA%\SafeJSON\` → `settings.json`, `backups\`, `recovery\`, `schema-cache\`.
+**App data location:** `%LOCALAPPDATA%\JSONsetRight\` → `settings.json`, `backups\`, `recovery\`, `schema-cache\`.
 
 ---
 
@@ -145,7 +149,7 @@ Because the GUI only ever applies validated edits, the file on disk is always va
 
 ### 5.5 Safety (v1)
 - **Undo/redo:** unlimited per tab, covering every edit, including drag-moves and type changes.
-- **Backups:** before each save, the previous version is copied to `%LOCALAPPDATA%\SafeJSON\backups\` (last 5 per file, configurable). Kept out of your project folders so git repos stay clean. "Restore from backup…" menu item.
+- **Backups:** before each save, the previous version is copied to `%LOCALAPPDATA%\JSONsetRight\backups\` (last 5 per file, configurable). Kept out of your project folders so git repos stay clean. "Restore from backup…" menu item.
 - **Auto-recovery:** unsaved changes saved as drafts every 30 seconds. After a crash, the app offers to restore them on next launch.
 - **Atomic save:** write to a temp file, then replace, so the original is never left half-written.
 - **External changes:** if the file changes on disk (e.g. edited in VS Code), the app prompts: Reload / Keep mine / Compare.
@@ -197,7 +201,7 @@ Each milestone ends with a working app, a git commit, and a tag.
 3. **M3 Tree view:** display, selection, expand/collapse, Details panel, search.
 4. **M4 Editing:** typed editors, add/delete/rename/duplicate, drag-and-drop, type-change warnings, duplicate-key blocking.
 5. **M5 Tabs & safety:** multiple tabs, unsaved-dot indicator, close prompts, auto-recovery, external-change detection.
-6. **M6 Polish & release:** theming, keyboard shortcuts, Settings dialog, Format document, trailing-comma policy, build portable `SafeJSON.exe`, publish as GitHub Release **v1.0**.
+6. **M6 Polish & release:** theming, keyboard shortcuts, Settings dialog, Format document, trailing-comma policy, build portable `JSONsetRight.exe`, publish as GitHub Release **v1.0**.
 
 ### Phase 2 — Schemas & raw mode (v2)
 7. **M7 Schema engine:** Ajv integration, discovery (3 methods), cache, Problems panel.
@@ -215,7 +219,7 @@ Each milestone ends with a working app, a git commit, and a tag.
 
 | Risk | Plan |
 |---|---|
-| **JSON5 format preservation.** No mainstream library edits JSON5 while keeping comments and unquoted keys. | **Resolved in M10:** SafeJSON's own JSON5 parser and offset-based editor keep comments, quoting and layout. |
+| **JSON5 format preservation.** No mainstream library edits JSON5 while keeping comments and unquoted keys. | **Resolved in M10:** JSONsetRight's own JSON5 parser and offset-based editor keep comments, quoting and layout. |
 | **SmartScreen warning.** Unsigned portable .exe files trigger "Windows protected your PC" for teammates. | Acceptable for internal use ("More info → Run anyway"). Code-signing certificate (~$100–300/yr) can be added later. |
 | **WebView2 requirement.** | Built into Windows 11 and current Windows 10. The portable build will show a clear message if it's missing. |
 | **"Portable" settings location.** | Settings in `%LOCALAPPDATA%`. If you later want a USB-stick mode, add "store settings next to the exe" when a `portable.flag` file is present. |
@@ -241,4 +245,4 @@ WebView2 is already present on Windows 11.
 - No GUI action can produce invalid JSON (covered by automated tests).
 - Duplicate keys cannot be created; destructive type changes require confirmation.
 - Undo/redo works across all edit types; backups and crash recovery verified manually.
-- Runs as a single portable `SafeJSON.exe` downloaded from a GitHub Release.
+- Runs as a single portable `JSONsetRight.exe` downloaded from a GitHub Release.

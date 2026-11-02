@@ -11,12 +11,12 @@ Click **Text** in the toolbar, or press **Ctrl+Shift+T**, to switch. Click **Tre
 
 What you type is **applied to the file only once it's valid**:
 
-- When you pause typing, SafeJSON checks the text. If it's valid, the change is applied, and each
+- When you pause typing, JSONsetRight checks the text. If it's valid, the change is applied, and each
   pause becomes one undo step.
 - If it isn't valid, a red banner shows exactly where the problem is, for example
   *"Line 5, column 3: Expected ','"*. Click **Go to problem** to jump there.
 - **While there's a problem, you can't save or switch to the tree.** Fix the text first.
-  The rest of SafeJSON keeps using the last valid version.
+  The rest of JSONsetRight keeps using the last valid version.
 
 The editor underlines mistakes as you type, and if the file has a [schema](07-schemas.md), it
 suggests setting names and values as you type (press **Ctrl+Space** to see suggestions).
@@ -27,7 +27,7 @@ See [File types](09-file-types.md).
 
 ## Opening files that aren't valid JSON
 
-If you open a file that has a mistake in it, SafeJSON opens it in text mode instead of refusing
+If you open a file that has a mistake in it, JSONsetRight opens it in text mode instead of refusing
 it. A message says what's wrong and where. Fix the mistake, and once the text is valid the tree
 and saving become available. The file's original line endings and encoding are kept.
 

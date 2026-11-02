@@ -40,6 +40,8 @@ const sections = files.map((file) => {
     return `<h${level} id="${anchor}">${inner}</h${level}>`;
   });
 
+  // Links to a heading in the same chapter ("#backups") get the chapter prefix too.
+  html = html.replace(/href="#([\w-]+)"/g, (_, anchor) => `href="#${id}--${anchor}"`);
   // Links between chapters ("10-safety.md#backups") become links within this page.
   html = html.replace(/href="(?:\.\/)?((?:\d\d-[\w-]+)|README)\.md(?:#([\w-]+))?"/g, (_, target, anchor) => {
     const targetId = chapterId(`${target}.md`);

@@ -1,6 +1,6 @@
 # Editing in the tree
 
-Everything you change goes through SafeJSON's checks, so the file always stays valid. Every change
+Everything you change goes through JSONsetRight's checks, so the file always stays valid. Every change
 can be undone with **Undo** (**Ctrl+Z**).
 
 ## Selecting and moving around
@@ -24,15 +24,15 @@ Select the setting, then use the **Value** editor in the details panel. Each typ
 
 Press **Escape** in a text or number box to cancel your typing.
 
-**Under the text box**, SafeJSON shows how the text will be saved, for example
+**Under the text box**, JSONsetRight shows how the text will be saved, for example
 `"He said \"hi\""`. Quotes, backslashes and line breaks are converted automatically. You never
 need to type escape codes yourself.
 
-**Numbers** can be written as `42`, `-7`, `3.14`, or `1e6` (one million). SafeJSON rejects things
+**Numbers** can be written as `42`, `-7`, `3.14`, or `1e6` (one million). JSONsetRight rejects things
 like `12px`, `1,000`, `.5`, or `NaN`, because standard JSON doesn't allow them. (JSON5 files are
 more relaxed: there, `.5`, `+1`, hex numbers like `0xFF`, `Infinity` and `NaN` are accepted. See
 [File types](09-file-types.md).) If a whole number
-is too large for most programs to store exactly (more than about 9 million billion), SafeJSON
+is too large for most programs to store exactly (more than about 9 million billion), JSONsetRight
 saves it exactly as you typed it and shows a warning.
 
 ### Editing directly in the tree
@@ -46,7 +46,7 @@ details panel instead, so no line breaks are lost.
 - Select it and change the **Key** box in the details panel, then press **Enter**, or
 - Double-click the name in the tree, or press **F2**.
 
-SafeJSON won't accept an empty name, or a name already used by another setting in the same group.
+JSONsetRight won't accept an empty name, or a name already used by another setting in the same group.
 List items don't have names; they're numbered by position.
 
 ## Adding settings and list items
@@ -88,7 +88,7 @@ duplicate it there (copy its value) and delete the original.
 
 Use the **Type** dropdown in the details panel, or right-click → **Change type to**.
 
-SafeJSON converts the value where it can: `5` becomes `"5"` as text, and `"42"` becomes `42` as a
+JSONsetRight converts the value where it can: `5` becomes `"5"` as text, and `"42"` becomes `42` as a
 number. If something would be lost, it asks first. For example, changing a group that contains
 3 settings into text would delete those settings. You can undo any type change.
 
@@ -116,9 +116,9 @@ searching.
 ## Comments
 
 Files that allow comments (see [File types](09-file-types.md)) may contain notes like
-`// The port to listen on`. SafeJSON shows a setting's comment in green next to it in the tree,
+`// The port to listen on`. JSONsetRight shows a setting's comment in green next to it in the tree,
 and in full in the details panel. Comments are always kept exactly as they are when you edit and
-save. SafeJSON doesn't add, edit or delete comments in the tree; use [Text mode](06-text-mode.md)
+save. JSONsetRight doesn't add, edit or delete comments in the tree; use [Text mode](06-text-mode.md)
 for that.
 
 ## Undo and redo

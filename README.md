@@ -1,12 +1,16 @@
-# SafeJSON
+# JSONsetRight
 
 A Windows app for editing JSON config files through a GUI, so you can't introduce syntax
 errors such as missing commas, unclosed quotes or mismatched brackets.
 
+*Formerly called **SafeJSON** (versions 1.0–3.1). See [RENAME-PLAN.md](RENAME-PLAN.md).
+GitHub redirects old links to this repository, so don't create a new repository named
+"SafeJSON" under this account: that would stop the redirects.*
+
 ## Using it
 
 The full **user guide** is in [docs/user-guide](docs/user-guide/README.md), as Markdown chapters and
-as a single page, [SafeJSON-User-Guide.html](docs/user-guide/SafeJSON-User-Guide.html), that opens
+as a single page, [JSONsetRight-User-Guide.html](docs/user-guide/JSONsetRight-User-Guide.html), that opens
 in any browser and prints cleanly. After changing the Markdown, run `npm run docs` to rebuild the page.
 
 
@@ -19,14 +23,14 @@ in any browser and prints cleanly. After changing the Markdown, run `npm run doc
   you change is rewritten.
 
 ### Schemas
-If a file has a JSON Schema, SafeJSON checks the file against it and helps you fill it in:
+If a file has a JSON Schema, JSONsetRight checks the file against it and helps you fill it in:
 descriptions for each setting, dropdowns for allowed values, suggested property names,
 required properties you're missing, and defaults. Saving a file that breaks its schema asks first.
 
-SafeJSON finds the schema, in this order:
+JSONsetRight finds the schema, in this order:
 1. One you chose for the file. Click the schema name in the status bar to choose, reload, or switch off.
 2. The file's own `"$schema"` property (a web address or a path relative to the file). Web schemas
-   are downloaded once and cached in `%LOCALAPPDATA%\SafeJSON\schema-cache` for offline use.
+   are downloaded once and cached in `%LOCALAPPDATA%\JSONsetRight\schema-cache` for offline use.
 3. A filename rule in Settings, such as `appsettings*.json`.
 
 ### Text mode
@@ -50,7 +54,7 @@ side is an open tab), and every change can be undone.
 
 ### JSON5
 JSON5 files (unquoted keys, 'single quotes', hex numbers, trailing commas, comments) are edited
-the same way. SafeJSON keeps the file's style: new keys and strings are written the way the file
+the same way. JSONsetRight keeps the file's style: new keys and strings are written the way the file
 already writes them. Format isn't available for JSON5 yet.
 
 ### Guardrails
@@ -60,10 +64,10 @@ already writes them. Format isn't available for JSON5 yet.
 
 ### Safety
 - **Backups:** each save keeps the previous version (5 by default) in
-  `%LOCALAPPDATA%\SafeJSON\backups`. Use **Backups…** to restore one.
+  `%LOCALAPPDATA%\JSONsetRight\backups`. Use **Backups…** to restore one.
 - **Crash recovery:** unsaved changes are saved as drafts every 30 seconds and offered back if
-  SafeJSON closes unexpectedly.
-- **Outside changes:** if another program (e.g. VS Code) changes an open file, SafeJSON reloads
+  JSONsetRight closes unexpectedly.
+- **Outside changes:** if another program (e.g. VS Code) changes an open file, JSONsetRight reloads
   it, or asks you first if you have unsaved edits.
 - Saving writes a temporary file and then swaps it in, so a crash mid-save never corrupts a file.
 
@@ -91,11 +95,11 @@ workload. See [PLAN.md](PLAN.md) for the full design and roadmap.
 npm install          # first time only
 npm run tauri dev    # run the app with live reload
 npm test             # unit tests (engine, tree, store)
-npm run tauri build -- --no-bundle   # portable exe -> src-tauri/target/release/safejson.exe
+npm run tauri build -- --no-bundle   # portable exe -> src-tauri/target/release/jsonsetright.exe
 ```
 
 ### Signed release builds
-`npm run build:signed` builds `release\SafeJSON.exe` and signs it with Azure Artifact Signing, so
+`npm run build:signed` builds `release\JSONsetRight.exe` and signs it with Azure Artifact Signing, so
 Windows (including Smart App Control) trusts it. A Microsoft sign-in page opens in your browser
 during signing. Requirements: the Windows SDK `signtool` (included with the Visual Studio Build
 Tools) and Microsoft's Artifact Signing plug-in
@@ -122,4 +126,4 @@ files only works in the desktop app.
 
 ## License
 
-SafeJSON is released under the [MIT License](LICENSE). Copyright (c) 2026 Eric McFall.
+JSONsetRight is released under the [MIT License](LICENSE). Copyright (c) 2026 Eric McFall.

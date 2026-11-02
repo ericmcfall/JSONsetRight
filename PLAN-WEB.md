@@ -1,16 +1,20 @@
-# SafeJSON in the browser: plan
+# JSONsetRight in the browser: plan
 
-A version of SafeJSON that runs in Microsoft Edge or Google Chrome, installable like an app,
+A version of JSONsetRight that runs in Microsoft Edge or Google Chrome, installable like an app,
 alongside the existing desktop `.exe`.
 
-Status: **Planned. No code written yet.**
+> Originally written for **SafeJSON**, the app's former name; updated to **JSONsetRight**
+> (see [RENAME-PLAN.md](RENAME-PLAN.md)).
+
+Status: **Planned, on hold** (November 2026). No code written yet. Since the plan was written, the
+repository has become public, so free GitHub Pages hosting is now an alternative to Cloudflare Pages.
 
 ## Why
 
 Windows 11's **Smart App Control** blocks unsigned `.exe` files outright (no "Run anyway"), and
 code signing costs money every year. A web app has no `.exe`, so Smart App Control never gets
 involved. Edge (built into Windows) can open and save files on the PC directly, after asking
-permission, so SafeJSON keeps working on real files.
+permission, so JSONsetRight keeps working on real files.
 
 ---
 
@@ -30,7 +34,7 @@ permission, so SafeJSON keeps working on real files.
 
 ## 2. What stays the same
 
-About 85% of SafeJSON is already browser code and is reused unchanged:
+About 85% of JSONsetRight is already browser code and is reused unchanged:
 the editing engine (JSON/JSONC/JSON5, format-preserving edits, undo), schemas and hints, the tree,
 table, text (Monaco) and compare views, validation, settings UI and all tests.
 
@@ -39,7 +43,7 @@ Only four places talk to the desktop app today, all backed by 11 small Rust comm
 | File | What it does now |
 |---|---|
 | `src/platform/files.ts` | Open/save dialogs, read/save files, backups, recovery drafts, schema download |
-| `src/store/settings.ts` | Reads/writes `%LOCALAPPDATA%\SafeJSON\settings.json` |
+| `src/store/settings.ts` | Reads/writes `%LOCALAPPDATA%\JSONsetRight\settings.json` |
 | `src/ui/safety.ts` | Close-window prompt, drag-and-drop, outside-change checks, crash recovery |
 | `src/App.tsx` | Files from the command line ("Open with"), window title |
 
@@ -76,33 +80,33 @@ Recent files, `schemaPairs` and backup lookups switch from paths to ids.
 | Feature | Desktop today | Browser version |
 |---|---|---|
 | Open | Windows dialog | Edge's file picker (`showOpenFilePicker`), filtered to .json/.jsonc/.json5 |
-| Save | Temp file + rename | `createWritable()`: Edge writes a hidden copy and swaps it in on close, so a crash mid-save can't corrupt the file. First save asks "Allow SafeJSON to save changes?" |
+| Save | Temp file + rename | `createWritable()`: Edge writes a hidden copy and swaps it in on close, so a crash mid-save can't corrupt the file. First save asks "Allow JSONsetRight to save changes?" |
 | Save as | Windows dialog | `showSaveFilePicker` |
 | Recent files | Paths in settings | Stored file handles; reopening asks to allow access again (one click) |
 | Drag & drop | Tauri event | Dropped files become file handles (`getAsFileSystemHandle`) |
 | "Open with" / double-click | Command-line argument | Installed app registers as a handler for .json/.jsonc/.json5 (`file_handlers` + `launchQueue`) |
-| Backups | `%LOCALAPPDATA%\SafeJSON\backups` | IndexedDB, last N per file; same Backups… dialog |
-| Crash-recovery drafts | `%LOCALAPPDATA%\SafeJSON\recovery` | IndexedDB, same 30-second timer and Recover prompt |
+| Backups | `%LOCALAPPDATA%\JSONsetRight\backups` | IndexedDB, last N per file; same Backups… dialog |
+| Crash-recovery drafts | `%LOCALAPPDATA%\JSONsetRight\recovery` | IndexedDB, same 30-second timer and Recover prompt |
 | Settings | `settings.json` | Browser storage |
 | Changed by another program | Rust checks modified time | Re-read the file's modified time every 5 s and on focus, same prompts |
-| Unsaved changes on close | Custom dialog per tab | Browser's standard "Leave site?" warning (wording can't be customized). Closing tabs inside SafeJSON is unchanged |
+| Unsaved changes on close | Custom dialog per tab | Browser's standard "Leave site?" warning (wording can't be customized). Closing tabs inside JSONsetRight is unchanged |
 | Window title | Tauri | Page title (shown on the installed app's window) |
 | Web schemas | Rust download + disk cache | `fetch` + browser cache, so they work offline after the first time. A site that blocks browser downloads gets a clear message: download the schema and choose it in the schema dialog |
-| Schema next to the file | Read by path | Ask once: "Choose the folder containing service.json so SafeJSON can read ./service.schema.json". Remembered; the folder must contain the file (checked with `resolve()`) |
+| Schema next to the file | Read by path | Ask once: "Choose the folder containing service.json so JSONsetRight can read ./service.schema.json". Remembered; the folder must contain the file (checked with `resolve()`) |
 
 ### 3.4 Installable and offline
-- A web app manifest (name, icons, colors, file handlers) lets Edge offer **Install SafeJSON**,
+- A web app manifest (name, icons, colors, file handlers) lets Edge offer **Install JSONsetRight**,
   which adds it to the Start menu with its own window.
 - A service worker keeps a copy of the app for offline use. When a new version is published,
-  SafeJSON shows **"A new version is ready. Reload"**, never mid-edit.
-- Edge is asked to keep SafeJSON's storage permanent (`navigator.storage.persist()`), so backups
+  JSONsetRight shows **"A new version is ready. Reload"**, never mid-edit.
+- Edge is asked to keep JSONsetRight's storage permanent (`navigator.storage.persist()`), so backups
   aren't cleared when disk space is low.
 
 ### 3.5 Builds and hosting
 - `npm run build` keeps building the desktop app as today. A new `npm run build:web` builds
   the website into `dist-web/`.
 - Cloudflare Pages builds the site from GitHub on every push to `main`, at an address like
-  `https://safejson.pages.dev`. Free tier limits (500 builds/month) are far above what's needed.
+  `https://jsonsetright.pages.dev`. Free tier limits (500 builds/month) are far above what's needed.
 - Desktop and browser versions share one version number and one GitHub Release.
 
 ---
@@ -115,9 +119,9 @@ Recent files, `schemaPairs` and backup lookups switch from paths to ids.
   "Allow on every visit", which removes most of these.
 - **Full paths aren't shown.** Tabs, the status bar and recent files show the file name, not
   `C:\…\name.json`.
-- **The close warning is generic.** The browser's own "Leave site?" box, not SafeJSON's
-  per-file "Save changes?" (still used when closing a tab inside SafeJSON).
-- **Backups live in the browser.** Clearing Edge's site data for SafeJSON deletes them.
+- **The close warning is generic.** The browser's own "Leave site?" box, not JSONsetRight's
+  per-file "Save changes?" (still used when closing a tab inside JSONsetRight).
+- **Backups live in the browser.** Clearing Edge's site data for JSONsetRight deletes them.
 - **"Open with" needs the installed app**, not just a browser tab.
 
 ---
@@ -133,7 +137,7 @@ Each ends with tests passing, a commit, and something you can try.
 | **W3** | **Web safety net.** Backups, recovery drafts and settings in IndexedDB; outside-change checks; persistent storage | Backups… restores, crash recovery offers your edits, VS Code edits are noticed |
 | **W4** | **Schemas in the browser.** Web schemas with offline cache; folder permission for `./schema.json`; schema dialog picks files | `samples/service.json` gets its schema after one folder prompt; schemastore schemas work offline |
 | **W5** | **Installable & offline.** Manifest, icons, service worker, file handlers, update prompt | Edge offers Install; installed app opens .json files from File Explorer and works offline |
-| **W6** | **Hosting & release.** Cloudflare Pages project, README "Use SafeJSON in your browser", release | `https://<name>.pages.dev` works; v4.0.0 released with both versions |
+| **W6** | **Hosting & release.** Cloudflare Pages project, README "Use JSONsetRight in your browser", release | `https://<name>.pages.dev` works; v4.0.0 released with both versions |
 
 Rough size: W1 and W2 are the biggest; W3–W5 are smaller; W6 is mostly setup.
 
@@ -142,7 +146,7 @@ Rough size: W1 and W2 are the biggest; W3–W5 are smaller; W6 is mostly setup.
 ## 6. What you'll need to do
 
 1. **W6:** create a free Cloudflare account and connect it to your GitHub repo (you sign in;
-   I'll give exact steps and the build settings to enter). Choose the site name (e.g. `safejson`).
+   I'll give exact steps and the build settings to enter). Choose the site name (e.g. `jsonsetright`).
 2. **After each milestone:** try it in Edge. File pickers and permission prompts can't be
    clicked through automatically.
 
