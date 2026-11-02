@@ -9,7 +9,7 @@ import { askDialog } from "./dialog";
 const store = () => useEditor.getState();
 
 /** The HTML user guide, published from docs/ by GitHub Pages. */
-export const USER_GUIDE_URL = "https://ericmcfall.github.io/SafeJSON/user-guide/SafeJSON-User-Guide.html";
+export const USER_GUIDE_URL = "https://ericmcfall.github.io/JSONsetRight/user-guide/JSONsetRight-User-Guide.html";
 
 /** Opens the user guide in the default web browser. */
 export function openUserGuide(): void {

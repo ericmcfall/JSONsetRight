@@ -23,7 +23,7 @@ import { TreeView } from "./ui/TreeView";
 let started = false;
 
 // Lets developers inspect the editor state from the browser console while developing.
-if (import.meta.env.DEV) Object.assign(window, { safejson: useEditor });
+if (import.meta.env.DEV) Object.assign(window, { jsonsetright: useEditor });
 
 function App() {
   const tab = useEditor((s) => s.tabs.find((t) => t.id === s.activeId));
@@ -92,8 +92,8 @@ function App() {
     return () => system.removeEventListener("change", apply);
   }, [theme]);
 
-  // Window title: "settings.json ● - SafeJSON"
-  const title = tab ? `${tab.title}${isDirty(tab) ? " ●" : ""} - SafeJSON` : "SafeJSON";
+  // Window title: "settings.json ● - JSONsetRight"
+  const title = tab ? `${tab.title}${isDirty(tab) ? " ●" : ""} - JSONsetRight` : "JSONsetRight";
   useEffect(() => {
     document.title = title;
     if (isTauri()) void getCurrentWindow().setTitle(title);

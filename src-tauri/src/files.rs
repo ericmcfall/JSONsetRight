@@ -1,6 +1,6 @@
 // File access for the editor: reading, crash-safe saving, and backups.
 //
-// Backups live in %LOCALAPPDATA%\SafeJSON\backups\<file name>-<id>\ so project folders and
+// Backups live in %LOCALAPPDATA%\JSONsetRight\backups\<file name>-<id>\ so project folders and
 // git repositories stay clean. Each backup is the file as it was just before a save.
 
 use serde::Serialize;
@@ -32,14 +32,14 @@ pub fn read_text_file(path: String) -> Result<FileContents, String> {
     let size = fs::metadata(path).map_err(|e| describe(e, path))?.len();
     if size > MAX_FILE_BYTES {
         return Err(format!(
-            "{} is {:.1} MB, which is larger than SafeJSON supports (10 MB).",
+            "{} is {:.1} MB, which is larger than JSONsetRight supports (10 MB).",
             display_name(path),
             size as f64 / 1_048_576.0
         ));
     }
     let bytes = fs::read(path).map_err(|e| describe(e, path))?;
     let text = String::from_utf8(bytes).map_err(|_| {
-        format!("{} is not UTF-8 text, so SafeJSON can't open it safely.", display_name(path))
+        format!("{} is not UTF-8 text, so JSONsetRight can't open it safely.", display_name(path))
     })?;
     Ok(FileContents { text, modified_ms: modified_ms(path)? })
 }
@@ -54,7 +54,7 @@ pub fn save_text_file(path: String, text: String, backup_count: u32) -> Result<u
         make_backup(path, backup_count)?;
     }
 
-    let temp = path.with_file_name(format!(".{}.safejson-tmp", display_name(path)));
+    let temp = path.with_file_name(format!(".{}.jsonsetright-tmp", display_name(path)));
     let write = || -> std::io::Result<()> {
         let mut file = fs::File::create(&temp)?;
         file.write_all(text.as_bytes())?;
@@ -93,7 +93,7 @@ pub fn list_backups(path: String) -> Result<Vec<BackupInfo>, String> {
     Ok(backups)
 }
 
-// ---- settings: %LOCALAPPDATA%\SafeJSON\settings.json (the interface owns the format)
+// ---- settings: %LOCALAPPDATA%\JSONsetRight\settings.json (the interface owns the format)
 
 #[tauri::command]
 pub fn read_settings() -> Result<Option<String>, String> {
@@ -112,13 +112,13 @@ pub fn write_settings(contents: String) -> Result<(), String> {
         .map_err(|e| describe(e, &path))
 }
 
-/// Files named on the command line, e.g. from "Open with > SafeJSON" in File Explorer.
+/// Files named on the command line, e.g. from "Open with > JSONsetRight" in File Explorer.
 #[tauri::command]
 pub fn startup_files() -> Vec<String> {
     std::env::args().skip(1).filter(|a| !a.starts_with('-')).collect()
 }
 
-// ---- auto-recovery drafts: %LOCALAPPDATA%\SafeJSON\recovery\<id>.json
+// ---- auto-recovery drafts: %LOCALAPPDATA%\JSONsetRight\recovery\<id>.json
 // The interface decides what goes in a draft (file path, title, text); Rust only stores it.
 
 #[tauri::command]
@@ -141,7 +141,7 @@ pub fn delete_recovery_draft(id: String) -> Result<(), String> {
     }
 }
 
-/// Contents of every draft left behind (normally none, unless SafeJSON did not close cleanly).
+/// Contents of every draft left behind (normally none, unless JSONsetRight did not close cleanly).
 #[tauri::command]
 pub fn list_recovery_drafts() -> Result<Vec<String>, String> {
     let dir = recovery_dir()?;
@@ -204,11 +204,11 @@ fn backup_dir(path: &Path) -> Result<PathBuf, String> {
 
 pub fn app_data_dir() -> Result<PathBuf, String> {
     std::env::var("LOCALAPPDATA")
-        .map(|base| PathBuf::from(base).join("SafeJSON"))
+        .map(|base| PathBuf::from(base).join("JSONsetRight"))
         .map_err(|_| "Could not find the LOCALAPPDATA folder.".to_string())
 }
 
-/// Simple stable hash (the same input gives the same id in every SafeJSON version).
+/// Simple stable hash (the same input gives the same id in every JSONsetRight version).
 fn fnv1a(bytes: &[u8]) -> u64 {
     bytes.iter().fold(0xcbf29ce484222325, |hash, b| (hash ^ *b as u64).wrapping_mul(0x100000001b3))
 }
@@ -232,7 +232,7 @@ mod tests {
 
     #[test]
     fn saves_atomically_and_keeps_limited_backups() {
-        let root = std::env::temp_dir().join(format!("safejson-test-{}", now_ms()));
+        let root = std::env::temp_dir().join(format!("jsonsetright-test-{}", now_ms()));
         fs::create_dir_all(&root).unwrap();
         // Point backups at the temp folder instead of the real %LOCALAPPDATA%.
         unsafe { std::env::set_var("LOCALAPPDATA", &root) };
@@ -249,14 +249,14 @@ mod tests {
         let backups = list_backups(file_str.clone()).unwrap();
         assert_eq!(backups.len(), 2, "only the newest 2 backups are kept");
         assert_eq!(fs::read_to_string(&backups[0].path).unwrap(), "{\"v\": 2}");
-        assert!(!root.join(".settings.json.safejson-tmp").exists(), "temp file cleaned up");
+        assert!(!root.join(".settings.json.jsonsetright-tmp").exists(), "temp file cleaned up");
 
         fs::remove_dir_all(&root).unwrap();
     }
 
     #[test]
     fn rejects_non_utf8_files() {
-        let file = std::env::temp_dir().join(format!("safejson-bin-{}.json", now_ms()));
+        let file = std::env::temp_dir().join(format!("jsonsetright-bin-{}.json", now_ms()));
         fs::write(&file, [0xff, 0xfe, 0x00]).unwrap();
         let err = read_text_file(file.to_string_lossy().into_owned()).err().unwrap();
         assert!(err.contains("not UTF-8"));

@@ -1,6 +1,6 @@
 // The document model: a JSON/JSONC file's text plus its parsed syntax tree.
 //
-// SafeJSON never edits parsed values and re-prints the file. It edits the *text* directly
+// JSONsetRight never edits parsed values and re-prints the file. It edits the *text* directly
 // (see edits.ts) and re-parses afterwards, so comments, key order and formatting survive.
 import {
   createScanner,

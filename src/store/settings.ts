@@ -1,4 +1,4 @@
-// User preferences, saved to %LOCALAPPDATA%\SafeJSON\settings.json.
+// User preferences, saved to %LOCALAPPDATA%\JSONsetRight\settings.json.
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { create } from "zustand";
 import type { SchemaPairs, SchemaRule } from "../engine/schema";

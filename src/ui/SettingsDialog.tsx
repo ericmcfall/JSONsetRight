@@ -47,7 +47,7 @@ export function SettingsDialog({ onClose }: { onClose(): void }) {
         <label className="setting">
           <span>
             Backups per file
-            <small>Earlier versions kept in %LOCALAPPDATA%\SafeJSON\backups. 0 turns backups off.</small>
+            <small>Earlier versions kept in %LOCALAPPDATA%\JSONsetRight\backups. 0 turns backups off.</small>
           </span>
           <input
             type="number"

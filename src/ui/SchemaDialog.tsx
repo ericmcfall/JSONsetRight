@@ -28,7 +28,7 @@ export function SchemaDialog({ tab, onClose }: { tab: Tab; onClose(): void }) {
       <div className="dialog settings" role="dialog" aria-modal="true" aria-labelledby="schema-title">
         <h2 id="schema-title">Schema for {tab.title}</h2>
         <p className="muted">
-          A JSON Schema describes which properties and values a file may contain. SafeJSON uses it to
+          A JSON Schema describes which properties and values a file may contain. JSONsetRight uses it to
           check the file, suggest properties, and offer allowed values.
         </p>
 

@@ -1,4 +1,4 @@
-// Builds docs/user-guide/SafeJSON-User-Guide.html from the Markdown chapters in docs/user-guide.
+// Builds docs/user-guide/JSONsetRight-User-Guide.html from the Markdown chapters in docs/user-guide.
 // Run with: npm run docs
 //
 // The Markdown files are the source; the HTML page is generated, so edit the .md files and rebuild.
@@ -9,13 +9,13 @@ import { join } from "node:path";
 import { marked } from "marked";
 
 const dir = join(process.cwd(), "docs", "user-guide");
-const output = join(dir, "SafeJSON-User-Guide.html");
+const output = join(dir, "JSONsetRight-User-Guide.html");
 const version = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8")).version;
 
 // README.md is the introduction; chapters are 01-....md, 02-....md, ... in order.
 const files = ["README.md", ...readdirSync(dir).filter((f) => /^\d\d-.+\.md$/.test(f)).sort()];
 
-/** GitHub-style heading anchor: "Where SafeJSON keeps its data" -> "where-safejson-keeps-its-data". */
+/** GitHub-style heading anchor: "Where JSONsetRight keeps its data" -> "where-jsonsetright-keeps-its-data". */
 const slug = (text) =>
   text
     .toLowerCase()
@@ -69,8 +69,8 @@ const page = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SafeJSON User Guide</title>
-<meta name="description" content="How to use SafeJSON ${version}, a Windows app for editing JSON files safely.">
+<title>JSONsetRight User Guide</title>
+<meta name="description" content="How to use JSONsetRight ${version}, a Windows app for editing JSON files safely.">
 <style>
 :root {
   --bg: #ffffff; --bg-side: #f5f6f8; --text: #1f2328; --muted: #59636e; --border: #d8dee4;
@@ -138,7 +138,7 @@ footer { color: var(--muted); font-size: 13px; }
 <body>
 <div class="layout">
 <nav class="toc" aria-label="Contents">
-<p class="brand">SafeJSON</p>
+<p class="brand">JSONsetRight</p>
 <p class="version">User Guide · version ${version}</p>
 <ul>
 ${tocHtml}
@@ -146,7 +146,7 @@ ${tocHtml}
 </nav>
 <main>
 ${sections.join("\n<p class=\"top-link\"><a href=\"#introduction\">↑ Back to top</a></p>\n")}
-<footer>SafeJSON ${version} User Guide. Generated from the Markdown files in docs/user-guide.</footer>
+<footer>JSONsetRight ${version} User Guide. Generated from the Markdown files in docs/user-guide.</footer>
 </main>
 </div>
 </body>

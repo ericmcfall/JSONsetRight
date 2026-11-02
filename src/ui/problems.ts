@@ -1,15 +1,15 @@
-// All problems for a document: SafeJSON's own checks plus schema validation.
+// All problems for a document: JSONsetRight's own checks plus schema validation.
 import { findProblems, type JsonDocument, type Problem } from "../engine";
 import { schemaProblems } from "../store/schemas";
 import { pathKey } from "./tree-model";
 
 export interface ShownProblem extends Problem {
-  source: "SafeJSON" | "Schema";
+  source: "JSONsetRight" | "Schema";
 }
 
 export function allProblems(tabId: string, doc: JsonDocument): ShownProblem[] {
   return [
-    ...findProblems(doc).map((p) => ({ ...p, source: "SafeJSON" as const })),
+    ...findProblems(doc).map((p) => ({ ...p, source: "JSONsetRight" as const })),
     ...schemaProblems(tabId, doc).map((p) => ({ ...p, severity: "error" as const, source: "Schema" as const })),
   ];
 }

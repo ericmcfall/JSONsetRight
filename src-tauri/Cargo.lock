@@ -1900,6 +1900,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "jsonsetright"
+version = "3.2.0"
+dependencies = [
+ "native-tls",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-opener",
+ "ureq",
+]
+
+[[package]]
 name = "keyboard-types"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2912,20 +2926,6 @@ name = "rustversion"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
-
-[[package]]
-name = "safejson"
-version = "3.1.0"
-dependencies = [
- "native-tls",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-opener",
- "ureq",
-]
 
 [[package]]
 name = "same-file"

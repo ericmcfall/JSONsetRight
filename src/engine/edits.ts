@@ -1,4 +1,4 @@
-// Every change SafeJSON makes to a file goes through these functions.
+// Every change JSONsetRight makes to a file goes through these functions.
 //
 // Each one takes a document and returns a NEW document (the old one is never modified, which
 // makes undo simple). Each edit changes only the text it has to, then the result is re-parsed:
@@ -282,7 +282,7 @@ function insertRawProperty(doc: JsonDocument, objectPath: Path, key: string, raw
   return replaceNodeText(withPlaceholder, requireNode(withPlaceholder, [...objectPath, key]), raw);
 }
 
-const PLACEHOLDER = "safejson:placeholder";
+const PLACEHOLDER = "jsonsetright:placeholder";
 
 function replaceNodeText(doc: JsonDocument, node: Node, content: string): JsonDocument {
   return commit(doc, applyEdits(doc.text, [{ offset: node.offset, length: node.length, content }]));
@@ -309,13 +309,13 @@ function modifyText(doc: JsonDocument, path: Path, value: JsonValue | undefined,
   return modifyAtPath(doc.text, doc.root, path, value, layout, extra, doc.dialect === "json5" ? "detect" : JSON_STYLE);
 }
 
-/** Re-parses edited text. An invalid result means a bug in SafeJSON, never a user mistake. */
+/** Re-parses edited text. An invalid result means a bug in JSONsetRight, never a user mistake. */
 function commit(doc: JsonDocument, text: string): JsonDocument {
   try {
     return withText(doc, text);
   } catch (error) {
     if (error instanceof JsonSyntaxError) {
-      throw new EditError("internal", `SafeJSON blocked an edit that would have broken the file (${error.message})`);
+      throw new EditError("internal", `JSONsetRight blocked an edit that would have broken the file (${error.message})`);
     }
     throw error;
   }

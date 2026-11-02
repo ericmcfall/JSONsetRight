@@ -93,7 +93,7 @@ async function offerRecovery(): Promise<void> {
   const names = drafts.map((d) => d.title).join(", ");
   const answer = await askDialog({
     title: "Recover unsaved work?",
-    message: `SafeJSON didn't close normally last time. Unsaved changes were found for: ${names}.`,
+    message: `JSONsetRight didn't close normally last time. Unsaved changes were found for: ${names}.`,
     confirmLabel: "Recover",
     extraLabel: "Discard",
   });

@@ -1,4 +1,4 @@
-// Entry point for the Rust side of SafeJSON. The interface calls the commands listed in
+// Entry point for the Rust side of JSONsetRight. The interface calls the commands listed in
 // generate_handler! below (see src/platform/files.ts for the TypeScript side).
 mod files;
 mod schemas;

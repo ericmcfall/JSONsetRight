@@ -212,7 +212,7 @@ export function Welcome() {
   const recent = useSettings((s) => s.recentFiles);
   return (
     <div className="welcome">
-      <h1>SafeJSON</h1>
+      <h1>JSONsetRight</h1>
       <p>Edit JSON config files without worrying about commas, quotes or brackets.</p>
       <div className="welcome-buttons">
         <button type="button" className="primary" onClick={() => openFiles()}>Open a file…</button>

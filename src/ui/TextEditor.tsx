@@ -16,7 +16,7 @@ const APPLY_DELAY_MS = 400;
 // One Monaco text model per tab, so each tab keeps its own cursor and Monaco undo history.
 const models = new Map<string, Model>();
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
-let syncing = false; // true while SafeJSON itself changes the text (not the person typing)
+let syncing = false; // true while JSONsetRight itself changes the text (not the person typing)
 
 function applyNow(tabId: string) {
   const timer = timers.get(tabId);
@@ -37,7 +37,7 @@ function modelFor(setup: Setup, tab: Tab): Model {
   let model = models.get(tab.id);
   if (!model) {
     const { monaco } = setup;
-    model = monaco.editor.createModel(textOf(tab), "json", monaco.Uri.parse(`inmemory://safejson/${tab.id}.json`));
+    model = monaco.editor.createModel(textOf(tab), "json", monaco.Uri.parse(`inmemory://jsonsetright/${tab.id}.json`));
     model.setEOL(tab.history.present.format.eol === "\r\n" ? monaco.editor.EndOfLineSequence.CRLF : monaco.editor.EndOfLineSequence.LF);
     const tabId = tab.id;
     model.onDidChangeContent(() => {
@@ -124,10 +124,10 @@ export function TextEditor({ tab }: { tab: Tab }) {
   useEffect(() => {
     if (!setup) return;
     const compiled = schema.compiled;
-    const modelUri = `inmemory://safejson/${tab.id}.json`;
+    const modelUri = `inmemory://jsonsetright/${tab.id}.json`;
     const lenient = tab.placeholder || doc.dialect === "jsonc";
     setup.jsonDefaults.setDiagnosticsOptions({
-      // The JSON checker doesn't understand JSON5, so JSON5 files rely on SafeJSON's own check.
+      // The JSON checker doesn't understand JSON5, so JSON5 files rely on JSONsetRight's own check.
       validate: doc.dialect !== "json5",
       allowComments: lenient,
       trailingCommas: lenient ? "ignore" : "error",

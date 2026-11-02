@@ -2,7 +2,7 @@
 * text=auto eol=lf
 
 # Sample files are test fixtures: keep their exact bytes, because line endings matter
-# for SafeJSON's "save produces identical bytes" round-trip tests.
+# for JSONsetRight's "save produces identical bytes" round-trip tests.
 samples/** -text
 
 *.png binary

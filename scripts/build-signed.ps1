@@ -1,7 +1,7 @@
-# Builds SafeJSON.exe and signs it with Azure Artifact Signing.
+# Builds JSONsetRight.exe and signs it with Azure Artifact Signing.
 #
 # Run with:  npm run build:signed
-# Output:    release\SafeJSON.exe (signed and timestamped, ready to attach to a GitHub Release)
+# Output:    release\JSONsetRight.exe (signed and timestamped, ready to attach to a GitHub Release)
 #
 # Signing opens a Microsoft sign-in page in your browser. Sign in with the account that has the
 # "Artifact Signing Certificate Profile Signer" role on the signing account.
@@ -21,7 +21,7 @@ $dlib = Join-Path $env:LOCALAPPDATA "Microsoft\MicrosoftArtifactSigningClientToo
 if (-not $signtool) { throw "signtool.exe not found. Install the Windows SDK signing tools (Visual Studio Build Tools include them)." }
 if (-not (Test-Path $dlib)) { throw "Artifact Signing plug-in not found. Install it with: winget install -e --id Microsoft.Azure.ArtifactSigningClientTools" }
 
-Write-Host "1/3  Building SafeJSON..." -ForegroundColor Cyan
+Write-Host "1/3  Building JSONsetRight..." -ForegroundColor Cyan
 Push-Location $root
 try {
   npm run tauri build -- --no-bundle
@@ -32,8 +32,8 @@ try {
 
 $releaseDir = Join-Path $root "release"
 New-Item -ItemType Directory -Force $releaseDir | Out-Null
-$exe = Join-Path $releaseDir "SafeJSON.exe"
-Copy-Item (Join-Path $root "src-tauri\target\release\safejson.exe") $exe -Force
+$exe = Join-Path $releaseDir "JSONsetRight.exe"
+Copy-Item (Join-Path $root "src-tauri\target\release\jsonsetright.exe") $exe -Force
 
 Write-Host "2/3  Signing (a Microsoft sign-in page will open in your browser)..." -ForegroundColor Cyan
 # Only for this script's run: tells the browser sign-in which Azure directory to use.

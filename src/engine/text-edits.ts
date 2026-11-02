@@ -1,4 +1,4 @@
-// Every structural edit SafeJSON makes (set, insert, remove) for all file types (JSON, JSONC,
+// Every structural edit JSONsetRight makes (set, insert, remove) for all file types (JSON, JSONC,
 // JSON5), using the syntax tree's exact offsets. Edits touch only the text they must: layout,
 // comments, commas and quote styles elsewhere in the file are left exactly as they were.
 // (jsonc-parser's modify() re-formats the lines it touches and can't read JSON5.)

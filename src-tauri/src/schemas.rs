@@ -1,5 +1,5 @@
 // Downloads JSON Schemas referenced by URL (e.g. "$schema": "https://json.schemastore.org/...").
-// Each download is cached in %LOCALAPPDATA%\SafeJSON\schema-cache so schemas keep working
+// Each download is cached in %LOCALAPPDATA%\JSONsetRight\schema-cache so schemas keep working
 // offline. The cached copy is used first unless `refresh` is true.
 
 use crate::files::app_data_dir;

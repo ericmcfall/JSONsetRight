@@ -2,7 +2,7 @@
   "Endpoint": "https://wus2.codesigning.azure.net/",
   "CodeSigningAccountName": "ericmcfall",
   "CertificateProfileName": "SafeJSON",
-  "CorrelationId": "SafeJSON release build",
+  "CorrelationId": "JSONsetRight release build",
   "ExcludeCredentials": [
     "ManagedIdentityCredential",
     "WorkloadIdentityCredential",
